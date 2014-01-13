@@ -1,0 +1,222 @@
+<!DOCTYPE dwr PUBLIC "-//GetAhead Limited//DTD Direct Web Remoting 2.0//EN" "http://www.getahead.ltd.uk/dwr//dwr20.dtd">
+
+<!-- DWR framework (Ajax + Spring) -->
+
+<dwr>
+  <allow>
+  
+    <!-- Converters: convert any bean of the model -->
+    <convert converter="bean" match="com.cesfelipesegundo.itis.model.*" />
+
+    <!-- Converters: convert any bean of the model -->
+    <convert converter="bean" match="com.cesfelipesegundo.itis.web.GroupWithTutors" />
+
+    <!-- Converters: convert any bean from ibatis -->
+    <convert converter="bean" match="com.ibatis.sqlmap.engine.mapping.result.*" />
+     
+    <!-- Tutor: question management -->
+    <create creator="spring" javascript="QuestionMgmt">
+      <param name="beanName" value="tutorQuestionManagementController"/>
+      <include method="saveQuestion"/>
+      <include method="newAnswer"/>
+      <include method="saveAnswer"/>
+      <include method="deleteAnswer"/>
+      <include method="editAnswer"/>
+      <include method="reviewExamsByQuestion"/>
+      <include method="getCurrentQuestionAnswers"/>
+      <include method="addQuestionMmedia"/>
+      <include method="addCommentMmedia"/>
+      <include method="deleteQuestionMmedia"/>
+      <include method="deleteCommentMmedia"/>
+      <include method="changeOrderQuestionMmedia"/>
+      <include method="addAnswerMmedia"/>
+      <include method="deleteAnswerMmedia"/>
+      <include method="changeOrderAnswerMmedia"/>
+      <include method="getCurrentAnswerMmedia"/>
+      <include method="setQuestionMmediaSize"/>
+      <include method="getQuestionMmediaByID"/>
+      <include method="getCurrentAnswerMmediaByID"/>
+      <include method="isInExam"/>
+      <include method="changeOrderCommentMmedia"/>
+      <include method="removeAnswersFromQuestion"/>
+      <include method="saveFillAnswer"/>
+      <include method="editGeogebraMM"/>
+    </create>
+
+    <!-- Tutor: question LIST management -->
+    <create creator="spring" javascript="QuestionListMgmt">
+      <param name="beanName" value="tutorQuestionListManagementController"/>
+	  <include method="deleteQuestion"/>
+	  <include method="deleteQuestions"/>
+	  <include method="deleteQuestionForbiden"/>
+      <include method="changeActivityQuestion"/>
+      <include method="changeActivityQuestions"/>
+      <include method="changeVisibilityQuestions"/>
+      <include method="changeDifficultyQuestions"/>
+      <include method="changeSubjectQuestions"/>
+      <include method="filterAndSearch"/>
+      <include method="importQuestions"/>
+      <include method="preImportQuestion"/>
+      <include method="getInstitutions"/>
+      <include method="getGroupsByInstitutions"/>
+      <include method="getSubjectsByGroup"/>
+      <include method="orderQuestionList"/>
+      <include method="getInstitutionsWidthPublicQuestions"/>
+    </create>
+
+    <!-- Tutor: exam management -->
+    <create creator="spring" javascript="TutorExamMgmt">
+      <param name="beanName" value="tutorExamManagementController"/>
+	  <include method="saveConfigExam"/>
+	  <include method="addConfigExamTheme"/>
+	  <include method="deleteConfigExamTheme"/>
+	  <include method="recorrectExam"/>
+	  <include method="setPublished"/>
+	  <include method="activeConfidenceLevel"/>
+	  <include method="addUser2CustomExam"/>
+	  <include method="removeUserFromCustomExam"/>
+	  <include method="getUsersNotInCustomExam"/>
+	  <include method="setCurrentExamCustomized"/>
+    </create>
+
+     <!-- Tutor: exam LIST management -->
+    <create creator="spring" javascript="TutorConfigExamListMgmt">
+      <param name="beanName" value="tutorExamListManagementController"/>
+	  <include method="deleteConfigExam"/>
+	  <include method="deleteConfigExams"/>
+	  <include method="changeReviewExam"/>
+      <include method="sort"/>
+      <include method="setExamVisible"/>
+    </create>
+ 
+     <!-- Tutor: grade LIST management -->
+    <create creator="spring" javascript="GradeListMgmt">
+      <param name="beanName" value="tutorGradeListManagementController"/>
+      <include method="filterAndSearch"/>
+      <include method="deleteStudentExam"/>
+      <include method="gradeExam"/>
+      <include method="orderCurrentGradeList"/>
+    </create>
+
+    <!-- Tutor: theme management -->
+    <create creator="spring" javascript="ThemeListMgmt">
+      <param name="beanName" value="tutorThemeListManagementController"/>
+      <include method="addTheme"/>
+      <include method="deleteTheme"/>
+      <include method="saveTheme"/>
+      <include method="changeOrderTheme"/>
+      <include method="updateThemeListOrder"/>
+      <include method="showDetailsTheme"/>
+    </create>
+
+    <!-- Tutor: student list management -->
+    <create creator="spring" javascript="StudentListMgmt">
+      <param name="beanName" value="tutorStudentListManagementController"/>
+      <include method="registerStudent"/>
+      <include method="unRegisterStudent"/>
+      <include method="saveStudent"/>
+      <include method="checkNewUserName"/>
+      <include method="runOrderBy"/>
+      <include method="getStudents"/>
+      <include method="orderStudents"/>
+      <include method="selectStudent"/>
+      <include method="importStudents"/>
+      <include method="getUnRegisteredStudent"/>
+      <include method="importStudentsFromCurrentList"/>
+    </create>
+
+	<!-- Tutor: stats management -->
+    <create creator="spring" javascript="GroupMgmt">
+       <param name="beanName" value="learnerExamController"/>
+    </create>
+
+    <!-- Learner: exam management -->
+    <create creator="spring" javascript="ExamMgmt">
+       <param name="beanName" value="learnerExamController"/>
+       <include method="reviewExam2PDF"/>
+       <include method="updateQuestion"/>
+       <include method="reUpdateQuestion"/>
+       <include method="getExam"/>
+       <include method="updateConfidenceLevel"/>
+       <include method="updateFillAnswer"/>
+    </create>    
+  
+    <!-- Admin: group management -->
+    <create creator="spring" javascript="AdminGroupMgmt">
+      <param name="beanName" value="adminGroupManagementController"/>
+      <include method="getRegisteredStudents"/>
+      <include method="getAssignedTutors"/>
+	  <include method="getUnregisteredStudents"/>
+	  <include method="getUnassignedTutors"/>
+	  <include method="addGroup"/>
+	  <include method="saveGroup"/>
+	  <include method="assignTutor"/>
+	  <include method="registerLearner"/>
+	  <include method="unAssignTutor"/>
+	  <include method="unRegisterLearner"/>
+	  <include method="deleteGroup"/>
+	  <include method="unAssignTutorCourseView"/>
+	  <include method="unAssignUserGroup"/>
+	  <include method="getGroups"/>
+	  <include method="getGroupsByInstitution"/>
+	  <include method="showStatsByInstitution"/>
+	  <include method="getFilteredGroups"/>
+	  <include method="getUserInfoGroups"/>
+	  <include method="showGroupDetails"/>
+	  <include method="getGroupsByCourse"/>
+	  <include method="getExamsByGroup"/>
+	  <include method="getLearnersNumber"/>
+    </create>
+
+    <!-- Admin: user management -->
+    <create creator="spring" javascript="AdminUserMgmt">
+      <param name="beanName" value="adminUserManagementController"/>
+      <include method="saveUser"/>
+      <include method="checkNewUserName"/>
+      <include method="getOrderedGroups"/>
+      <include method="getFilteredUsers"/>
+    </create>
+    
+    <!-- Gonzalo was here -->
+    <!-- Admin: Course management -->
+    <create creator="spring" javascript="AdminCourseMgmt">
+      <param name="beanName" value="adminCourseManagementController"/>
+      <include method="getGroupsWithTutors"/>
+      <include method="getOrderedGroupsWithTutors"/>
+      <include method="isCodeAlreadyInUse"/>
+      <include method="getCourses"/>
+      <include method="getCourseStats"/>
+	  <include method="getCourseByInstitutionAndGroup"/>
+	  <include method="filterByCourse"/>
+    </create>
+    
+    <create creator="spring" javascript="AdminInstitutionMgmt">
+      <param name="beanName" value="adminInstitutionManagementController"/>
+      <include method="filterByUser"/>
+      <include method="filterByGroup"/>
+    </create>
+    
+    <create creator="spring" javascript="AdminMgmt">
+      <param name="beanName" value="adminManagementController"/>
+      <include method="getPreviousExamsFiltered"/>
+      <include method="getCourseStatsByExam"/>
+      <include method="getSearchUsersFiltered"/>
+      <include method="orderUserList"/>
+      <include method="orderPreviousExamsList"/>
+      <include method="findInstitution"/>
+      <include method="orderInstitutionList"/>
+      <include method="getActiveExamsFiltered"/>
+      <include method="orderActiveExamsList"/>
+      <include method="getNextExamsFiltered"/>
+      <include method="orderNextExamsList"/>
+      <include method="order100LastConectionsBy"/>
+      <include method="runFilterAndSearch100Conections"/>
+      <include method="show5LastConections"/>
+      <include method="showUsersNotVinculated"/>
+      <include method="deleteUserById"/>
+      <include method="deleteExams"/>
+      <include method="deleteAllGeneratedExamsTest"/>
+    </create>
+
+  </allow>
+</dwr>

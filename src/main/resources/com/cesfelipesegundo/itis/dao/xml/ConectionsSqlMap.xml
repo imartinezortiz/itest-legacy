@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Conections">
+	
+	
+	<select id="100LastConections" resultMap="ModelResults.ConectionsResul">
+		SELECT
+			u.idusu as idusu,
+			u.usuario as userName,
+			u.apes as surname,
+			u.nombre as name,
+			p.permiso as role,
+			u.email as email,
+			u.dni as persId,
+			u.passw as passwd,
+			c.fecha as date,
+			c.id as idConection,
+			c.ip as ip
+		FROM 
+			usuarios u,
+			conexiones c,
+      		permisos p
+		WHERE
+			u.idusu = c.idusuario AND
+     		p.usuario = u.usuario
+    	ORDER BY
+      		c.fecha DESC
+    	LIMIT 100
+	</select>
+	
+	<select id="runFilterAndSearch100Conections" parameterClass="java.util.Map" resultMap="ModelResults.ConectionsResul">
+		SELECT
+			u.idusu as idusu,
+			u.usuario as userName,
+			u.apes as surname,
+			u.nombre as name,
+			p.permiso as role,
+			u.email as email,
+			u.dni as persId,
+			u.passw as passwd,
+			c.fecha as date,
+			c.id as idConection,
+			c.ip as ip
+		FROM 
+			usuarios u,
+			conexiones c,
+      		permisos p
+		WHERE
+			u.idusu = c.idusuario AND
+     		p.usuario = u.usuario
+     		<isNotNull prepend="AND" property="idConection">
+     			c.id LIKE #idConection#
+     		</isNotNull>
+     		<isNotNull prepend="AND" property="userNameConection">
+     			u.usuario LIKE #userNameConection#
+     		</isNotNull>
+     		<isNotNull prepend="AND" property="date1">
+     			c.fecha >= #date1#
+     		</isNotNull>
+     		<isNotNull prepend="AND" property="date2">
+     			#date2# >= c.fecha
+     		</isNotNull>
+    	ORDER BY
+      		c.fecha DESC
+    	LIMIT 100
+	</select>
+	
+	<select id="show5LastConections" parameterClass="java.lang.Long" resultMap="ModelResults.ConectionsResul">
+		SELECT
+			u.idusu as idusu,
+			u.usuario as userName,
+			u.apes as surname,
+			u.nombre as name,
+			p.permiso as role,
+			u.email as email,
+			u.dni as persId,
+			u.passw as passwd,
+			c.fecha as date,
+			c.id as idConection,
+			c.ip as ip
+		FROM 
+			usuarios u,
+			conexiones c,
+      		permisos p
+		WHERE
+			u.idusu = c.idusuario AND
+     		p.usuario = u.usuario AND 
+     		u.idusu = #value#
+    	ORDER BY
+      		c.fecha DESC
+    	LIMIT 5
+	</select>
+	
+	<insert id="addNewConection" parameterClass="java.util.Map">
+		INSERT INTO 
+			conexiones (idusuario,ip) 
+		VALUES (#idUsuario#,#ip#)
+	</insert>
+
+</sqlMap>

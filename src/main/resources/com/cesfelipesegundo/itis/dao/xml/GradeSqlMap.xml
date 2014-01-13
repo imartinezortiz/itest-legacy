@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Grade">
+
+	<resultMap id="TemplateGradeResult" class="com.cesfelipesegundo.itis.model.TemplateGrade">
+		<result property="id" column="idGrade"/>
+		<result property="learner.id" column="learnerGrade"/>
+		<result property="exam.id" column="examGrade"/>
+		<result property="ip" column="ipGrade"/>
+		<result property="grade" column="gradeGrade"/>
+		<result property="begin" column="beginGrade"/>
+		<result property="end" column="endGrade"/>
+		<result property="time" column="timeGrade"/>
+	</resultMap>
+	
+	<select id="checkGrade" parameterClass="java.util.Map" resultMap="TemplateGradeResult">
+		SELECT
+			califs.idcalif AS idGrade,
+			califs.alu AS learnerGrade,
+			califs.exam AS examGrade,
+			califs.ip AS ipGrade,
+			califs.nota AS gradeGrade,
+			califs.fecha_ini AS beginGrade,
+			califs.fecha_fin AS endGrade,
+			califs.tiempo AS timeGrade
+		FROM
+			califs
+		WHERE
+			#idLearner# = califs.alu AND
+			#idExam# = califs.exam AND
+			#finalGrade# = califs.nota
+	</select>
+	<select id="selectGrade" parameterClass="java.util.Map" resultMap="TemplateGradeResult">
+		SELECT
+			califs.idcalif AS idGrade,
+			califs.alu AS learnerGrade,
+			califs.exam AS examGrade,
+			califs.ip AS ipGrade,
+			califs.nota AS gradeGrade,
+			califs.fecha_ini AS beginGrade,
+			califs.fecha_fin AS endGrade,
+			califs.tiempo AS timeGrade
+		FROM
+			califs
+		WHERE
+			#iduser# = califs.alu AND
+			#idexam# = califs.exam
+	</select>
+	
+	<!-- Given a criteria stored in a map, this query select all the Grades matching this query -->
+	<select id="selectTemplateGradesByCriteria" parameterClass="java.util.Map" resultMap="TemplateGradeResult">
+		SELECT 
+			califs.idcalif AS idGrade,
+			califs.alu AS learnerGrade,
+			usuarios.apes,
+			califs.exam AS examGrade,
+			examenes.titulo,
+			examenes.grupo,
+			califs.ip AS ipGrade,
+			califs.nota AS gradeGrade,
+			califs.fecha_ini AS beginGrade,
+			califs.fecha_fin AS endGrade,
+			califs.tiempo AS timeGrade,
+			califs.fecha_fin-califs.fecha_ini AS diferencia
+		FROM 
+			califs,
+			usuarios,
+			examenes
+		WHERE
+			usuarios.idusu = califs.alu AND
+			examenes.idexam = califs.exam
+			<isNotNull prepend="AND" property="begin">
+				califs.fecha_ini >= #begin#
+			</isNotNull>
+			<isNotNull prepend="AND" property="end">
+				#end# >= califs.fecha_fin 
+			</isNotNull>
+			<isNotNull prepend="AND" property="exam">
+				califs.exam = #exam#
+			</isNotNull>
+			<isNotNull prepend="AND" property="grade">
+				califs.nota = #grade#
+			</isNotNull>
+			<isNotNull prepend="AND" property="group">
+				examenes.grupo = #group#
+			</isNotNull>
+			<isNotNull prepend="AND" property="learner">
+				califs.alu = #learner#
+			</isNotNull>
+			<isNotNull prepend="AND" property="time">
+				califs.tiempo = #time#
+			</isNotNull>
+		<isNotNull property="preferredOrder">
+			ORDER BY $preferredOrder$ 
+		</isNotNull>
+		<isNotNull property="maxResultCount">
+			LIMIT #firstResult#, #maxResultCount#
+		</isNotNull>
+	</select>
+	
+	<!-- StatsDAOImpl -->
+	<!-- Given a group identifier, this query gets all the califs related to this group -->
+	<!-- IMPORTANT: I do not check that the exam is under revision, graded and stuff -->
+	<select id="selectCalifDatasByGroupId" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.CalifData">
+		SELECT 
+			examenes.titulo AS title,
+			examenes.nota_max AS maxGrade,
+			examenes.duracion AS duration,
+			califs.exam AS idexam,
+			califs.alu AS idalu,
+			califs.nota AS grade,
+			califs.tiempo AS time,
+			usuarios.apes AS surname,
+			usuarios.nombre AS name, 
+			usuarios.usuario AS username
+		FROM
+			examenes,
+			usuarios, 
+			califs
+		WHERE
+			examenes.grupo = #value# AND 
+			califs.exam = examenes.idexam AND 
+			usuarios.idusu = califs.alu
+		ORDER BY
+			examenes.titulo ASC
+	</select>
+	
+	<!-- StatsDAOImpl -->
+	<!-- Given a exam identifier, this query gets the calif related to this exam -->
+	<!-- IMPORTANT: I do not check that the exam is under revision, graded and stuff -->
+	<select id="selectGradeByExamId" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.Grade">
+		SELECT 
+			califs.alu AS idStudent,
+			califs.exam AS idExam,
+			califs.ip AS ip,
+			califs.nota AS grade,
+			califs.tiempo AS time,
+			califs.fecha_ini AS begin,
+			califs.fecha_fin AS end,
+			examenes.nota_max AS maxGrade
+		FROM
+			califs,
+			examenes
+		WHERE
+			califs.exam=#examen# AND
+			califs.alu =#alumno# AND
+			examenes.idexam = califs.exam
+	</select>
+	
+	<!-- Given a group identifier, this query takes some information about stats -->
+	<!-- IMPORTANT: I do not check that the exam is under revision, graded and stuff -->
+	<!-- IMPORTANT: With this query, the field maxGradePerQuestion is not filled -->
+	<select id="selectAnsweredQuestionDatasByGroupId" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.AnsweredQuestionData">
+		(
+		SELECT 
+			log_exams.exam AS idexam,
+			log_exams.alu AS idalu,
+			log_exams.preg AS id,
+			log_exams.nivel_confianza AS confidenceLevelMarked,
+			examenes.nivelConfianza AS confidenceLevelActive,
+			preguntas.titulo AS title,
+			preguntas.enunciado AS 'text',
+			preguntas.comentario AS 'comment',
+			preguntas.tipo AS 'questionType',
+			temas.tema AS subject,
+			SUM(log_exams.puntos) AS answersGradeSum,
+			SUM(log_exams.marcada) AS answered,
+			0 AS answeredWithSuccess
+		FROM
+			examenes,
+			log_exams,
+			preguntas,
+			temas
+		WHERE
+			examenes.grupo = #value# AND
+			log_exams.exam = examenes.idexam AND 
+			preguntas.idpreg = log_exams.preg AND 
+			temas.idtema = preguntas.tema
+		GROUP BY
+			log_exams.exam,
+			log_exams.alu, 
+			log_exams.preg
+		)
+		UNION(
+			SELECT
+			log_exams_fill.exam AS idexam,
+			log_exams_fill.alu AS idalu,
+			log_exams_fill.preg AS id,
+			log_exams_fill.nivel_confianza AS confidenceLevelMarked,
+			examenes.nivelConfianza AS confidenceLevelActive,
+			preguntas.titulo AS title,
+			preguntas.enunciado AS 'text',
+			preguntas.comentario AS 'comment',
+			preguntas.tipo AS 'questionType',
+			temas.tema AS subject,
+			SUM(log_exams_fill.puntos) AS answersGradeSum,
+			1 AS answered,
+			0 AS answeredWithSuccess
+		FROM
+			examenes,
+			log_exams_fill,
+			preguntas,
+			temas
+		WHERE
+			examenes.grupo = #value# AND
+			log_exams_fill.exam = examenes.idexam AND
+			preguntas.idpreg = log_exams_fill.preg AND
+			temas.idtema = preguntas.tema
+		GROUP BY
+			log_exams_fill.exam,
+			log_exams_fill.alu,
+			log_exams_fill.preg
+		)
+	</select>
+
+	<!-- Given a group identifier, this query takes some information about stats -->
+	<!-- IMPORTANT: I do not check that the exam is under revision, graded and stuff -->
+	<!-- IMPORTANT: With this query, the field maxGradePerQuestion is not filled -->
+	<select id="selectAnsweredQuestionDatasByExamId" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.AnsweredQuestionData">
+		(
+SELECT
+			log_exams.exam AS idexam,
+			log_exams.alu AS idalu,
+			log_exams.preg AS id,
+			log_exams.nivel_confianza AS confidenceLevelMarked,
+			examenes.nivelConfianza AS confidenceLevelActive,
+			preguntas.titulo AS title,
+			preguntas.enunciado AS 'text',
+			preguntas.comentario AS 'comment',
+			preguntas.tipo AS 'questionType',
+			temas.tema AS subject,
+			SUM(log_exams.puntos) AS answersGradeSum,
+			SUM(log_exams.marcada) AS answered,
+			0 AS answeredWithSuccess
+		FROM
+			log_exams,
+			preguntas,
+			temas,
+			examenes
+		WHERE
+			log_exams.exam = #value# AND
+			preguntas.idpreg = log_exams.preg AND
+			temas.idtema = preguntas.tema AND
+			examenes.idexam = log_exams.exam
+		GROUP BY
+			log_exams.exam,
+			log_exams.alu, 
+			log_exams.preg
+)
+UNION
+(
+SELECT
+			log_exams_fill.exam AS idexam,
+			log_exams_fill.alu AS idalu,
+			log_exams_fill.preg AS id,
+			log_exams_fill.nivel_confianza AS confidenceLevelMarked,
+			examenes.nivelConfianza AS confidenceLevelActive,
+			preguntas.titulo AS title,
+			preguntas.enunciado AS 'text',
+			preguntas.comentario AS 'comment',
+			preguntas.tipo AS 'questionType',
+			temas.tema AS subject,
+			SUM(log_exams_fill.puntos) AS answersGradeSum,
+			1 AS answered,
+			0 AS answeredWithSuccess
+		FROM
+			log_exams_fill,
+			preguntas,
+			temas,
+			examenes
+		WHERE
+			log_exams_fill.exam = #value# AND
+			preguntas.idpreg = log_exams_fill.preg AND
+			temas.idtema = preguntas.tema AND
+			examenes.idexam = log_exams_fill.exam
+		GROUP BY
+			log_exams_fill.exam,
+			log_exams_fill.alu,
+			log_exams_fill.preg
+)
+	</select>
+
+
+	<!-- Given an exam id, this function returns the max. grade per question -->
+	<select id="selectMaxGradePerQuestion" parameterClass="java.lang.Long" resultClass="java.lang.Double">
+		SELECT 
+			examenes.nota_max / SUM(temas_exam.n_pregs) AS value
+		FROM
+			examenes,
+			temas_exam
+		WHERE
+			examenes.idexam = #value# AND 
+			temas_exam.exam = examenes.idexam
+		GROUP BY
+			examenes.idexam
+	</select>
+
+	<select id="selectAnswersPerQuestion" parameterClass="com.cesfelipesegundo.itis.model.AnsweredQuestionData" resultClass="java.lang.Long">
+		SELECT
+			log_exams.resp AS value
+		FROM
+			log_exams
+		WHERE
+			log_exams.marcada > 0 AND
+			log_exams.exam = #idexam# AND
+			log_exams.alu = #idalu# AND
+			log_exams.preg = #id#
+	</select>
+
+	<select id="isAnswerCorrect" parameterClass="java.util.Map" resultClass="java.lang.Boolean">
+		SELECT
+			respuestas.solucion AS value
+		FROM
+			respuestas
+		WHERE
+			respuestas.preg = #questionId# AND
+			respuestas.idresp = #answerId#
+	</select>
+
+	<select id="getUserFillAnswer" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		SELECT
+		  l.resp AS 'userFillAnswer',
+		  r.texto AS 'solution'
+		FROM
+		  log_exams_fill l,
+		  respuestas r,
+		  preguntas p
+		WHERE
+		  l.preg = p.idpreg AND
+		  r.preg = p.idpreg AND
+		  l.exam = #idexam# AND
+		  l.alu = #idalu# AND
+		  l.preg = #idpreg#
+	</select>
+
+	<!-- Borra calif -->
+	<delete id="deleteStudentGrade" parameterClass="java.util.Map">
+		DELETE FROM califs WHERE alu=#stdId# AND exam=#examId#
+	</delete>
+	
+	<select id="selectGradeByGroupAndUser" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.Grade">
+		SELECT 
+			c.idcalif AS id,
+			c.alu AS idStudent,
+			c.exam AS idExam,
+			c.ip AS ip,
+			c.nota AS grade,
+			c.tiempo AS time,
+			c.fecha_ini AS begin,
+			c.fecha_fin AS end,
+			e.nota_max AS maxGrade
+		FROM
+			califs c,
+			examenes e
+		WHERE
+			e.grupo = #group# AND
+			e.idexam = c.exam AND
+			c.alu = #user#
+		ORDER BY 
+			e.fecha_fin DESC
+	</select>
+	
+	<select id="getGradesByUser" parameterClass="java.lang.String" resultClass="com.cesfelipesegundo.itis.model.Grade">
+		SELECT 
+			c.idcalif AS id,
+			c.alu AS idStudent,
+			c.exam AS idExam,
+			c.ip AS ip,
+			c.nota AS grade,
+			c.tiempo AS time,
+			c.fecha_ini AS begin,
+			c.fecha_fin AS end,
+			e.nota_max AS maxGrade
+		FROM
+			califs c,
+			examenes e,
+			usuarios u
+		WHERE
+			e.idexam = c.exam AND
+			c.alu = u.idusu AND
+			u.usuario = #value#
+		ORDER BY 
+			e.fecha_fin DESC
+	</select>
+	
+	<select id="getAnswerTestStatsByGroup" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.AnswerData">
+		SELECT
+		  l.preg AS 'questionId',
+		  l.resp AS 'id',
+		  r.texto AS 'text',
+		  l.marcada AS 'marcada',
+		  p.tipo AS 'tipoPreg',
+		  r.solucion AS 'solution'
+		FROM
+		  log_exams l,
+		  examenes e,
+		  respuestas r,
+		  preguntas p
+		WHERE
+		  l.exam = e.idexam AND
+		  r.idresp = l.resp AND
+		  p.idpreg = r.preg AND
+		  e.grupo = #value#
+		ORDER BY
+		  l.preg
+	
+		
+	</select>
+	
+	<select id="getAnswerFillStatsByGroup" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.AnswerData">
+		SELECT
+		  l.preg AS 'questionId',
+		  l.resp AS 'resp',
+		  r.texto AS 'text',
+		  p.tipo AS 'tipoPreg'
+		FROM
+		  log_exams_fill l,
+		  examenes e,
+		  respuestas r,
+		  preguntas p
+		WHERE
+		  l.exam = e.idexam AND
+		  p.idpreg = l.preg AND
+      	  r.preg = p.idpreg AND
+		  e.grupo = #value#
+		ORDER BY
+		  l.preg
+	
+		
+	</select>
+	
+	<select id="getAnswerTestStatsByExam" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.AnswerData">
+			SELECT
+			  l.preg AS 'questionId',
+			  l.resp AS 'id',
+			  r.texto AS 'text',
+			  l.marcada AS 'marcada',
+			  p.tipo AS 'tipoPreg',
+			  r.solucion AS 'solution'
+			FROM
+			  log_exams l,
+			  respuestas r,
+			  preguntas p
+			WHERE
+			  l.exam = #value# AND
+			  r.idresp = l.resp AND
+			  p.idpreg = r.preg
+			ORDER BY
+			  l.preg
+	</select>
+	
+	<select id="getAnswerFillStatsByExam" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.AnswerData">
+			SELECT
+			  l.preg AS 'questionId',
+			  l.resp AS 'resp',
+			  r.texto AS 'text',
+			  p.tipo AS 'tipoPreg'
+			FROM
+			  log_exams_fill l,
+			  respuestas r,
+			  preguntas p
+			WHERE
+			  l.exam = #value# AND
+			  l.preg = p.idpreg AND
+			  p.idpreg = r.preg
+			ORDER BY
+			  l.preg
+	</select>
+	
+	<select id="getFillAnswerStat" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.AnswerStats">
+		SELECT
+		  l.preg AS 'idQuestion',
+		  l.resp AS 'respText',
+		  r.idresp AS 'idResp',
+		  r.solucion AS 'solution',
+      	  COUNT(l.preg) AS 'markedNumber'
+		FROM
+		  log_exams_fill l,
+		  respuestas r,
+		  preguntas p
+		WHERE
+		  l.preg = #value# AND
+		  p.idpreg = l.preg AND
+		  r.preg = p.idpreg
+		GROUP BY
+		  respText
+	    ORDER BY
+	      markedNumber DESC
+	</select>
+	
+</sqlMap>

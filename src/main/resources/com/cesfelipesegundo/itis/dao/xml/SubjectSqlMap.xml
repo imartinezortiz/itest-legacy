@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Subject">
+
+
+	<select id="getAllSubjects" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.Subject">
+		(SELECT 
+			idtema AS id,
+			temas.tema AS subject,
+			orden AS "order",
+			"0" AS usedInExam			
+		FROM 
+			temas
+		WHERE 
+			temas.grupo = #value# AND
+			temas.idtema NOT IN (SELECT tema FROM temas_exam))
+		UNION
+		
+	</select>
+	
+	<!-- Consulta parametrizada por id -->	
+	<select id="getSubject" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.Subject">
+		(SELECT 
+			idtema AS id,
+			tema AS subject,
+			orden AS "order",
+			'1' AS usedInExam
+		 FROM 
+			temas
+		 WHERE 
+			temas.idtema = #value# AND idtema IN (SELECT tema FROM temas_exam)
+		 LIMIT 1)
+		UNION
+		(SELECT 
+			idtema AS id,
+			tema AS subject,
+			orden AS "order",
+			'0' AS usedInExam
+		 FROM 
+			temas
+		 WHERE 
+			temas.idtema = #value# AND idtema NOT IN (SELECT tema FROM temas_exam)
+		 LIMIT 1)
+	</select>
+
+	<!-- Insercion de tema -->
+	<insert id="insertSubject" parameterClass="com.cesfelipesegundo.itis.model.Subject">
+		INSERT INTO 
+			temas (tema,orden,grupo)
+		VALUES
+			(#subject#,#order#,#group.id#)
+		<selectKey keyProperty="id" resultClass="java.lang.Long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>	
+
+	<!-- Actualiza tema -->
+	<update id="updateSubject" parameterClass="com.cesfelipesegundo.itis.model.Subject">
+		UPDATE temas
+		SET
+			tema = #subject#,
+			orden = #order#
+			<isNotNull prepend="," property="group.id">
+				grupo = #group.id#
+			</isNotNull>
+		WHERE 
+			idtema = #id#
+	</update>	
+
+	<!-- Borra tema -->
+	<delete id="deleteSubject" parameterClass="com.cesfelipesegundo.itis.model.Subject">
+		DELETE FROM temas WHERE idtema=#id#
+	</delete>
+
+
+	<!--
+		Themes: the usedInExam is a derived field, not stored.
+	-->
+	<select id="getSubjectsByGroupId" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.Subject">
+		(SELECT 
+			idtema AS id,
+			temas.tema AS subject,
+			orden AS "order",
+			"0" AS usedInExam			
+		FROM 
+			temas
+		WHERE 
+			temas.grupo = #value# AND
+			temas.idtema NOT IN (SELECT tema FROM temas_exam))
+		UNION
+		(SELECT 
+			idtema AS id,
+			temas.tema AS subject,
+			orden AS "order",
+			"1" AS usedInExam			
+		FROM 
+			temas
+		WHERE 
+			temas.grupo = #value# AND
+			temas.idtema IN (SELECT tema FROM temas_exam))
+	</select>
+	
+	<select id="getSubjectByQuestionId" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.Subject">
+		SELECT 
+			idtema AS id,
+			t.tema AS subject,
+			orden AS "order",
+			"0" AS usedInExam			
+		FROM 
+			temas t,
+			preguntas p
+		WHERE 
+			p.tema = t.idtema AND
+			p.idpreg = #value#
+		</select>
+	
+	<!-- Returns syllabus from a given group id -->
+	<!-- Subjects appear ordered from first to last -->
+	<!-- Does not calculate usedInExam derived field, just put it to zero -->
+	<select id="getSubjectsByGroupIdOrderByOrdenAsc" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.Subject">
+		SELECT
+			idtema AS id,
+			temas.tema AS subject,
+			orden AS "order",
+			"0" AS usedInExam
+		FROM
+			temas
+		WHERE
+			temas.grupo = #value#
+		ORDER BY temas.orden ASC
+	</select>
+	
+	<!-- Number of questions for a given theme -->
+	<select id="getNumQuestionsBySubjectId" parameterClass="java.lang.Long" resultClass="java.lang.Long">
+		SELECT count(idpreg)
+		FROM preguntas
+		WHERE preguntas.tema = #value# 
+	</select>
+	
+	<!-- List of questions for a given subject and group id -->
+	<select id="getQuestionsBySubjectAndGroupId" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.TemplateExamQuestion">
+		SELECT
+			idpreg AS id,
+			titulo AS title,
+			enunciado AS text,
+			dificultad AS difficulty,
+			visibilidad AS visibility,
+			comentario AS comment,
+			activa AS active,
+			n_resp_correctas AS numCorrectAnswers,
+			"0" AS usedInExam
+		FROM
+			preguntas
+		WHERE
+			preguntas.tema = #subjectId# AND preguntas.grupo = #groupId#
+	</select>
+	
+	<!-- Number of questions for a given subject, group and difficulty -->
+	<select id="getQuestionsNumber" parameterClass="java.util.Map" resultClass="java.lang.Long">
+		SELECT 
+			COUNT(*) 
+		FROM 
+			preguntas
+		WHERE
+			preguntas.activa = 1 AND
+			preguntas.dificultad = #difficulty# AND 
+			preguntas.grupo = #groupId# AND 
+			preguntas.tema = #subjectId# 
+			<isNotNull prepend="AND" property="questionType">
+		    	preguntas.tipo = #questionType# 
+		    </isNotNull>
+			
+	</select>
+	
+	<!-- Number min of answer for a given subject, group and difficulty -->
+	<select id="getAnswerMinNumber" parameterClass="java.util.Map" resultClass="java.lang.Long">
+		
+		SELECT 
+			min(resp) 
+		FROM(
+	      		(
+	    			SELECT
+	      				count(respuestas.idresp) as resp
+					FROM
+						preguntas,respuestas
+					WHERE
+						
+						preguntas.activa = 1 AND
+						preguntas.dificultad = #difficulty# AND 
+						preguntas.grupo = #groupId# AND 
+						preguntas.tema = #subjectId# AND
+						preguntas.idpreg = respuestas.preg 
+						<isNotNull prepend="AND" property="questionType">
+					    	preguntas.tipo = #questionType# 
+					    </isNotNull>
+				    GROUP BY
+						  preguntas.idpreg
+				    ORDER BY
+					    resp asc
+	      		)
+			UNION(
+	
+	    			SELECT
+	      				0 as resp
+					FROM
+						preguntas
+					WHERE
+						preguntas.activa = 1 AND
+						preguntas.dificultad = #difficulty# AND 
+						preguntas.grupo = #groupId# AND 
+						preguntas.tema = #subjectId# AND
+						preguntas.idpreg NOT IN(select respuestas.preg from respuestas) 
+						<isNotNull prepend="AND" property="questionType">
+					    	preguntas.tipo = #questionType# 
+					    </isNotNull>
+				    GROUP BY
+						  preguntas.idpreg
+				    ORDER BY
+					    resp asc
+				)
+
+			) tab
+		ORDER BY
+			    resp asc
+		
+	</select>
+	
+	<select id="getTotalQuestionLow" parameterClass="java.util.Map" resultClass="java.lang.Long">
+		SELECT 
+			COUNT(*) 
+		FROM 
+			preguntas
+		WHERE
+			preguntas.dificultad = #difficulty# AND 
+			preguntas.grupo = #groupId# AND 
+			preguntas.tema = #subjectId#
+			<isNotNull prepend="AND" property="questionType">
+		    	preguntas.tipo = #questionType# 
+		    </isNotNull>
+	</select>
+	
+	<select id="getAllSubjectsNumber" resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*)
+		FROM 
+			asignaturas
+	</select>
+	
+	<select id="isThemeRepeat" parameterClass="java.util.Map" resultClass="java.lang.Boolean">
+		SELECT
+			COUNT(*)
+		FROM
+			temas
+		WHERE
+			temas.tema = #tema# AND
+			temas.grupo = #grupo#
+		LIMIT 1
+		
+	</select>
+</sqlMap>

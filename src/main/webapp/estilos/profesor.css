@@ -1,0 +1,126 @@
+/*********************----------------------------------------------*********************/
+/*********************------------ INTERFAZ DEL PROFESOR -----------*********************/
+/*********************-- Clases añdidas por Alfredo. {4,5}/11/06 --*********************/
+/*********************----------------------------------------------*********************/
+
+/*#opcionesmitadizq{
+	position: relative; left: 0%; width: 50%; margin-top: 2pt; text-align:left; font-size:14px;
+}
+
+#opcionesmitadder{
+	position: relative; left:50%; width: 50%; margin-top: 2pt; text-align:left; font-size:14px; clear:right; 
+}
+
+#opcionescentro{
+	position: relative;	width: 100%; text-align:center; font-size:14px; border:
+}*/
+
+/* ------------------------------------------------------------------------------------- */
+
+legend{
+		font-size:16px; font-weight:bold;
+}
+
+/* ------------------------------------------------------------------------------------- */
+
+.listado {
+text-align:left; width: 100%
+}
+
+.listado th{
+background-color:#CCCCCC; font-weight:bold
+}
+
+.opcioneslistado{
+width:50%
+}
+
+.tabla2mitades{
+text-align:left; width:100%;
+}
+
+.columnamitad{
+width:50%
+}
+
+.setespecial{
+background-color: #FFECD9
+}
+
+.setrespuesta{
+background-color:#E8E8D0;
+}
+
+.setherramienta{
+border: ridge 3px olive;
+}
+
+.divenunciadoizq{
+/*width:59%; height:50% ; position:absolute;*/
+	width: 59%; float: left;
+}
+
+.divenunciadoder{
+/*width:40%; height:51% ; position:relative; left: 61% */
+	width: 38%; float: right; clear: right;
+}
+
+.divrespuestaizq{
+/*width:59%; height:25% ; position:absolute; top:55%*/
+	width: 59%; float: left;
+}
+
+.divrespuestader{
+/*width:40%; height:25% ; position:relative; top:75%; left: 61%*/
+	width: 38%; float: right; clear: right;
+}
+
+.divmitadizq{
+/*position:fixed; width:50%;*/
+	width: 50%; float: left;
+}
+
+.divmitadder{
+/*position: relative; left:50%; width:50%*/
+	width: 50%; float: right; clear: right;
+}
+
+.divsolomitadizq{
+/*position: relative; width:50%; */
+	width: 50%;
+}
+
+.divcentro{
+clear: both;
+}
+
+
+/* Group main tasks */
+.divDosIzq, .divDosDer {
+   text-align: left;
+   font-size:12pt;
+   color:#660033;
+   padding:1%;
+}
+
+.divDosIzq {
+	width: 45%; float: left;
+}
+
+.divDosDer {
+	width: 45%; float: right; clear: right;
+}
+
+
+/* Options for main menu for a group */
+.listaopcionesgroup a{
+		text-decoration:none; color:#660033;
+}
+
+.listaopcionesgroup li {
+	display: block; font-size: 11pt; margin:5pt;
+}
+
+.listaopcionesgroup a:hover{
+	color:#330099; background-color:#FFFFCC; font-weight: bold;
+}

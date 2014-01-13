@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+    <bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <!-- Interfaz Profesor -->
+                <prop key="/tutor/index.itest">indexTutorController</prop>
+                <prop key="/tutor/list_Group.itest">TutorGroupImportController</prop>
+                <prop key="/tutor/managegroup.itest">tutorGroupMultiController</prop>
+                <prop key="/tutor/managequestion.itest">tutorQuestionMultiController</prop>
+                <prop key="/tutor/manageconfigexam.itest">tutorExamMultiController</prop>
+                <prop key="/tutor/fileupload.itest">fileUploadController</prop>
+                <!-- Interfaz Alumno -->                
+                <prop key="/learner/index.itest">indexLearnerController</prop>
+                <prop key="/learner/newexam.itest">learnerExamMultiController</prop>
+                <!-- Interfaz Administrador -->
+                <prop key="/admin/index.itest">indexAdminController</prop>
+                <prop key="/admin/admin.itest">adminMultiController</prop>
+                <prop key="/admin/institution.itest">adminInstitutionMultiController</prop>
+                <!-- Common funcionalities (multicontroller) -->
+                <prop key="/common/index.itest">commonMultiController</prop>
+            </props>
+        </property>
+    </bean>
+
+</beans>

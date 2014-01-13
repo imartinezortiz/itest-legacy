@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 	xmlns="http://www.springframework.org/schema/beans"
+       	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       	xmlns:jee="http://www.springframework.org/schema/jee"
+		xsi:schemaLocation=" 
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.0.xsd">
+	
+	<!-- Iván: DAOs de Prueba -->
+	<!-- Comentarlos cuando no hagan falta	-->
+		
+	<!-- DATASOURCE -->
+	
+	<!-- Definición manual de la conexión a BBDD -->
+	<!-- La utiliza JOSELE para los JUnit -->
+	<!-- 
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+		<property name="url" value="jdbc:mysql://localhost:3306/bd_itest"/>
+        <property name="username" value="uitest"/>
+        <property name="password" value="cambiar!"/>
+    </bean> 
+    -->
+	<!-- Integración de Spring con la gestión del Pool de base  -->	
+	<jee:jndi-lookup id="dataSource" jndi-name="java:/comp/env/jdbc/iTestDB"/>
+   
+	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="classpath:com/cesfelipesegundo/itis/dao/config/ibatis.xml"/>
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+
+	<!-- DAOS JOSELE -->
+
+	<bean id="answerExamDAO" class="com.cesfelipesegundo.itis.dao.AnswerExamDAOImpl" >
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>	
+	
+	<bean id="basicDataExamDAO" class="com.cesfelipesegundo.itis.dao.BasicDataExamDAOImpl" >
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>	
+
+	<bean id="configExamDAO" class="com.cesfelipesegundo.itis.dao.ConfigExamDAOImpl" >
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>	
+
+	<bean id="courseDAO" class="com.cesfelipesegundo.itis.dao.CourseDAOImpl" >
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+
+	<bean id="examDAO" class="com.cesfelipesegundo.itis.dao.ExamDAOImpl" >
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>	
+
+	<bean id="groupDAO" class="com.cesfelipesegundo.itis.dao.GroupDAOImpl" >
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+
+	<bean id="templateExamAnswerDAO" class="com.cesfelipesegundo.itis.dao.TemplateExamAnswerDAOImpl" >
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+
+	<bean id="templateExamDAO" class="com.cesfelipesegundo.itis.dao.TemplateExamDAOImpl" >
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>	
+	
+    <bean id="templateExamQuestionDAO" class="com.cesfelipesegundo.itis.dao.TemplateExamQuestionDAOImpl" >
+	    <property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+
+	<bean id="userDAO" class="com.cesfelipesegundo.itis.dao.UserDAOImpl" >
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>	
+	
+	<bean id="templateGradeDAO" class="com.cesfelipesegundo.itis.dao.TemplateGradeDAOImpl" >
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>	
+	
+	
+	<bean id="statsDAO" class="com.cesfelipesegundo.itis.dao.StatsDAOImpl" >
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>	
+
+	<bean id="subjectDAO" class="com.cesfelipesegundo.itis.dao.SubjectDAOImpl" >
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>	
+		
+	<bean id="institutionDAO" class="com.cesfelipesegundo.itis.dao.InstitutionDAOImpl">
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>		
+	
+	<bean id="conectionsDAO" class="com.cesfelipesegundo.itis.dao.ConectionsDAOImpl">
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>		
+	<bean id="retrievePasswordDAO" class="com.cesfelipesegundo.itis.dao.RetrievePasswordDAOImpl">
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+
+</beans>

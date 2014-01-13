@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<!-- CONFIGURACION DE DAO -->
+	<import resource="classpath:com/cesfelipesegundo/itis/web/config/spring-dao.xml" />
+
+	<!-- CONTROLLER, PARTE DE SPRINGAPP-CONTROLLER.XML, INCORPORADO AQUI PARA TEST -->
+	<bean id="listadoCentrosController" class="com.cesfelipesegundo.itis.biz.controller.ListadoCentrosController">
+		<property name="centrosDAO" ref="centrosDao"/>
+	</bean>
+	
+</beans>

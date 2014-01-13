@@ -1,0 +1,81 @@
+<!--
+    Configuration of iTest Application Tomcat Context
+    
+    See: http://tomcat.apache.org/tomcat-5.5-doc/config/context.html
+-->
+<Context swallowoutput="true">
+<!-- 
+    Database configuration
+
+    maxActive: Maximum number of dB connections in pool. Make sure you
+    configure your mysqld max_connections large enough to handle
+    all of your db connections. Set to 0 for no limit.
+
+    maxIdle: Maximum number of idle dB connections to retain in pool.
+    Set to -1 for no limit.  See also the DBCP documentation on this
+    and the minEvictableIdleTimeMillis configuration parameter.
+
+    maxWait: Maximum time to wait for a dB connection to become available
+    in ms, in this example 10 seconds. An Exception is thrown if
+    this timeout is exceeded.  Set to -1 to wait indefinitely.
+
+    username and password: MySQL dB username and password for dB connections
+
+    driverClassName: Class name for the old mm.mysql JDBC driver is
+    org.gjt.mm.mysql.Driver - we recommend using Connector/J though.
+    Class name for the official MySQL Connector/J driver is com.mysql.jdbc.Driver.
+
+    url: The JDBC connection url for connecting to your MySQL dB.
+    The autoReconnect=true argument to the url makes sure that the
+    mm.mysql JDBC Driver will automatically reconnect if mysqld closed the
+    connection.  mysqld by default closes idle connections after 8 hours.
+
+    removeAbandoned: If true abandoned dB connections are removed and recycled.
+
+    removeAbandonedTimeout: set the number of seconds a dB connection has been 
+    idle before it is considered abandoned.
+
+    logAbandoned: attribute can be set to true if you want DBCP to log a stack trace 
+    of the code which abandoned the dB connection resources.
+    
+    testOnBorrow & validationQuery Parameters used to test the connection availability 
+    before is returned to the application
+-->
+  <Resource     name="jdbc/iTestDB" 
+                auth="Container" 
+                type="javax.sql.DataSource"
+                maxActive="50" maxIdle="10" maxWait="10000"
+                testOnBorrow="true" validationQuery="SELECT 1 FROM DUAL" 
+                username="itest" password="itest" driverClassName="com.mysql.jdbc.Driver"
+                url="jdbc:mysql://localhost:3306/itest?autoReconnect=true&amp;useUnicode=yes&amp;characterEncoding=UTF-8"/>
+                
+<!-- 
+    Mail Session Configuration
+	
+    mail.smtp.host  Mail server, IP preferred to avoid DNS lookup
+    				(ucsmtp.ucm.es tiene como direccion 147.96.1.163)
+    mail.user       Mail user account (optional)
+    password        Mail account password (optional)
+-->
+  <Resource		name="mail/itestSession" 
+  				auth="Container"
+            	type="javax.mail.Session"
+            	mail.smtp.host="147.96.1.163" />
+
+<!-- 
+    User Authentication Realm configuration using a JDBC Datasource through JNDI
+
+    See: http://tomcat.apache.org/tomcat-5.5-doc/realm-howto.html#DataSourceRealm
+-->
+    <Realm  className="org.apache.catalina.realm.DataSourceRealm" 
+            digest="md5"
+            dataSourceName="jdbc/iTestDB"
+            localDataSource="true"
+            roleNameCol="permiso"
+            userCredCol="passw"
+            userNameCol="usuario"
+            userRoleTable="permisos"
+            userTable="usuarios"
+            debug="99"
+             />
+</Context>

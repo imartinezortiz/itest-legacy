@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.0.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+
+
+	<!-- The transactional advice (i.e. what 'happens'; see the <aop:advisor/> bean below) -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<!-- the transactional semantics... -->
+		<tx:attributes>
+			<tx:method name="*" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- similarly, don't forget the PlatformTransactionManager -->
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	 <bean id="mailSender"
+		class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="session" ref="mailSession" />
+	</bean>
+	
+	
+	<!--<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+	        <property name="host" value="smtp.gmail.com"/>
+	        <property name="port" value="25"/>
+	        <property name="username" value="usuario@gmail.com"/>
+	        <property name="password" value="contraseña"/>
+	        <property name="javaMailProperties">
+	            <props>
+	                <prop key="mail.transport.protocol">smtp</prop>
+	                <prop key="mail.smtp.auth">true</prop>
+	                <prop key="mail.smtp.starttls.enable">true</prop>
+	                <prop key="mail.debug">true</prop>
+	            </props>
+	        </property>
+	    </bean>-->
+	 
+
+	<!-- this is a template message that we can pre-load with default state -->
+	<bean id="templateMessage"
+		class="org.springframework.mail.SimpleMailMessage">
+		<property name="from" value="iTest" />
+		<property name="to" value="itest@ajz.ucm.es" />
+		<property name="subject"
+			value="Informe automático de error: Excepción en iTest" />
+	</bean>
+	
+	<bean id="myErrorReporter"
+		class="com.cesfelipesegundo.itis.biz.ErrorReportingAspect">
+		<property name="mailSender" ref="mailSender" />
+		<property name="templateMessage" ref="templateMessage" />
+		<property name="order" value="2" />
+	</bean>
+	
+  
+    <bean id="mailSenderManagementService" class="com.cesfelipesegundo.itis.biz.MailSenderManagementServiceImpl">
+        <property name="mailSender" ref="mailSender"/>
+    </bean>
+
+
+	<bean id="myDatabaseTransaction"
+		class="com.cesfelipesegundo.itis.biz.DatabaseTransactionsAspect">
+		<property name="maxRetries" value="3" />
+		<property name="order" value="1" />
+	</bean>
+
+	<bean id="profiler"
+		class="com.cesfelipesegundo.itis.biz.profiling.ProfilerAspect">
+		<property name="profilingStrategy" ref="jamonProfilingStrategy" />
+		<property name="order" value="3" />
+	</bean>
+
+	<bean id="jamonProfilingStrategy"
+		class="com.cesfelipesegundo.itis.biz.profiling.JamonProfilingStrategy"
+		init-method="reset" destroy-method="report">
+	</bean>
+
+	<aop:config>
+		<aop:pointcut id="businessService"
+			expression="execution(* com.cesfelipesegundo.itis.biz.*.*(..))" />
+		<aop:advisor advice-ref="txAdvice"
+			pointcut-ref="businessService" />
+		<aop:aspect id="myErrorManagementAspect"
+			ref="myErrorReporter">
+			<aop:after-throwing pointcut-ref="businessService"
+				throwing="exception" method="doErrorReport" />
+		</aop:aspect>
+		<aop:aspect id="myRetryTransactionAspect"
+			ref="myDatabaseTransaction">
+			<aop:around pointcut-ref="businessService"
+				method="doDatabaseOperation" />
+		</aop:aspect>
+		<aop:aspect id="myProfilerAspect"
+			ref="profiler">
+			<aop:around pointcut-ref="businessService"
+				method="doProfile" />
+		</aop:aspect>
+	</aop:config>
+
+	<!-- IntegraciÃ³n de Spring con la gestiÃ³n del Pool de base  -->
+	<jee:jndi-lookup id="mailSession"
+		jndi-name="java:/comp/env/mail/itestSession" />
+
+	<bean id="userManagementService"
+		class="com.cesfelipesegundo.itis.biz.UserManagementServiceImpl">
+		<property name="userDAO" ref="userDAO" />
+		<property name="conectionsDAO" ref="conectionsDAO" />
+	</bean>
+
+	<bean id="tutorManagementService"
+		class="com.cesfelipesegundo.itis.biz.TutorManagementServiceImpl">
+		<property name="groupDAO" ref="groupDAO" />
+		<property name="courseDAO" ref="courseDAO" />
+		<property name="templateExamQuestionDAO"
+			ref="templateExamQuestionDAO" />
+		<property name="templateExamAnswerDAO"
+			ref="templateExamAnswerDAO" />
+		<property name="configExamDAO" ref="configExamDAO" />
+		<property name="templateGradeDAO" ref="templateGradeDAO" />
+		<property name="statsDAO" ref="statsDAO" />
+		<property name="templateExamDAO" ref="templateExamDAO" />
+		<property name="userDAO" ref="userDAO" />
+		<property name="examDAO" ref="examDAO" />
+		<property name="subjectDAO" ref="subjectDAO" />
+		<property name="rootPath" value="/common/mmedia/" />
+	</bean>
+
+	<bean id="learnerManagementService"
+		class="com.cesfelipesegundo.itis.biz.LearnerManagementServiceImpl">
+		<property name="basicDataExamDAO" ref="basicDataExamDAO" />
+		<property name="userDAO" ref="userDAO" />
+		<property name="configExamDAO" ref="configExamDAO" />
+		<property name="templateExamDAO" ref="templateExamDAO" />
+		<property name="answerExamDAO" ref="answerExamDAO" />
+		<property name="examDAO" ref="examDAO" />
+		<property name="templateExamQuestionDAO"
+			ref="templateExamQuestionDAO" />
+		<property name="templateGradeDAO" ref="templateGradeDAO" />
+		<property name="groupDAO" ref="groupDAO" />
+		<property name="subjectDAO" ref="subjectDAO" />
+		<property name="rootPath" value="/common/mmedia/" />
+	</bean>
+
+	<bean id="adminManagementService"
+		class="com.cesfelipesegundo.itis.biz.AdminManagementServiceImpl">
+		<property name="institutionDAO" ref="institutionDAO" />
+		<property name="userDAO" ref="userDAO" />
+		<property name="courseDAO" ref="courseDAO" />
+		<property name="groupDAO" ref="groupDAO" />
+		<property name="subjectDAO" ref="subjectDAO" />
+		<property name="examDAO" ref="examDAO" />
+		<property name="tutorManagementService"
+			ref="tutorManagementService" />
+			<property name="learnerManagementService"
+			ref="learnerManagementService" />
+		<property name="conectionsDAO" ref="conectionsDAO"/>
+	</bean>
+
+	<bean id="commonManagementService"
+		class="com.cesfelipesegundo.itis.biz.CommonManagementService">
+		<property name="userDAO" ref="userDAO" />
+		<property name="retrievePasswordDAO" ref="retrievePasswordDAO" />
+	</bean>
+
+</beans>

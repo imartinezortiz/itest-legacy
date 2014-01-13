@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="User">
+	<!-- Consulta parametrizada por apodo de usuario -->
+	<select id="selectByUserName" parameterClass="java.lang.String" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT
+			idusu as id,
+			u.usuario as userName,
+			apes as surname,
+			nombre as name,
+			permiso as role,
+			email as email,
+			dni as persId,
+			passw as passwd
+		FROM usuarios u,permisos p
+		WHERE u.usuario = #value# and u.usuario=p.usuario
+	</select>
+	
+	<select id="getUsersByFilter" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT
+			idusu as id,
+			u.usuario as userName,
+			apes as surname,
+			nombre as name,
+			permiso as role,
+			email as email,
+			dni as persId,
+			passw as passwd
+		FROM 
+			usuarios u,
+			permisos p
+		WHERE 
+			u.usuario=p.usuario
+			AND u.centro=#Institution#
+			<isNotNull prepend="AND" property="dni">
+			u.dni LIKE #dni#
+			</isNotNull>
+			<isNotNull prepend="AND" property="name">
+			u.nombre LIKE #name#
+			</isNotNull>
+			<isNotNull prepend="AND" property="surname">
+			u.apes LIKE #surname#
+			</isNotNull>
+			<isNotNull prepend="AND" property="userName">
+			u.usuario LIKE #userName#
+			</isNotNull>
+			<isNotNull prepend="AND" property="typeUser">
+			p.permiso LIKE #typeUser#
+			</isNotNull>
+		ORDER BY 
+			u.apes
+			
+	</select>
+
+
+	<select id="getUsersSearched" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT
+			idusu as id,
+			u.usuario as userName,
+			apes as surname,
+			nombre as name,
+			permiso as role,
+			email as email,
+			dni as persId,
+			passw as passwd
+		FROM 
+			usuarios u,
+			permisos p
+		WHERE 
+			u.usuario=p.usuario
+			<isNotNull prepend="AND" property="id">
+			u.idusu = #id#
+			</isNotNull>
+			<isNotNull prepend="AND" property="dni">
+			u.dni LIKE #dni#
+			</isNotNull>
+			<isNotNull prepend="AND" property="name">
+			u.nombre LIKE #name#
+			</isNotNull>
+			<isNotNull prepend="AND" property="surname">
+			u.apes LIKE #surname#
+			</isNotNull>
+			<isNotNull prepend="AND" property="userName">
+			u.usuario LIKE #userName#
+			</isNotNull>
+			<isNotNull prepend="AND" property="typeUser">
+			p.permiso LIKE #typeUser#
+			</isNotNull>
+		ORDER BY 
+			u.apes
+			
+	</select>
+	<!-- Consulta de usuario parametrizada por id de usuario -->
+	<select id="getUserById" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT
+			u.idusu as id,
+			u.usuario as userName,
+			u.apes as surname,
+			u.nombre as name,
+			p.permiso as role,
+			u.email as email,
+			u.dni as persId,
+			passw as passwd
+		FROM 
+			usuarios u,permisos p
+		WHERE 
+			idusu = #value# and u.usuario=p.usuario
+		LIMIT 1
+	</select>
+
+	<!-- Consulta de usuario parametrizada por id de usuario y password -->
+	<select id="getUserByIdAndPassw" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT
+			u.idusu as id,
+			u.usuario as userName,
+			u.apes as surname,
+			u.nombre as name,
+			p.permiso as role,
+			u.email as email,
+			u.dni as persId,
+			passw as passwd
+		FROM 
+			usuarios u,permisos p
+		WHERE 
+			idusu = #userId# and passw = md5(#pass#) and u.usuario=p.usuario
+		LIMIT 1
+	</select>	
+
+	<!-- Solo se actualiza la contraseña -->
+	<update id="updateUserPassword" parameterClass="java.util.Map">
+		UPDATE 
+			usuarios 
+		SET 
+			passw = md5(#pass#)
+		WHERE 
+			idusu = #userId#
+	</update>
+
+	<!-- Actualizacion de todos los datos del usuario que no sean null.
+	     IMPORTANTE: id no puede ser null Y NO SE ACTUALIZA EL NOMBRE DE USUARIO -->
+	<update id="updateUserData" parameterClass="java.util.Map">
+		UPDATE 
+			usuarios
+		SET
+			nombre = #user.name#,
+			apes = #user.surname#,
+			dni = #user.persId#
+			<isNotNull prepend="," property="inst.id">
+				centro = #inst.id#
+			</isNotNull>
+			<isNotNull prepend="," property="user.email">
+				email = #user.email#
+			</isNotNull>
+			<isNotNull prepend="," property="user.passwd">
+				passw = md5(#user.passwd#)
+			</isNotNull>
+		WHERE 
+			idusu = #user.id#
+	</update>
+
+	<!-- Actualizacion de role -->
+	<update id="updateUserRoleByUserName" parameterClass="com.cesfelipesegundo.itis.model.User">
+		UPDATE 
+			permisos
+		SET
+			permiso = #role#
+		WHERE
+			usuario = #userName#
+	</update>
+		
+	<!-- Se utiliza un mapa como entrada para insertar el centro -->
+	<insert id="insertUserData" parameterClass="java.util.Map">
+		INSERT INTO 
+			usuarios (dni,nombre,apes,centro,email,usuario,passw)
+		VALUES
+			(#user.persId#,#user.name#,#user.surname#,#inst.id#,#user.email#,#user.userName#,md5(#user.passwd#))
+		<selectKey resultClass="java.lang.Long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<!-- Solo el rol -->
+	<insert id="insertUserRole" parameterClass="com.cesfelipesegundo.itis.model.User">
+		INSERT INTO 
+			permisos (usuario,permiso)
+		VALUES
+			(#userName#,#role#)
+	</insert>	
+	
+	<!-- Registro de alumno -->
+	<insert id="registerStudent" parameterClass="java.util.Map">
+		INSERT INTO 
+			matriculas (alumno,grupo)
+		VALUES
+			(#stdId#,#groupId#)
+	</insert>
+
+	<!-- Des-registro de alumno -->
+	<delete id="unRegisterStudent" parameterClass="java.util.Map">
+		DELETE FROM matriculas WHERE alumno = #stdId# AND grupo = #groupId#
+	</delete>	
+	
+	<!-- Registro de tutor -->
+	<insert id="registerTutor" parameterClass="java.util.Map">
+		INSERT INTO 
+			imparten (profe,grupo)
+		VALUES
+			(#tutorId#,#groupId#)
+	</insert>
+
+	<!-- Des-registro de tutor -->
+	<delete id="unRegisterTutor" parameterClass="java.util.Map">
+		DELETE FROM imparten WHERE profe = #tutorId# AND grupo = #groupId#
+	</delete>		
+	
+	<!-- Consulta de profesores parametrizada por grupo -->
+	<select id="getAssignedTutors" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT
+			u.idusu as id,
+			u.usuario as userName,
+			u.apes as surname,
+			u.nombre as name,
+			p.permiso as role,
+			u.email as email,
+			u.dni as persId,
+			passw as passwd
+		FROM 
+			usuarios u, permisos p 
+		WHERE 
+			u.centro = #institutionId#  AND p.usuario = u.usuario AND (p.permiso='TUTOR' OR p.permiso='TUTORAV')
+			AND u.idusu IN (SELECT i.profe FROM grupos g, imparten i WHERE i.grupo = g.idgrupo AND g.centro = #institutionId# AND g.idgrupo = #groupId#)
+	</select>
+	
+		<!-- Consulta de profesores parametrizada por grupo -->
+	<select id="getUnAssignedTutors" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT
+			u.idusu as id,
+			u.usuario as userName,
+			u.apes as surname,
+			u.nombre as name,
+			p.permiso as role,
+			u.email as email,
+			u.dni as persId,
+			passw as passwd
+		FROM 
+			usuarios u, permisos p 
+		WHERE 
+			u.centro = #institutionId#  AND p.usuario = u.usuario AND (p.permiso='TUTOR' OR p.permiso='TUTORAV') 
+			AND u.idusu NOT IN (SELECT i.profe FROM grupos g, imparten i WHERE i.grupo = g.idgrupo AND g.centro = #institutionId# AND g.idgrupo = #groupId#)
+	</select>
+	
+			<!-- Consulta de profesores parametrizada por grupo -->
+	<select id="getTutors" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT
+			u.idusu as id,
+			u.usuario as userName,
+			u.apes as surname,
+			u.nombre as name,
+			p.permiso as role,
+			u.email as email,
+			u.dni as persId,
+			passw as passwd
+		FROM 
+			usuarios u, permisos p 
+		WHERE 
+			u.centro = #institutionId# AND p.usuario = u.usuario AND (p.permiso='TUTOR' OR p.permiso='TUTORAV')
+	</select>
+	
+	<!-- Borra usuario-->
+	<delete id="deleteUser" parameterClass="com.cesfelipesegundo.itis.model.User">
+		DELETE FROM usuarios WHERE idusu=#id#
+	</delete>
+	
+	<select id="getLearners" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT
+			u.idusu as id,
+			u.usuario as userName,
+			u.apes as surname,
+			u.nombre as name,
+			p.permiso as role,
+			u.email as email,
+			u.dni as persId,
+			passw as passwd
+		FROM 
+			usuarios u, permisos p 
+		WHERE 
+			u.centro = #institutionId# AND p.usuario = u.usuario AND (p.permiso='LEARNER' OR p.permiso='KID')
+	</select>
+	
+	<select id="getUsers" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT
+			u.idusu as id,
+			u.usuario as userName,
+			u.apes as surname,
+			u.nombre as name,
+			p.permiso as role,
+			u.email as email,
+			u.dni as persId,
+			passw as passwd
+		FROM 
+			usuarios u, permisos p 
+		WHERE 
+			u.centro = #institutionId# AND p.usuario = u.usuario
+	</select>
+	<select id="getAllLearners" resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*)
+		FROM
+			permisos p
+		WHERE 
+			p.permiso = 'KID' OR
+			p.permiso = 'LEARNER'
+	</select>
+	<select id="getAllTutors" resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*)
+		FROM 
+			permisos p
+		WHERE 
+			p.permiso='TUTOR' OR p.permiso='TUTORAV'
+	</select>
+	
+	<!-- Consulta parametrizada por apodo de usuario -->
+	<select id="getSearchUsersFiltered" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT
+			u.idusu as id,
+			u.usuario as userName,
+			u.apes as surname,
+			u.nombre as name,
+			p.permiso as role,
+			u.email as email,
+			u.dni as persId,
+			u.passw as passwd
+		FROM 
+			usuarios u,
+			permisos p
+		WHERE
+			u.usuario = p.usuario
+			<isNotNull prepend="AND" property="name">
+			u.nombre LIKE #name#
+			</isNotNull>
+			<isNotNull prepend="AND" property="apes">
+			u.apes LIKE #apes#
+			</isNotNull>
+			<isNotNull prepend="AND" property="user">
+			u.usuario LIKE #user#
+			</isNotNull>
+			<isNotNull prepend="AND" property="type">
+			p.permiso LIKE #type#
+			</isNotNull>
+	</select>
+	<select id="showUsersNotVinculated" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT
+			u.idusu as id,
+			u.usuario as userName,
+			u.apes as surname,
+			u.nombre as name,
+			p.permiso as role,
+			u.email as email,
+			u.dni as persId,
+			u.passw as passwd
+		FROM 
+			usuarios u,
+			permisos p
+		WHERE
+			  u.usuario = p.usuario AND
+			  u.idusu NOT IN (SELECT profe FROM imparten) AND 
+			  u.idusu NOT IN (SELECT alumno FROM matriculas) AND
+			  p.permiso != 'ADMIN';
+	</select>
+	
+	<select id="getUsersNotInCustomExam" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT 
+			m.alumno AS id,
+			u.usuario AS userName,
+			u.apes AS surname,
+			u.nombre AS name,
+			p.permiso as role,
+			u.email as email,
+			u.dni as persId,
+			u.passw as passwd
+		FROM 
+			matriculas m,
+			usuarios u,
+			permisos p
+		WHERE 
+			m.grupo = #idGroup# AND
+			u.idusu = m.alumno AND
+			u.usuario = p.usuario AND
+			m.alumno NOT IN (SELECT alumno FROM exam_individ WHERE examen = #idExam#)
+	</select>
+	
+	<select id="getUsersInCustomExam" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.CustomExamUser">
+		SELECT 
+			u.idusu AS id,
+			u.usuario AS userName,
+			u.apes AS surname,
+			u.nombre AS name,
+			p.permiso as role,
+			u.email as email,
+			u.dni as persId,
+			u.passw as passwd
+		FROM 
+			usuarios u,
+			permisos p,
+			exam_individ e
+		WHERE 
+			u.usuario = p.usuario AND
+			u.idusu = e.alumno AND
+			e.examen = #value#
+	</select>
+	
+	<insert id="addUser2CustomExam" parameterClass="java.util.Map">
+		INSERT INTO 
+			exam_individ (alumno,examen)
+		VALUES
+			(#idUser#,#idExam#)
+	</insert>
+	
+	<delete id="removeUserFromCustomExam" parameterClass="java.util.Map">
+		DELETE FROM exam_individ 
+		WHERE alumno = #userId# AND 
+		examen = #examId#
+	</delete>
+</sqlMap>

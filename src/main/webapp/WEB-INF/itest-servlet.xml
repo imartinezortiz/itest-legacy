@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!-- 
+	Configuración de Spring para la Aplicación WEB
+-->
+<beans>
+	<!-- CONFIGURACION DE LOS CONTROLADORES -->
+	<import resource="classpath:com/cesfelipesegundo/itis/web/config/spring-controller.xml" />
+
+	<!--  VALIDATORS -->
+	<import resource="classpath:com/cesfelipesegundo/itis/web/config/spring-validator.xml" />
+    
+	<!--  MAPPINGS -->
+	<import resource="classpath:com/cesfelipesegundo/itis/web/config/spring-mapping.xml" />
+	
+    <!-- VIEW -->
+	<import resource="classpath:com/cesfelipesegundo/itis/web/config/spring-view.xml" />
+    
+	<!-- PROPERTIES -->
+	<!-- 
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="classpath:properties/messages" />
+    </bean> 
+    -->
+    
+</beans>

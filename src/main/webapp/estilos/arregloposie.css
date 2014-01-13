@@ -1,0 +1,27 @@
+#cabecera {
+	top: expression( ( aux = document.body.scrollTop ) + 'px' );
+}
+
+.logo {
+	top: expression( ( aux = document.body.scrollTop ) + 'px' );
+}
+
+#logo1 {
+	top: expression( ( aux = document.body.scrollTop ) + 'px' );
+}
+
+#logo2 {
+	top: expression( ( aux = document.body.scrollTop ) + 'px' );
+}
+
+#menu {
+	top: expression( 50 + ( aux = document.body.scrollTop ) + 'px');
+}
+
+#reloj {
+	top: expression( 4 + ( aux = document.body.scrollTop ) + 'px' );
+}
+
+#continuar {
+	top: expression( 100 + ( aux = document.body.scrollTop ) + 'px');
+}

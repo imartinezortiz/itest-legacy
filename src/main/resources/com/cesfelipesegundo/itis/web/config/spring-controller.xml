@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+
+    <!--  
+         *************** Controladores de la VIEW ************
+    -->
+
+
+  <!-- Tutor (Profesores) *************************************************************************************** -->
+    <bean id="indexTutorController" class="com.cesfelipesegundo.itis.web.controller.IndexTutorController">
+    	<property name="tutorManagementService" ref="tutorManagementService" />
+    </bean>
+	<bean id="TutorGroupImportController" class="com.cesfelipesegundo.itis.web.controller.TutorGroupImportController">
+    	<property name="tutorManagementService" ref="tutorManagementService" />
+    	<property name="tutorGroupManagementController" ref="tutorGroupManagementController" />
+    </bean>
+    <!-- MultiActionController for managing course operations. It delegates to a class whose methods are invoked depending
+         on the params of the URL -->
+    <!-- Este bean enlaza el valor del parámetro "method" de la llamada con un método del objeto delegado --> 
+    <bean id="tutorGroupParamResolver" class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodNameResolver">
+        <property name="paramName" value="method"/>
+    </bean>
+
+	<!-- MultiActionController: gestiona el envío de acciones al delegado en función de los parámetros -->
+      <bean id="tutorGroupMultiController" class="org.springframework.web.servlet.mvc.multiaction.MultiActionController">
+        <property name="methodNameResolver" ref="tutorGroupParamResolver"/>
+        <property name="delegate" ref="tutorGroupManagementController"/>
+      </bean>
+
+
+	  <!-- Delgate: implements management of the group. It is a Spring session bean (must be proxied) -->
+      <bean id="tutorGroupManagementController" class="com.cesfelipesegundo.itis.web.controller.TutorGroupManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="tutorManagementService" ref="tutorManagementService" />
+        <property name="learnerManagementService" ref="learnerManagementService" />
+        <!-- Question management -->
+        <property name="tutorQuestionManagementController" ref="tutorQuestionManagementController" />
+        <!-- Question LIST management -->
+        <property name="tutorQuestionListManagementController" ref="tutorQuestionListManagementController" />
+        <!-- Exam management -->
+        <property name="tutorExamManagementController" ref="tutorExamManagementController" />
+		<!-- Exam LIST management -->
+        <property name="tutorExamListManagementController" ref="tutorExamListManagementController" />
+		<!-- Theme LIST management -->
+        <property name="tutorThemeListManagementController" ref="tutorThemeListManagementController" />
+		<!-- Student LIST management -->
+        <property name="tutorStudentListManagementController" ref="tutorStudentListManagementController" />
+      	<property name="tutorGradeListManagementController" ref="tutorGradeListManagementController"/>
+      </bean>
+      
+      <!-- Este bean enlaza el valor del parámetro "method" de la llamada con un método del objeto delegado --> 
+	    <bean id="tutorQuestionParamResolver" class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodNameResolver">
+	        <property name="paramName" value="method"/>
+	    </bean>
+
+	  <!-- MultiActionController: gestiona el envío de acciones al delegado en función de los parámetros -->
+      <bean id="tutorQuestionMultiController" class="org.springframework.web.servlet.mvc.multiaction.MultiActionController">
+        <property name="methodNameResolver" ref="tutorQuestionParamResolver"/>
+        <property name="delegate" ref="tutorQuestionManagementController"/>
+      </bean>
+      
+      <!-- Este bean enlaza el valor del parámetro "method" de la llamada con un método del objeto delegado --> 
+	    <bean id="tutorExamParamResolver" class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodNameResolver">
+	        <property name="paramName" value="method"/>
+	    </bean>
+      
+      <!-- MultiActionController: gestiona el envío de acciones al delegado en función de los parámetros -->
+      <bean id="tutorExamMultiController" class="org.springframework.web.servlet.mvc.multiaction.MultiActionController">
+        <property name="methodNameResolver" ref="tutorExamParamResolver"/>
+        <property name="delegate" ref="tutorExamManagementController"/>
+      </bean>
+      
+      <!-- The beans that perform as properties and work with Ajax are defined in spring-dwr.xml file -->
+      
+            
+      <!-- File upload -->
+      
+      <!-- lets use the Commons-based implementation of the MultipartResolver interface -->
+      <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+      
+      <!-- It has to be a Spring session bean -->
+      <bean id="fileUploadController" class="com.cesfelipesegundo.itis.web.controller.FileUploadController">
+        <property name="commandClass" value="com.cesfelipesegundo.itis.web.FileUploadBean"/>
+        <property name="successView" value="tutor/file_uploaded"/>
+        <property name="tutorManagementService" ref="tutorManagementService" />
+        <property name="tutorStudentListManagementController" ref="tutorStudentListManagementController"></property>
+	  </bean>
+      
+	  <!-- The other necessary beans are defined in spring-dwr.xml -->
+
+
+  <!-- Learner (Alumnos) *************************************************************************************** -->
+      <!-- Principal -->
+      <bean id="indexLearnerController" class="com.cesfelipesegundo.itis.web.controller.IndexLearnerController">
+        <property name="learnerManagementService" ref="learnerManagementService" />
+      </bean>
+      
+      <!-- Activación de examen y generación aleatoria: usamos un MultiActionController que delega en una clase cuyos métodos 
+           son invocados en función del parámetro que se reciba en la URL -->
+      <!-- Este bean enlaza el valor del parámetro "method" de la llamada con un método del objeto delegado --> 
+      <bean id="learnerParamResolver" class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodNameResolver">
+        <property name="paramName" value="method"/>
+      </bean>
+
+	  <!-- MultiActionController: gestiona el envío de acciones al delegado en función de los parámetros -->
+      <bean id="learnerExamMultiController" class="org.springframework.web.servlet.mvc.multiaction.MultiActionController">
+        <property name="methodNameResolver" ref="learnerParamResolver"/>
+        <property name="delegate" ref="learnerExamController"/>
+      </bean>
+
+	  <!-- The other necessary beans are defined in spring-dwr.xml -->
+	  
+	<!-- Admin (Administradores) *************************************************************************************** -->
+    <bean id="indexAdminController" class="com.cesfelipesegundo.itis.web.controller.IndexAdminController">
+    	<property name="adminInstitutionMgmtController" ref="adminInstitutionManagementController"/>
+    </bean>
+    
+    <!-- MultiActionController for managing admin operations. It delegates to a class whose methods are invoked depending
+         on the params of the URL -->
+    <!-- Este bean enlaza el valor del parámetro "method" de la llamada con un método del objeto delegado --> 
+    <bean id="adminParamResolver" class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodNameResolver">
+        <property name="paramName" value="method"/>
+    </bean>
+
+	<!-- MultiActionController: gestiona el envío de acciones al delegado en función de los parámetros -->
+      <bean id="adminMultiController" class="org.springframework.web.servlet.mvc.multiaction.MultiActionController">
+        <property name="methodNameResolver" ref="adminParamResolver"/>
+        <property name="delegate" ref="adminManagementController"/>
+      </bean>
+    
+      <!-- Delgate: implements general admin management. It is a Spring session bean (must be proxied) -->
+      <bean id="adminManagementController" class="com.cesfelipesegundo.itis.web.controller.AdminManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="adminManagementService" ref="adminManagementService" />
+        <property name="tutorManagementService" ref="tutorManagementService" />
+        <property name="learnerManagementService" ref="learnerManagementService" />
+        <property name="adminInstitutionManagementController" ref="adminInstitutionManagementController" />
+        <property name="adminUserManagementController" ref="adminUserManagementController" />
+      </bean>
+    
+	<!-- MultiActionController: gestiona el envío de acciones al delegado en función de los parámetros -->
+      <bean id="adminInstitutionMultiController" class="org.springframework.web.servlet.mvc.multiaction.MultiActionController">
+        <property name="methodNameResolver" ref="adminParamResolver"/>
+        <property name="delegate" ref="adminInstitutionManagementController"/>
+      </bean>
+    
+      <!-- Delegate: implements general admin management. It is a Spring session bean (must be proxied) -->
+      <bean id="adminInstitutionManagementController" class="com.cesfelipesegundo.itis.web.controller.AdminInstitutionManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="adminManagementService" ref="adminManagementService" />
+        <property name="tutorManagementService" ref="tutorManagementService" />
+        <!-- Group management -->
+        <property name="adminGroupManagementController" ref="adminGroupManagementController" />
+        <!-- User management -->
+        <property name="adminUserManagementController" ref="adminUserManagementController" />
+      </bean>
+
+	  <!-- The other necessary beans are defined in spring-dwr.xml -->
+	  
+    <!-- COMMON Functionalities -->
+    
+    <!-- Este bean enlaza el valor del parámetro "method" de la llamada con un método del objeto delegado --> 
+    <bean id="commonParamResolver" class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodNameResolver">
+        <property name="paramName" value="method"/>
+    </bean>
+    
+	<!-- MultiActionController: "index" controller -->
+    <bean id="commonMultiController" class="org.springframework.web.servlet.mvc.multiaction.MultiActionController">
+        <property name="methodNameResolver" ref="commonParamResolver"/>
+        <property name="delegate" ref="commonManagementController"/>
+    </bean>
+
+
+    <!-- Delgate: implements management of the group. It is a Spring session bean (must be proxied) -->
+    <bean id="commonManagementController" class="com.cesfelipesegundo.itis.web.controller.CommonManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="commonManagementService" ref="commonManagementService" />
+    </bean>
+
+</beans>

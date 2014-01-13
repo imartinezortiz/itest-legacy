@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	Configuración de Spring para los DAO y los servicios
+-->
+<beans 	xmlns="http://www.springframework.org/schema/beans"
+       	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation=" 
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- CONFIGURACION DE DAO -->
+	<import resource="classpath:com/cesfelipesegundo/itis/dao/config/spring-dao.xml" />
+
+	<!-- CONFIGURACION DE LOS SERVICIOS -->
+	<import resource="classpath:com/cesfelipesegundo/itis/biz/config/spring-biz.xml" />
+	
+	<!-- Para Ajax: beans the Spring. Deben estar declarados aqui para que los
+	     encuentre DWR -->
+	<import resource="classpath:com/cesfelipesegundo/itis/web/config/spring-dwr.xml" />
+	
+</beans>

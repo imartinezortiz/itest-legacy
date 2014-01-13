@@ -1,0 +1,976 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="TemplateExam">
+
+	<!-- Consulta parametrizada por Id de examen -->
+	<!-- Toma la informacion basica de examenes para rellenar la clase TemplateExam -->
+	<select id="getTemplateExam" parameterClass="java.lang.Long" resultMap="ModelResults.TemplateExamResult">
+		SELECT 
+			examenes.idexam AS idExam,
+			examenes.titulo AS titleExam,
+			examenes.visibilidad AS visibilityExam,
+			examenes.distrib_pregs AS questionDistributionExam,
+			examenes.duracion AS durationExam,
+			examenes.fecha_ini AS startDateExam,
+			examenes.fecha_fin AS endDateExam,
+			examenes.nota_max AS maxGradeExam, 
+			examenes.rev_activa AS activeReviewExam,
+			examenes.corr_parcial AS partialCorrectionExam,
+			examenes.p_preg_fallada AS penQuestionFailedExam,
+			examenes.p_preg_no_resp AS penQuestionNotAnsweredExam,
+			examenes.p_resp_fallada AS penAnswerFailedExam,
+			examenes.cota_calif_preg AS minQuestionGradeExam,
+			examenes.muestra_num_corr AS showNumCorrectAnswersExam,
+			examenes.nivelConfianza AS confidenceLevel,
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter, 
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 
+		FROM 
+			examenes,
+			grupos,
+			asignaturas,
+			centros
+		WHERE 
+			examenes.idexam = #value# AND
+			grupos.idgrupo = examenes.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro
+		LIMIT 1
+	</select>
+	
+	<!-- Consulta parametrizada por Id de grupo -->
+	<!-- Toma la informacion basica de examenes para rellenar la clase TemplateExam -->
+	<select id="getTemplateExamsByGroupId" parameterClass="java.lang.Long" resultMap="ModelResults.TemplateExamResult">
+		SELECT 
+			examenes.idexam AS idExam,
+			examenes.titulo AS titleExam,
+			examenes.visibilidad AS visibilityExam,
+			examenes.distrib_pregs AS questionDistributionExam,
+			examenes.duracion AS durationExam,
+			examenes.fecha_ini AS startDateExam,
+			examenes.fecha_fin AS endDateExam,
+			examenes.nota_max AS maxGradeExam,
+			examenes.rev_activa AS activeReviewExam, 
+			examenes.corr_parcial AS partialCorrectionExam,
+			examenes.p_preg_fallada AS penQuestionFailedExam,
+			examenes.p_preg_no_resp AS penQuestionNotAnsweredExam,
+			examenes.p_resp_fallada AS penAnswerFailedExam,
+			examenes.cota_calif_preg AS minQuestionGradeExam,
+			examenes.muestra_num_corr AS showNumCorrectAnswersExam,
+			examenes.nivelConfianza AS confidenceLevel,
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 
+		FROM 
+			examenes,
+			grupos,
+			asignaturas,
+			centros
+		WHERE 
+			examenes.grupo = #value# AND
+			grupos.idgrupo = examenes.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro
+	</select>
+	
+	<!-- OJO: El atributo activeReview es boolean, no Boolean -->
+	<update id="updateTemplateExamReviewFlag" parameterClass="com.cesfelipesegundo.itis.model.TemplateExam">
+		UPDATE 
+			examenes 
+		SET 
+			rev_activa = #activeReview#
+		WHERE 
+			idexam = #id#
+	</update>
+
+	<delete id="deleteTemplateExam" parameterClass="java.lang.Long">
+		DELETE FROM examenes WHERE idexam = #value#
+	</delete>
+
+	<!-- Dado un id de examen, esta consulta coge todos los temas relativos al examen -->
+	<select id="getTemplateExamSubject" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.TemplateExamSubject">
+		SELECT 
+			temas_exam.tema AS id,
+			temas.tema AS subject,
+			temas_exam.n_pregs AS questionsNumber,
+			temas_exam.n_resp_x_preg AS answersxQuestionNumber,
+			temas_exam.dificultad_max AS maxDifficulty, 
+			temas_exam.dificultad_min AS minDifficulty,
+			temas.orden AS sort,
+			temas_exam.tipo_pregs AS questionsType
+		FROM 
+			temas_exam,
+			temas
+		WHERE 
+			temas_exam.exam = #value# AND
+			temas.idtema = temas_exam.tema
+	</select>
+	
+	<select id="getTemplateExamSubjectByCourseId" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.TemplateExamSubject">
+		SELECT 
+			temas_exam.tema AS id,
+			temas.tema AS subject,
+			temas_exam.n_pregs AS questionsNumber,
+			temas_exam.n_resp_x_preg AS answersxQuestionNumber,
+			temas_exam.dificultad_max AS maxDifficulty, 
+			temas_exam.dificultad_min AS minDifficulty,
+			temas.orden AS sort
+		FROM 
+			temas_exam,
+			temas
+		WHERE 
+			temas.asig = #value# AND
+			temas.idtema = temas_exam.tema
+	</select>
+	
+	<select id="getTemplateSubjectByGroupId" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.TemplateExamSubject">
+		SELECT 
+			temas.idtema AS id,
+			temas.tema AS subject,
+			temas.orden AS sort			
+		FROM 
+			temas
+		WHERE 
+			temas.grupo = #value#
+		ORDER BY sort
+	</select>
+	
+	<!-- Dado un id de tema, esta consulta coge todas las preguntas relativas al tema -->
+	<select id="getTemplateExamQuestion" parameterClass="com.cesfelipesegundo.itis.model.TemplateExamSubject" resultMap="ModelResults.TemplateExamQuestionResult">
+		SELECT 
+			preguntas.idpreg AS idQuestion,
+			preguntas.titulo AS titleQuestion,
+			preguntas.enunciado AS textQuestion,
+			preguntas.dificultad AS difficultyQuestion,
+			preguntas.visibilidad AS visibilityQuestion,
+			preguntas.comentario AS commentQuestion,
+			preguntas.activa AS activeQuestion,
+			preguntas.n_resp_correctas AS numCorrectAnswersQuestion,
+			preguntas.used_in_exam AS usedInExamQuestion,
+			preguntas.tipo AS type,
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,			
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter,
+			temas.idtema AS idSubject,
+			temas.tema AS subjectSubject,
+			temas.orden AS orderSubject
+		FROM 
+			preguntas,
+			grupos,
+			asignaturas, 
+			centros,
+			temas
+		WHERE 
+			preguntas.tema = #id# AND
+			grupos.idgrupo = preguntas.grupo AND 
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND 
+			temas.idtema = preguntas.tema AND
+			preguntas.tipo = #questionsType#
+	</select>
+
+	<!-- Dado un id de pregunta, se coge la misma. -->
+	<select id="getTemplateExamQuestionById" parameterClass="java.lang.Long" resultMap="ModelResults.TemplateExamQuestionResult">
+		SELECT 
+			preguntas.idpreg AS idQuestion,
+			preguntas.titulo AS titleQuestion,
+			preguntas.enunciado AS textQuestion,
+			preguntas.dificultad AS difficultyQuestion,
+			preguntas.visibilidad AS visibilityQuestion,
+			preguntas.comentario AS commentQuestion,
+			preguntas.activa AS activeQuestion,
+			preguntas.n_resp_correctas AS numCorrectAnswersQuestion,
+			preguntas.used_in_exam AS usedInExamQuestion,
+			preguntas.tipo AS type,
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,			
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter,
+			temas.idtema AS idSubject,
+			temas.tema AS subjectSubject,
+			temas.orden AS orderSubject
+		FROM 
+			preguntas,
+			grupos,
+			asignaturas, 
+			centros, 
+			temas 
+		WHERE 
+			preguntas.idpreg = #value# AND
+			grupos.idgrupo = preguntas.grupo AND 
+			asignaturas.idasig = grupos.asig AND 
+			centros.idcentro = grupos.centro AND 
+			temas.idtema = preguntas.tema
+	</select>
+
+	<select id="getTemplateExamQuestionByGroupId" parameterClass="java.lang.Long" resultMap="ModelResults.TemplateExamQuestionResult">
+		SELECT 
+			preguntas.idpreg AS idQuestion,
+			preguntas.titulo AS titleQuestion,
+			preguntas.enunciado AS textQuestion,
+			preguntas.dificultad AS difficultyQuestion,
+			preguntas.visibilidad AS visibilityQuestion,
+			preguntas.comentario AS commentQuestion,
+			preguntas.activa AS activeQuestion,
+			preguntas.n_resp_correctas AS numCorrectAnswersQuestion,
+			preguntas.used_in_exam AS usedInExamQuestion,
+			preguntas.tipo AS type,
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,			
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter,
+			temas.idtema AS idSubject,
+			temas.tema AS subjectSubject,
+			temas.orden AS orderSubject 
+		FROM 
+			preguntas,
+			grupos,
+			asignaturas,
+			centros, 
+			temas  
+		WHERE 
+			preguntas.grupo = #value# AND 
+			grupos.idgrupo = #value# AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND 
+			temas.idtema = preguntas.tema
+	</select>
+
+	<!-- Dado una query, esta consulta coge todas las preguntas relativas al query -->
+	<select id="findTemplateExamQuestion" parameterClass="java.util.Map" resultMap="ModelResults.TemplateExamQuestionResult">
+		SELECT 
+			preguntas.idpreg AS idQuestion,
+			preguntas.titulo AS titleQuestion,
+			preguntas.enunciado AS textQuestion,
+			preguntas.dificultad AS difficultyQuestion,
+			preguntas.visibilidad AS visibilityQuestion,
+			preguntas.comentario AS commentQuestion,
+			preguntas.activa AS activeQuestion,
+			preguntas.n_resp_correctas AS numCorrectAnswersQuestion,
+			preguntas.used_in_exam AS usedInExamQuestion,
+			preguntas.tipo AS type,
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,			
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter,
+			temas.idtema AS idSubject,
+			temas.tema AS subjectSubject,
+			temas.orden AS orderSubject
+		FROM 
+			preguntas,
+			grupos,
+			asignaturas, 
+			centros,
+			temas 
+		WHERE
+			grupos.idgrupo = preguntas.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND 
+			temas.idtema = preguntas.tema 
+			<isNotNull prepend="AND" property="institution">
+				centros.idcentro = #institution#
+			</isNotNull>
+			<isNotNull prepend="AND" property="textTheme">
+				temas.tema LIKE #textTheme#
+			</isNotNull>
+			<isNotNull prepend="AND" property="id">
+				preguntas.idpreg = #id#
+			</isNotNull>
+			<isNotNull prepend="AND" property="title">
+				preguntas.titulo LIKE #title#
+			</isNotNull>
+			<isNotNull prepend="AND" property="text">
+				preguntas.enunciado LIKE #text#
+			</isNotNull>
+			<isNotNull prepend="AND" property="subject">
+				preguntas.tema = #subject#
+			</isNotNull>
+			<isNotNull prepend="AND" property="group">
+				preguntas.grupo = #group#
+			</isNotNull>
+			<isNotNull prepend="AND" property="difficulty">
+				preguntas.dificultad = #difficulty#
+			</isNotNull>
+			<isNotNull prepend="AND" property="active">
+				preguntas.activa = #active#
+			</isNotNull>
+			<isNotNull prepend="AND" property="scope">
+				preguntas.visibilidad = #scope#
+			</isNotNull>
+			<isNotNull prepend="AND" property="excludeGroup">
+				preguntas.grupo != #excludeGroup#
+			</isNotNull>
+			<isNotNull prepend="AND" property="questionType">
+				preguntas.tipo = #questionType#
+			</isNotNull>
+			<isNotNull prepend="AND" property="userId">
+				preguntas.grupo IN (SELECT grupo FROM imparten WHERE profe = #userId#)
+			</isNotNull>
+		<isNotNull property="preferredOrder">
+			ORDER BY $preferredOrder$ 
+		</isNotNull>
+		<isNotNull property="maxResultCount">
+			LIMIT #firstResult#, #maxResultCount#
+		</isNotNull>
+	</select>
+
+	<insert id="addNewTemplateExamQuestion" parameterClass="com.cesfelipesegundo.itis.model.TemplateExamQuestion">
+		INSERT INTO 
+			preguntas (titulo, enunciado, dificultad, tema, grupo, visibilidad, comentario, activa, n_resp_correctas, used_in_exam, tipo)
+		VALUES
+			(#title#, #text#, #difficulty#, #subject.id#, #group.id#, #visibility#, #comment#, #active#, #numCorrectAnswers#, #usedInExam#, #type#)
+		<selectKey keyProperty="id" resultClass="java.lang.Long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="updateTemplateExamQuestion" parameterClass="com.cesfelipesegundo.itis.model.TemplateExamQuestion">
+		UPDATE preguntas 
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="title">
+				titulo = #title#
+			</isNotNull>
+			<isNotNull prepend="," property="text">
+				enunciado = #text#
+			</isNotNull>
+			<isNotNull prepend="," property="difficulty">
+				dificultad = #difficulty#
+			</isNotNull>
+			<isNotNull prepend="," property="subject.id">
+				tema = #subject.id#
+			</isNotNull>
+			<isNotNull prepend="," property="group.id">
+				grupo = #group.id#
+			</isNotNull>
+			<isNotNull prepend="," property="visibility">
+				visibilidad = #visibility#
+			</isNotNull>
+			<isNotNull prepend="," property="comment">
+				comentario = #comment#
+			</isNotNull>
+			<isNotNull prepend="," property="active">
+				activa = #active#
+			</isNotNull>
+			<isNotNull prepend="," property="numCorrectAnswers">
+				n_resp_correctas = #numCorrectAnswers#
+			</isNotNull>
+			<isNotNull prepend="," property="usedInExam">
+				used_in_exam = #usedInExam#
+			</isNotNull>
+			<isNotNull prepend="," property="type">
+				tipo = #type#
+			</isNotNull>
+		</dynamic>
+		WHERE 
+			idpreg = #id#
+	</update>
+
+	<update id="updateTemplateExamQuestionUsedInExam" parameterClass="com.cesfelipesegundo.itis.model.TemplateExamQuestion">
+		UPDATE preguntas 
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="usedInExam">
+				used_in_exam = #usedInExam#
+			</isNotNull>
+		</dynamic>
+		WHERE 
+			idpreg = #id#
+	</update>
+
+	<delete id="deleteTemplateExamQuestion" parameterClass="java.lang.Long">
+		DELETE FROM preguntas WHERE idpreg = #value#
+	</delete>
+
+	<!-- Dado un id de pregunta, esta consulta coge todas los elementos multimedia de la misma. -->
+	<select id="getQuestionMedia" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.MediaElem">
+		SELECT 
+			extra_pregs.idextrap AS id,
+			extra_pregs.ruta AS path,
+			extra_pregs.tipo AS type,
+			extra_pregs.orden AS 'order',
+			extra_pregs.nombre AS name,
+			extra_pregs.ancho AS width,
+			extra_pregs.alto AS height,
+			extra_pregs.geogebra_type AS geogebraType
+		FROM 
+			extra_pregs 
+		WHERE 
+			extra_pregs.preg = #value#
+	</select>
+
+	<update id="updateQuestionMedia" parameterClass="java.util.Map">
+		UPDATE extra_pregs 
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="preg">
+				preg = #preg#
+			</isNotNull>
+			<isNotNull prepend="," property="ruta">
+				ruta = #ruta#
+			</isNotNull>
+			<isNotNull prepend="," property="tipo">
+				tipo = #tipo#
+			</isNotNull>
+			<isNotNull prepend="," property="orden">
+				orden = #orden#
+			</isNotNull>
+			<isNotNull prepend="," property="nombre">
+				nombre = #nombre#
+			</isNotNull>
+			<isNotNull prepend="," property="width">
+				ancho = #width#
+			</isNotNull>
+			<isNotNull prepend="," property="height">
+				alto = #height#
+			</isNotNull>
+			<isNotNull prepend="," property="geogebraType">
+				geogebra_type = #geogebraType#
+			</isNotNull>
+		</dynamic>
+		WHERE 
+			idextrap = #idextrap#
+	</update>
+
+	<insert id="addNewQuestionMedia" parameterClass="java.util.Map">
+		INSERT INTO 
+			extra_pregs (preg, ruta, tipo, orden, nombre, ancho, alto, geogebra_type)
+		VALUES
+			(#preg#, #ruta#, #tipo#, #orden#, #nombre#, #width#, #height#, #geogebraType#)
+		<selectKey resultClass="java.lang.Long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<delete id="deleteQuestionMedia" parameterClass="java.lang.Long">
+		DELETE FROM extra_pregs WHERE idextrap = #value#
+	</delete>
+	
+	<!-- Dado un id de pregunta, esta consulta coge todas los comentarios multimedia de la misma. -->
+	<select id="getCommentMedia" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.MediaElem">
+		SELECT 
+			extra_pregs_comentario.idextrapcom  AS id,
+			extra_pregs_comentario.ruta AS path,
+			extra_pregs_comentario.tipo AS type,
+			extra_pregs_comentario.orden AS 'order',
+			extra_pregs_comentario.nombre AS name,
+			extra_pregs_comentario.ancho AS width,
+			extra_pregs_comentario.alto AS height
+		FROM 
+			extra_pregs_comentario 
+		WHERE 
+			extra_pregs_comentario.preg = #value#
+	</select>
+
+	<update id="updateCommentMedia" parameterClass="java.util.Map">
+		UPDATE extra_pregs_comentario 
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="preg">
+				preg = #preg#
+			</isNotNull>
+			<isNotNull prepend="," property="ruta">
+				ruta = #ruta#
+			</isNotNull>
+			<isNotNull prepend="," property="tipo">
+				tipo = #tipo#
+			</isNotNull>
+			<isNotNull prepend="," property="orden">
+				orden = #orden#
+			</isNotNull>
+			<isNotNull prepend="," property="nombre">
+				nombre = #nombre#
+			</isNotNull>
+			<isNotNull prepend="," property="width">
+				ancho = #width#
+			</isNotNull>
+			<isNotNull prepend="," property="height">
+				alto = #height#
+			</isNotNull>
+		</dynamic>
+		WHERE 
+			idextrapcom  = #idextrapcom#
+	</update>
+
+	<insert id="addNewCommentMedia" parameterClass="java.util.Map">
+		INSERT INTO 
+			extra_pregs_comentario (preg, ruta, tipo, orden, nombre, ancho, alto)
+		VALUES
+			(#preg#, #ruta#, #tipo#, #orden#, #nombre#, #width#, #height#)
+		<selectKey resultClass="java.lang.Long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<delete id="deleteCommentMedia" parameterClass="java.lang.Long">
+		DELETE FROM extra_pregs_comentario WHERE idextrapcom = #value#
+	</delete>
+
+	<!-- Dado un id de pregunta, esta consulta coge todas las respuestas relativas a la pregunta -->
+	<select id="getTemplateExamAnswer" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.TemplateExamAnswer">
+		SELECT 
+			respuestas.idresp AS id,
+			respuestas.texto AS text,
+			respuestas.solucion AS solution,
+			respuestas.valor AS value,
+			respuestas.activa AS active,
+			respuestas.used_in_exam_question AS usedInExam
+		FROM 
+			respuestas 
+		WHERE 
+			respuestas.preg = #value#
+	</select>
+
+	<!-- Dado un id de respuesta, esta consulta coge todas los elementos multimedia de la misma. -->
+	<select id="getAnswerMedia" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.MediaElem">
+		SELECT 
+			extra_resps.idextrar AS id,
+			extra_resps.ruta AS path,
+			extra_resps.tipo AS type,
+			extra_resps.orden AS 'order',
+			extra_resps.nombre AS name,
+			extra_resps.ancho AS width,
+			extra_resps.alto AS height
+		FROM 
+			extra_resps 
+		WHERE 
+			extra_resps.resp = #value#
+	</select>
+	
+	<update id="updateAnswerMedia" parameterClass="java.util.Map">
+		UPDATE extra_resps 
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="resp">
+				resp = #resp#
+			</isNotNull>
+			<isNotNull prepend="," property="ruta">
+				ruta = #ruta#
+			</isNotNull>
+			<isNotNull prepend="," property="tipo">
+				tipo = #tipo#
+			</isNotNull>
+			<isNotNull prepend="," property="orden">
+				orden = #orden#
+			</isNotNull>
+			<isNotNull prepend="," property="nombre">
+				nombre = #nombre#
+			</isNotNull>
+			<isNotNull prepend="," property="width">
+				ancho = #width#
+			</isNotNull>
+			<isNotNull prepend="," property="height">
+				alto = #height#
+			</isNotNull>
+		</dynamic>
+		WHERE 
+			idextrar = #idextrar#
+	</update>
+
+	<insert id="addNewAnswerMedia" parameterClass="java.util.Map">
+		INSERT INTO 
+			extra_resps (resp, ruta, tipo, orden, nombre, ancho, alto)
+		VALUES
+			(#resp#, #ruta#, #tipo#, #orden#, #nombre#, #width#, #height#)
+		<selectKey resultClass="java.lang.Long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<delete id="deleteAnswerMedia" parameterClass="java.lang.Long">
+		DELETE FROM extra_resps WHERE idextrar = #value#
+	</delete>
+
+	<insert id="addNewTemplateExamAnswer" parameterClass="com.cesfelipesegundo.itis.model.TemplateExamAnswer">
+		INSERT INTO 
+			respuestas (texto, preg, solucion, valor, activa, used_in_exam_question)
+		VALUES
+			(#text#, #question.id#, #solution#, #value#, #active#, #usedInExam#)
+		<selectKey keyProperty="id" resultClass="java.lang.Long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<update id="updateTemplateExamAnswer" parameterClass="com.cesfelipesegundo.itis.model.TemplateExamAnswer">
+		UPDATE respuestas 
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="text">
+				texto = #text#
+			</isNotNull>
+			<isNotNull prepend="," property="question.id">
+				preg = #question.id#
+			</isNotNull>
+			<isNotNull prepend="," property="solution">
+				solucion = #solution#
+			</isNotNull>
+			<isNotNull prepend="," property="value">
+				valor = #value#
+			</isNotNull>
+			<isNotNull prepend="," property="active">
+				activa = #active#
+			</isNotNull>
+			<isNotNull prepend="," property="usedInExam">
+				used_in_exam_question = #usedInExam#
+			</isNotNull>
+		</dynamic>
+		WHERE 
+			idresp = #id#
+	</update>
+
+	<update id="updateTemplateExamAnswerUsedInExam" parameterClass="com.cesfelipesegundo.itis.model.TemplateExamAnswer">
+		UPDATE respuestas 
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="usedInExam">
+				used_in_exam_question = #usedInExam#
+			</isNotNull>
+		</dynamic>
+		WHERE 
+			idresp = #id#
+	</update>
+
+	<delete id="deleteTemplateExamAnswer" parameterClass="java.lang.Long">
+		DELETE FROM respuestas WHERE idresp = #value#
+	</delete>
+	
+	<!-- Muestra los examenes actualmente activos el grupo, la asignatura y el centro al que pertenecen -->
+	<select id="getActiveExams" resultMap="ModelResults.ExamGlobalInfoResul">
+		SELECT
+			examenes.idexam AS examId,
+			examenes.titulo AS examTitle,
+			examenes.fecha_ini AS startDate,
+			examenes.fecha_fin AS endDate,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS academicYear,
+			asignaturas.nombre AS subject,
+			centros.nombre AS center,
+      		CONCAT(usuarios.apes,', ',usuarios.nombre) AS teachers
+      		
+		FROM
+			examenes,
+			grupos,
+			asignaturas,
+			centros,
+			imparten,
+			usuarios
+		WHERE
+			examenes.fecha_fin >= NOW() AND
+			NOW() >= examenes.fecha_ini AND
+			grupos.idgrupo = examenes.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND
+			imparten.grupo = grupos.idgrupo AND
+			imparten.profe = usuarios.idusu
+		ORDER BY
+			examenes.fecha_fin DESC,
+			examenes.idexam DESC,
+			usuarios.apes ASC
+			
+	</select>
+	
+	<!-- Muestra los examenes que vayan a activarse en un futuro el grupo, la asignatura y el centro al que pertenecen -->
+	<select id="getNextExams" resultMap="ModelResults.ExamGlobalInfoResul">
+		SELECT 
+			examenes.idexam AS examId,
+			examenes.titulo AS examTitle,
+			examenes.fecha_ini AS startDate,
+			examenes.fecha_fin AS endDate,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS academicYear,
+			asignaturas.nombre AS subject,
+			centros.nombre AS center,
+      		CONCAT(usuarios.apes,', ',usuarios.nombre) AS teachers
+		FROM 
+			examenes,
+			grupos,
+			asignaturas,
+			centros,
+			imparten,
+			usuarios
+		WHERE
+			examenes.fecha_fin >= NOW() AND
+			examenes.fecha_ini >= NOW() AND
+			examenes.publicado = 1 AND
+			grupos.idgrupo = examenes.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND
+			imparten.grupo = grupos.idgrupo AND
+			imparten.profe = usuarios.idusu
+		ORDER BY 
+			examenes.fecha_ini DESC,
+			examenes.idexam DESC,
+			usuarios.usuario ASC
+			
+	</select>
+	
+	<!-- Muestra los examenes que vayan a activarse en un futuro el grupo, la asignatura y el centro al que pertenecen -->
+	<select id="getPreviousExams" parameterClass="java.util.Map" resultMap="ModelResults.ExamGlobalInfoResul">
+		SELECT 
+			examenes.idexam AS examId,
+			examenes.titulo AS examTitle,
+			examenes.fecha_ini AS startDate,
+			examenes.fecha_fin AS endDate,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS academicYear,
+			asignaturas.nombre AS subject,
+			centros.nombre AS center,
+      		usuarios.usuario AS teachers
+		FROM 
+			examenes,
+			grupos,
+			asignaturas,
+			centros,
+			imparten,
+			usuarios
+		WHERE
+			NOW() >= examenes.fecha_fin AND
+			grupos.idgrupo = examenes.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND
+			imparten.grupo = grupos.idgrupo AND
+			imparten.profe = usuarios.idusu
+			<isNotNull prepend="AND" property="idInstitution">
+				centros.idcentro = #idInstitution#
+			</isNotNull>
+			<isNotNull prepend="AND" property="idCourse">
+				asignaturas.idasig = #idCourse#
+			</isNotNull>
+			<isNotNull prepend="AND" property="year">
+				grupos.anio= #year#
+			</isNotNull>
+		ORDER BY 
+			examenes.fecha_ini DESC,
+			examenes.idexam DESC,
+			usuarios.usuario ASC,
+			centros.idcentro
+	</select>
+	
+	<select id="getActiveExamsFiltered" parameterClass="java.util.Map" resultMap="ModelResults.ExamGlobalInfoResul">
+		SELECT
+			examenes.idexam AS examId,
+			examenes.titulo AS examTitle,
+			examenes.fecha_ini AS startDate,
+			examenes.fecha_fin AS endDate,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS academicYear,
+			asignaturas.nombre AS subject,
+			centros.nombre AS center,
+      		CONCAT(usuarios.apes,', ',usuarios.nombre) AS teachers
+      		
+		FROM
+			examenes,
+			grupos,
+			asignaturas,
+			centros,
+			imparten,
+			usuarios
+		WHERE
+			examenes.fecha_fin >= NOW() AND
+			NOW() >= examenes.fecha_ini AND
+			grupos.idgrupo = examenes.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND
+			imparten.grupo = grupos.idgrupo AND
+			imparten.profe = usuarios.idusu
+			<isNotNull prepend="AND" property="centro">
+				centros.nombre LIKE #centro#
+			</isNotNull>
+			<isNotNull prepend="AND" property="asignatura">
+				asignaturas.nombre LIKE #asignatura#
+			</isNotNull>
+			<isNotNull prepend="AND" property="startDate">
+				examenes.fecha_ini >= #startDate#
+			</isNotNull>
+			<isNotNull prepend="AND" property="endDate">
+				#endDate# >= examenes.fecha_fin
+			</isNotNull>
+		ORDER BY
+			examenes.fecha_fin DESC,
+			examenes.idexam DESC,
+			usuarios.apes ASC
+	</select>
+	
+	<select id="getNextExamsFiltered" parameterClass="java.util.Map" resultMap="ModelResults.ExamGlobalInfoResul">
+		SELECT 
+			examenes.idexam AS examId,
+			examenes.titulo AS examTitle,
+			examenes.fecha_ini AS startDate,
+			examenes.fecha_fin AS endDate,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS academicYear,
+			asignaturas.nombre AS subject,
+			centros.nombre AS center,
+      		CONCAT(usuarios.apes,', ',usuarios.nombre) AS teachers
+		FROM 
+			examenes,
+			grupos,
+			asignaturas,
+			centros,
+			imparten,
+			usuarios
+		WHERE
+			examenes.fecha_fin >= NOW() AND
+			examenes.fecha_ini >= NOW() AND
+			examenes.publicado = 1 AND
+			grupos.idgrupo = examenes.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND
+			imparten.grupo = grupos.idgrupo AND
+			imparten.profe = usuarios.idusu
+			<isNotNull prepend="AND" property="centro">
+				centros.nombre LIKE #centro#
+			</isNotNull>
+			<isNotNull prepend="AND" property="asignatura">
+				asignaturas.nombre LIKE #asignatura#
+			</isNotNull>
+			<isNotNull prepend="AND" property="startDate">
+				examenes.fecha_ini >= #startDate#
+			</isNotNull>
+			<isNotNull prepend="AND" property="endDate">
+				#endDate# >= examenes.fecha_fin
+			</isNotNull>
+		ORDER BY 
+			examenes.fecha_ini DESC,
+			examenes.idexam DESC,
+			usuarios.usuario ASC
+	</select>
+	
+	<update id="updateQuestionNotUsedInExam" parameterClass="java.lang.Long">
+		UPDATE preguntas p
+		SET
+		  p.used_in_exam = 0
+		WHERE
+		  idpreg IN (SELECT DISTINCT p.idpreg
+		  FROM
+		    temas t
+		  WHERE
+		    p.idpreg NOT IN (SELECT l.preg FROM log_exams l) AND
+		    p.idpreg NOT IN (SELECT l.preg FROM log_exams_fill l) AND
+		    p.tema = t.idtema AND
+		    t.grupo = #value# AND
+		    p.used_in_exam = 1)
+	</update>
+	
+	<update id="updateAnswersNotUsedInExam" parameterClass="java.lang.Long">
+		UPDATE respuestas r
+		SET
+		  r.used_in_exam_question = 0
+		WHERE
+		  r.idresp IN (SELECT DISTINCT r.idresp
+		  FROM
+		    temas t,
+		    preguntas p
+		  WHERE
+		    p.idpreg NOT IN (SELECT l.preg FROM log_exams l) AND
+		    p.idpreg NOT IN (SELECT l.preg FROM log_exams_fill l) AND
+		    p.tema = t.idtema AND
+		    t.grupo = #value# AND
+		    r.preg = p.idpreg AND
+		    r.used_in_exam_question = 1)
+	</update>		
+</sqlMap>

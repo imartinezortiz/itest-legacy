@@ -1,0 +1,159 @@
+
+/********************************************************************************************/
+/*********************** Clases Interfaz Alumno. Creado el 3/11/06 **************************/
+/********************************************************************************************/
+
+
+/********************************************************************************************/
+/*************** Clases para formularios de la página principal del alumno ******************/
+/********************************************************************************************/
+
+.formrealizarexamen {
+   /*width: 80%;*/ margin: 0 10%; /*float: left; margin-top: 10pt;  */
+}
+
+.formrevisarexamen {
+   /*width: 80%;*/ margin: 0 10%; /*float: right;* margin-top: 10pt; */
+}
+
+/********************************************************************************************/
+/***************         Clases para la página de comprobar plugins         *****************/
+/********************************************************************************************/
+
+.comprobarPluginIzquierda {
+   width: 48%; float: left; clear: left; border: outset; background-color: #CCCCCC; font-size:14px; text-align: center; margin-right: 1%; margin-bottom: 20pt; padding: 10pt 0;
+}
+
+.comprobarPluginDerecha  {
+   width: 48%; float: right; clear: right; border: outset; background-color:  #CCCCCC; font-size:14px; text-align: center; margin-left: 1%; margin-bottom: 20pt; padding: 10pt 0;
+}
+
+.comprobarPluginTodoAncho {
+   width: 99%; clear: both; border: outset; background-color:  #CCCCCC; font-size:14px; text-align: center; margin-left:2pt; margin-bottom: 20pt; padding: 10pt 0;
+}
+
+.cabeceraPlugins {
+    font-size:16px; background-color:#666666; color:#FFFFFF; margin:0; font-weight:bold; Margin-bottom: 10pt;
+}
+
+.textoPlugins {
+    font-size:14px; margin:0; padding-left:10pt; padding-right:10pt; text-align:center; padding:10pt;
+}
+
+.textoPluginsAviso {
+    font-size:14px; margin:0; padding-left:10pt; padding-right:10pt; text-align:center; padding:10pt; font-weight:bold; text-decoration:blink;
+}
+
+.botoniniciarexamen{
+	text-align:center; width:100%;
+ }
+ 
+/********************************************************************************************/
+/***************       Clases para la página principal del examen           *****************/
+/********************************************************************************************/
+
+#reloj{
+	position: absolute; top: 4px; left: 40%; width:60%; text-align:center; z-index:4; height:45px;
+}
+
+#aspectoReloj{
+	font-family:verdana; font-size:14pt; font-weight:bold; text-align:center; width: 150px; height:30px; border: ridge; background-color: #FFCCCC;
+}
+
+
+/* Modificaciï¿½n de reglas para usar posicionamiento fijo en navegadores que admitan CSS2 */
+body > #reloj { position: fixed; }
+/****************************************************************************************/
+
+.tituloExamen{
+   font-size:24px; border: ridge; font-weight:bold; letter-spacing:2pt; background-color: #FFFF99; width: 85%; margin-top:30pt; margin-bottom:50pt; padding:15px;
+ }
+
+.tituloPregunta{
+   padding:0; font-size:18px; background-color:#666666; color:#FFFFFF; width: 75%
+}
+
+.preguntaExamen{
+   padding: 10pt; border:groove; width: 75%; background-color:#FFFFCC; margin-bottom:50pt; text-align:justify;
+}
+
+.preguntaArriba {
+	height: 0;
+}
+
+.preguntaAbajo {
+	height: 0;
+}
+
+.enunciadoPregunta{
+   padding-left: 10pt; padding-right: 15pt; font-size:16px; text-align:justify; 
+} 
+
+.respuestasTipoTest{
+   padding-left: 40pt; padding-right: 40pt; font-size:16px; text-align:justify; clear: left;
+}
+
+.multimedia {
+	margin-bottom: 10pt;
+}
+
+.multimediaImagenSimple {
+	border: outset; margin:0; padding:0; text-align:left;
+} 
+
+.multimediaImagenSimpleResp {
+  width: 100pt; border: outset; vertical-align: middle; margin-bottom: 5pt;
+} 
+
+.multimediaFlash {
+  width: 800; height: 500;
+}
+
+.respuestaCorrecta{
+  font-size:16px; text-align:justify; background-color:#00FF00;
+}
+
+.respuestaSeleccionada {
+	background-color:#00FF00
+}
+
+.formComentarioProfesor{
+  font-size:16px; text-align:justify; background-color: #FFFFFF; margin: 15pt;
+} 
+
+.comprobarPlugin{
+   border: outset; padding:10pt; margin:10pt; width: 65%; background-color: #CCFFFF; font-size:14px; text-align: center;
+}
+
+.marco {
+	background-color: #990000;
+	padding: 0;
+	border: solid medium #990000;
+}
+
+.marco td, .marco tr {
+	margin:0; padding:0;
+}
+
+/* Grades */
+.grade {
+	font-size:20px; font-family:verdana; font-weight:bold;
+}
+
+/* ******************* Div for hiding the exam until it is fully loaded ********************** */
+/* Trasparent, full screen */
+#divHideExam  { 	
+	position: fixed; top:0; left: 0; right:0; width: 100%; z-index:2; height: 100%;
+	background-color: white;
+	border:medium solid black;
+	text-align: center;
+	font-size:20px; font-family:verdana; font-weight:bold;
+	padding-top: 150px;
+}
+
+/* Preformatted text to display return carriages in questions and answers */
+pre {
+	font: inherit;
+	text-align: inherit;
+	clear: right;
+}

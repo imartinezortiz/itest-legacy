@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+    Beans para asociar vistas lógicas a físicas: con uno sólo es suficiente porque los nombres de las vistas
+    lógicas incluirán "la ruta" o sección a la que pertenecen (tutor, learner, etc ...)
+-->
+<beans>
+
+   <!-- Resolutor vistas lógicas a físicas -->  
+   <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+      <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+      <property name="prefix" value="/WEB-INF/jsp/"/>
+      <property name="suffix" value=".jsp"/>
+   </bean>
+ 
+</beans>

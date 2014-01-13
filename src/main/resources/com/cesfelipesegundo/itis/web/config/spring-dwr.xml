@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+
+  <!-- Tutor (Profesores) *************************************************************************************** -->
+	
+	  <!-- The following beans are properties of a session bean, so they sould be session scoped -->
+
+	  <!-- Management of the current question. It has to be a Spring session bean -->
+      <bean id="tutorQuestionManagementController" class="com.cesfelipesegundo.itis.web.controller.TutorQuestionManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="tutorManagementService" ref="tutorManagementService" />
+        <property name="learnerManagementService" ref="learnerManagementService" />
+      </bean>
+
+	  <!-- Management of the question LIST. It has to be a Spring session bean -->
+      <bean id="tutorQuestionListManagementController" class="com.cesfelipesegundo.itis.web.controller.TutorQuestionListManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="tutorManagementService" ref="tutorManagementService" />
+        <property name="adminManagementService" ref="adminManagementService" />
+        <property name="learnerManagementService" ref="learnerManagementService" />
+      </bean>
+      
+      <!-- Management of the current exam. It has to be a Spring session bean -->
+      <bean id="tutorExamManagementController" class="com.cesfelipesegundo.itis.web.controller.TutorExamManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="tutorManagementService" ref="tutorManagementService" />
+        <property name="learnerManagementService" ref="learnerManagementService" />
+      </bean>
+
+	  <!-- Management of the exam configuration LIST. It has to be a Spring session bean -->
+      <bean id="tutorExamListManagementController" class="com.cesfelipesegundo.itis.web.controller.TutorExamListManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="tutorManagementService" ref="tutorManagementService" />
+      </bean>
+
+	  <!-- Management of the grade LIST. It has to be a Spring session bean -->
+      <bean id="tutorGradeListManagementController" class="com.cesfelipesegundo.itis.web.controller.TutorGradeListManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="tutorManagementService" ref="tutorManagementService" />
+        <property name="learnerManagementService" ref="learnerManagementService" />
+      </bean>
+
+	  <!-- Management of the theme LIST. It has to be a Spring session bean -->
+      <bean id="tutorThemeListManagementController" class="com.cesfelipesegundo.itis.web.controller.TutorThemeListManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="tutorManagementService" ref="tutorManagementService" />
+      </bean>
+
+	  <!-- Management of the student LIST. It has to be a Spring session bean -->
+      <bean id="tutorStudentListManagementController" class="com.cesfelipesegundo.itis.web.controller.TutorStudentListManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="tutorManagementService" ref="tutorManagementService" />
+      </bean>
+
+  <!-- Learner (Alumnos) *************************************************************************************** -->
+
+	  <!-- Delegado: implementa los métodos de control de nuevo examen. It has to be a Spring session bean -->
+      <bean id="learnerExamController" class="com.cesfelipesegundo.itis.web.controller.LearnerExamController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="learnerManagementService" ref="learnerManagementService" />
+        <property name="tutorManagementService" ref="tutorManagementService" />
+        <property name="mailSenderManagementService" ref="mailSenderManagementService"/>
+      </bean>
+     
+  <!-- Admin (Administradores) *************************************************************************************** -->
+
+      <!-- Management of the current group. It has to be a Spring session bean -->
+      <bean id="adminGroupManagementController" class="com.cesfelipesegundo.itis.web.controller.AdminGroupManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="tutorManagementService" ref="tutorManagementService" />
+        <property name="adminManagementService" ref="adminManagementService" />
+      </bean>
+
+      <!-- Management of the users. It has to be a Spring session bean -->
+      <bean id="adminUserManagementController" class="com.cesfelipesegundo.itis.web.controller.AdminUserManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="tutorManagementService" ref="tutorManagementService" />
+        <property name="adminManagementService" ref="adminManagementService" />
+      </bean>
+      
+      <!-- Gonzalo was here -->
+      <!-- Management of the current group. It has to be a Spring session bean -->
+      <bean id="adminCourseManagementController" class="com.cesfelipesegundo.itis.web.controller.AdminCourseManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="tutorManagementService" ref="tutorManagementService" />
+        <property name="adminManagementService" ref="adminManagementService" />
+      </bean>
+      <bean id="adminInstitutionManagementController" class="com.cesfelipesegundo.itis.web.controller.AdminInstitutionManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="tutorManagementService" ref="tutorManagementService" />
+        <property name="adminManagementService" ref="adminManagementService" />
+      </bean>
+      
+      <bean id="adminManagementController" class="com.cesfelipesegundo.itis.web.controller.AdminManagementController" scope="session">
+        <aop:scoped-proxy/>
+        <property name="adminManagementService" ref="adminManagementService" />
+      </bean>
+
+</beans>

@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ConfigExam">
+	
+
+	<!-- Toma la informacion basica de examenes para rellenar la clase ConfigExam -->
+	<select id="selectConfigExam" parameterClass="java.lang.Long" resultMap="ModelResults.ConfigExamResult">
+		SELECT 
+			examenes.idexam AS idExam,
+			examenes.titulo AS titleExam,
+			examenes.visibilidad AS visibilityExam,
+			examenes.distrib_pregs AS questionDistributionExam,
+			examenes.duracion AS durationExam,
+			examenes.fecha_ini AS startDateExam,
+			examenes.fecha_fin AS endDateExam,
+			examenes.peso_exam AS weightExam,
+			examenes.nota_max AS maxGradeExam,
+			examenes.rev_activa AS activeReviewExam, 
+			examenes.corr_parcial AS partialCorrectionExam,
+			examenes.muestra_num_corr AS showNumCorrectAnswersExam,
+			examenes.p_preg_fallada AS penQuestionFailedExam,
+			examenes.p_preg_no_resp AS penQuestionNotAnsweredExam,
+			examenes.p_resp_fallada AS penAnswerFailedExam,
+			examenes.cota_calif_preg AS minQuestionGradeExam,
+			examenes.fecha_ini_rev AS startDateRevExam,
+			examenes.fecha_fin_rev AS endDateRevExam,
+			examenes.p_nivel_confianza AS penConfidenceLevel,  
+			examenes.r_nivel_confianza AS rewardConfidenceLevel,
+			examenes.nivelConfianza AS confidenceLevel,
+			examenes.publicado AS published,
+			examenes.personalizado AS customized,
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 
+		FROM 
+			examenes,
+			grupos,
+			asignaturas,
+			centros
+		WHERE 
+			examenes.idexam = #value# AND
+			grupos.idgrupo = examenes.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro
+		LIMIT 1
+	</select>
+
+	<!-- Consulta parametrizada por Id de grupo -->
+	<!-- Toma la informacion basica de examenes para rellenar la clase ConfigExam -->
+	<select id="selectConfigExamsByGroupId" parameterClass="java.util.Map" resultMap="ModelResults.ConfigExamResult">
+		SELECT 
+			examenes.idexam AS idExam,
+			examenes.titulo AS titleExam,
+			examenes.visibilidad AS visibilityExam,
+			examenes.distrib_pregs AS questionDistributionExam,
+			examenes.duracion AS durationExam,
+			examenes.fecha_ini AS startDateExam,
+			examenes.fecha_fin AS endDateExam,
+			examenes.peso_exam AS weightExam,
+			examenes.nota_max AS maxGradeExam,
+			examenes.rev_activa AS activeReviewExam, 
+			examenes.corr_parcial AS partialCorrectionExam,
+			examenes.muestra_num_corr AS showNumCorrectAnswersExam,
+			examenes.p_preg_fallada AS penQuestionFailedExam,
+			examenes.p_preg_no_resp AS penQuestionNotAnsweredExam,
+			examenes.p_resp_fallada AS penAnswerFailedExam,
+			examenes.cota_calif_preg AS minQuestionGradeExam,
+			examenes.fecha_ini_rev AS startDateRevExam,
+			examenes.fecha_fin_rev AS endDateRevExam, 
+			examenes.p_nivel_confianza AS penConfidenceLevel,
+			examenes.r_nivel_confianza AS rewardConfidenceLevel,
+			examenes.publicado AS published, 
+			examenes.nivelConfianza AS confidenceLevel,
+			examenes.personalizado AS customized,
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 
+		FROM 
+			examenes,
+			grupos,
+			asignaturas,
+			centros
+		WHERE 
+			examenes.grupo = #groupId# AND
+			grupos.idgrupo = examenes.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro
+		$orderBy$
+	</select>
+
+	<insert id="insertConfigExam" parameterClass="com.cesfelipesegundo.itis.model.ConfigExam">
+		INSERT INTO 
+			examenes (titulo, grupo, visibilidad, distrib_pregs, duracion, fecha_ini, fecha_fin, peso_exam, nota_max, rev_activa, corr_parcial, muestra_num_corr, p_preg_fallada, p_preg_no_resp, p_resp_fallada, cota_calif_preg,fecha_ini_rev,fecha_fin_rev,p_nivel_confianza,r_nivel_confianza,publicado,nivelConfianza,personalizado)
+		VALUES
+			(#title#, #group.id#, #visibility#, #questionDistribution#, #duration#, #startDate#, #endDate#, #weight#, #maxGrade#, #activeReview#, #partialCorrection#, #showNumCorrectAnswers#, #penQuestionFailed#, #penQuestionNotAnswered#, #penAnswerFailed#, #minQuestionGrade#, #startDateRevision#, #endDateRevision#, #penConfidenceLevel#, #rewardConfidenceLevel#,#published#,#confidenceLevel#,#customized#)
+		<selectKey keyProperty="id" resultClass="java.lang.Long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<!-- OJO: Hay algunos campos que no son tipos basicos -->
+	<update id="updateConfigExam" parameterClass="com.cesfelipesegundo.itis.model.ConfigExam">
+		UPDATE 
+			examenes 
+		SET 
+			visibilidad = #visibility#,
+			distrib_pregs = #questionDistribution#,
+			duracion = #duration#,
+			nota_max = #maxGrade#,
+			rev_activa = #activeReview#,
+			publicado = #published#,
+			nivelConfianza = #confidenceLevel#
+			<isNotNull prepend="," property="title">
+				titulo = #title#
+			</isNotNull>
+			<isNotNull prepend="," property="group">
+				grupo = #group.id#
+			</isNotNull>
+			<isNotNull prepend="," property="startDate">
+				fecha_ini = #startDate#
+			</isNotNull>
+			<isNotNull prepend="," property="endDate">
+				fecha_fin = #endDate#
+			</isNotNull>
+		    <isNotNull prepend="," property="weight">
+				peso_exam = #weight#
+			</isNotNull>
+			<isNotNull prepend="," property="partialCorrection">
+				corr_parcial = #partialCorrection#
+			</isNotNull>
+			<isNotNull prepend="," property="showNumCorrectAnswers">
+				muestra_num_corr = #showNumCorrectAnswers#
+			</isNotNull>
+			<isNotNull prepend="," property="penQuestionFailed">
+				p_preg_fallada = #penQuestionFailed#
+			</isNotNull>
+			<isNotNull prepend="," property="penQuestionNotAnswered">
+				p_preg_no_resp = #penQuestionNotAnswered#
+			</isNotNull>
+			<isNotNull prepend="," property="penAnswerFailed">
+				p_resp_fallada = #penAnswerFailed#
+			</isNotNull>
+			<isNotNull prepend="," property="minQuestionGrade">
+				cota_calif_preg = #minQuestionGrade#
+			</isNotNull>
+			<isNotNull prepend="," property="startDateRevision">
+				fecha_ini_rev = #startDateRevision#
+			</isNotNull>
+			<isNotNull prepend="," property="endDateRevision">
+				fecha_fin_rev = #endDateRevision#
+			</isNotNull>
+			<isNotNull prepend="," property="penConfidenceLevel">
+				p_nivel_confianza = #penConfidenceLevel#
+			</isNotNull>
+			<isNotNull prepend="," property="rewardConfidenceLevel">
+				r_nivel_confianza = #rewardConfidenceLevel#
+			</isNotNull>
+			<isNotNull prepend="," property="customized">
+				personalizado = #customized#
+			</isNotNull>
+			<isNotNull prepend="," property="published">
+				publicado = #published#
+			</isNotNull>
+		WHERE 
+			idexam = #id#
+	</update>
+
+	<!-- OJO: El atributo activeReview es boolean, no Boolean -->
+	<update id="updateConfigExamReviewFlag" parameterClass="com.cesfelipesegundo.itis.model.ConfigExam">
+		UPDATE 
+			examenes 
+		SET 
+			rev_activa = #activeReview#,
+			fecha_fin_rev = #endDateRevision#
+		WHERE 
+			idexam = #id#
+	</update>
+
+	<delete id="deleteConfigExam" parameterClass="java.lang.Long">
+		DELETE FROM examenes WHERE idexam = #value#
+	</delete>
+
+	<!-- Dado un id de examen, esta consulta coge todos los temas relativos al examen -->
+	<select id="selectConfigExamSubjectsByExamId" parameterClass="java.lang.Long" resultMap="ModelResults.ConfigExamSubjectResult">
+		SELECT 
+			temas_exam.idtemaexam,
+			temas_exam.exam,
+			temas.idtema,
+			temas.tema,
+			temas.orden,
+			temas_exam.n_pregs,
+			temas_exam.n_resp_x_preg,
+			temas_exam.dificultad_max, 
+			temas_exam.dificultad_min,
+			temas_exam.tipo_pregs AS questionType
+		FROM 
+			temas_exam,
+			temas
+		WHERE 
+			temas_exam.exam = #value# AND
+			temas.idtema = temas_exam.tema
+	</select>
+	
+	<update id="updateConfigExamSubject" parameterClass="com.cesfelipesegundo.itis.model.ConfigExamSubject">
+		UPDATE 
+			temas_exam 
+		SET
+			n_pregs = #questionsNumber#,
+			n_resp_x_preg = #answersxQuestionNumber#,
+			dificultad_max = #maxDifficulty#,
+			dificultad_min = #minDifficulty#
+			<isNotNull prepend="," property="cexam.id">
+				exam = #cexam.id#
+			</isNotNull>
+			<isNotNull prepend="," property="subject.id">
+				tema = #subject.id#
+			</isNotNull>
+			<isNotNull prepend="," property="questionType">
+				tipo_pregs = #questionType#
+			</isNotNull>
+		WHERE 
+			idtemaexam = #id#
+	</update>
+	
+	<insert id="insertConfigExamSubject" parameterClass="com.cesfelipesegundo.itis.model.ConfigExamSubject">
+		INSERT INTO 
+			temas_exam (exam, tema, n_pregs, n_resp_x_preg, dificultad_max, dificultad_min,tipo_pregs)
+		VALUES
+			(#cexam.id#, #subject.id#, #questionsNumber#, #answersxQuestionNumber#, #maxDifficulty#, #minDifficulty#,#questionType#)
+		<selectKey resultClass="java.lang.Long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<delete id="deleteConfigExamSubject" parameterClass="java.lang.Long">
+		DELETE FROM temas_exam WHERE idtemaexam = #value#
+	</delete>
+		
+	<select id="getAllConfigExams" resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*)
+		FROM 
+			examenes
+	</select>
+	
+	
+	
+</sqlMap>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+<sqlMapConfig>
+	<!-- Statement namespaces are required for Abator -->
+	<settings useStatementNamespaces="true" />
+
+	<!-- SQL Map XML files should be listed here -->
+	
+	<!-- DAO/objeto -->
+	<sqlMap resource="com/cesfelipesegundo/itis/dao/xml/ModelResultsSqlMap.xml" />
+	<sqlMap resource="com/cesfelipesegundo/itis/dao/xml/AnswerExamSqlMap.xml" />
+	<sqlMap resource="com/cesfelipesegundo/itis/dao/xml/BasicDataExamSqlMap.xml" />
+	<sqlMap resource="com/cesfelipesegundo/itis/dao/xml/ConfigExamSqlMap.xml" />
+	<sqlMap resource="com/cesfelipesegundo/itis/dao/xml/ExamSqlMap.xml" />
+	<sqlMap resource="com/cesfelipesegundo/itis/dao/xml/GradeSqlMap.xml" />
+	<sqlMap resource="com/cesfelipesegundo/itis/dao/xml/GroupSqlMap.xml" />
+	<sqlMap resource="com/cesfelipesegundo/itis/dao/xml/TemplateExamSqlMap.xml" />
+	<sqlMap resource="com/cesfelipesegundo/itis/dao/xml/UserSqlMap.xml" />
+	<sqlMap resource="com/cesfelipesegundo/itis/dao/xml/SubjectSqlMap.xml" />
+	<sqlMap resource="com/cesfelipesegundo/itis/dao/xml/InstitutionSqlMap.xml" />
+	<sqlMap resource="com/cesfelipesegundo/itis/dao/xml/CourseSqlMap.xml" />
+	<sqlMap resource="com/cesfelipesegundo/itis/dao/xml/ConectionsSqlMap.xml" />
+	<sqlMap resource="com/cesfelipesegundo/itis/dao/xml/RetrievePasswordSqlMap.xml" />
+	
+</sqlMapConfig>

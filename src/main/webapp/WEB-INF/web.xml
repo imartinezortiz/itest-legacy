@@ -1,0 +1,408 @@
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd">
+    <display-name>itest</display-name>
+    <description>iTest Online Assessment Tool</description>
+	
+<!--    Context initialization parameters 
+        Define shared String constants used within your application, 
+        which can be customized by the system administrator who is
+         installing your application.  The values actually assigned 
+         to these parameters can be retrieved in a servlet or JSP 
+         page by calling:
+
+             String value =
+               getServletContext().getInitParameter("name");
+
+         where "name" matches the <param-name> element of
+         one of these initialization parameters.
+
+         You can define any number of context initialization
+         parameters, including zero.
+-->
+    <context-param>
+       <description>I18N Configuration for JSTL</description>
+       <param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+       <param-value>com.cesfelipesegundo.itis.web.bundles.Mensajes</param-value>
+    </context-param>
+    
+<!--
+    Filter Declarations
+-->
+
+<!-- UTF-8 filter mapping -->
+	<filter>
+		<filter-name>charsetFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>charsetFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+    <!-- NoCacheFilter adds HTTP header to disable browser cache -->
+    <filter>
+        <filter-name>NoCache</filter-name>
+        <filter-class>com.cesfelipesegundo.itis.web.filters.NoCacheFilter</filter-class>
+    </filter>
+    
+    <!-- Comprueba que el objeto Usuario ha sido inicializado, si no lo está redirige al home del usuario -->
+    <filter>
+        <filter-name>Security</filter-name>
+        <filter-class>com.cesfelipesegundo.itis.web.filters.SecurityFilter</filter-class>
+        <init-param>
+        	<description>Ruta virtual del servlet Home</description>
+        	<param-name>HOME_SERVLET_PATH</param-name>
+        	<param-value>/common/Home</param-value>
+        </init-param>
+        <init-param>
+        	<description>Lista de rutas protegidas en el sistema</description>
+        	<param-name>PROTECTED_PATHS</param-name>
+        	<param-value>/tutor,/admin,/learner,/common</param-value>
+        </init-param>
+    </filter>
+    
+<!--
+    Filter mappings
+-->    
+    <filter-mapping>
+        <filter-name>NoCache</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>Security</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+	<!-- Inicialización de Spring -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+<!--
+    Listener Configurations:
+    CHEMA: listener necesario para soportar beans con alcance (scope) tipo request and session.
+           Van a ser necesario en la parte web.
+-->           
+  <listener>
+    <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+  </listener>
+
+
+<!--    Servlet definitions for the servlets that make up
+         your web application, including initialization
+         parameters.  With Tomcat, you can also send requests
+         to servlets not listed here with a request like this:
+
+           http://localhost:8080/{context-path}/servlet/{classname}
+
+         but this usage is not guaranteed to be portable.  It also
+         makes relative references to images and other resources
+         required by your servlet more complicated, so defining
+         all of your servlets (and defining a mapping to them with
+         a servlet-mapping element) is recommended.
+
+         Servlet initialization parameters can be retrieved in a
+         servlet or JSP page by calling:
+
+             String value =
+               getServletConfig().getInitParameter("name");
+
+         where "name" matches the <param-name> element of
+         one of these initialization parameters.
+
+         You can define any number of servlets, including zero.
+-->
+    <servlet>
+      <servlet-name>LogOut</servlet-name>
+      <servlet-class>com.cesfelipesegundo.itis.web.servlets.LogOutServlet</servlet-class>
+      <load-on-startup>2</load-on-startup>      
+    </servlet>
+    
+	<servlet>
+      <servlet-name>Home</servlet-name>
+      <servlet-class>com.cesfelipesegundo.itis.web.servlets.HomeServlet</servlet-class>
+      <init-param>
+      	<param-name>ADMIN</param-name>
+      	<param-value>/admin/index.itest</param-value>
+      </init-param>
+      <init-param>
+      	<param-name>TUTOR</param-name>
+      	<param-value>/tutor/index.itest</param-value>
+      </init-param>
+      <init-param>
+      	<param-name>TUTORAV</param-name>
+      	<param-value>/tutor/index.itest</param-value>
+      </init-param>
+      <init-param>
+      	<param-name>LEARNER</param-name>
+      	<param-value>/learner/index.itest</param-value>
+      </init-param>
+	  <init-param>
+      	<param-name>KID</param-name>
+      	<param-value>/learner/index.itest</param-value>
+      </init-param>
+      <load-on-startup>2</load-on-startup>
+    </servlet>
+    
+	<!-- 
+	Esta línea carga itest-servlet.xml, contenido en el mismo directorio
+	que este archivo.
+	 -->
+	<servlet>
+		<servlet-name>itest</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>api</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+ 
+    <!-- DWR framework (Ajax + Spring) -->
+	<servlet>
+	  <display-name>DWR Servlet</display-name>
+	  <servlet-name>dwr-invoker</servlet-name>
+	  <servlet-class>uk.ltd.getahead.dwr.DWRServlet</servlet-class>
+
+      <!-- Needed for Safari browser compatibility -->
+	  <init-param>
+	     <param-name>allowGetForSafariButMakeForgeryEasier</param-name>
+	     <param-value>true</param-value>
+<!--	  
+	     <param-name>debug</param-name>
+	     <param-value>true</param-value>
+-->	  
+	  </init-param>
+	</servlet>
+
+	<servlet>
+        <servlet-name>JamonReport</servlet-name>
+        <jsp-file>/WEB-INF/jsp/admin/jamonadmin.jsp</jsp-file>
+	</servlet>
+	
+	<servlet>
+        <servlet-name>StickyCaptcha</servlet-name>
+        <servlet-class>com.cesfelipesegundo.itis.web.controller.StickyCaptchaServletImpl</servlet-class>
+        <init-param>
+            <param-name>width</param-name>
+            <param-value>250</param-value>
+        </init-param>
+        <init-param>
+            <param-name>height</param-name>
+            <param-value>75</param-value>
+        </init-param>
+    </servlet>
+
+<!--    Define mappings that are used by the servlet container to
+         translate a particular request URI (context-relative) to a
+         particular servlet.  The examples below correspond to the
+         servlet descriptions above.  Thus, a request URI like:
+
+           http://localhost:8080/{contextpath}/graph
+
+         will be mapped to the "graph" servlet, while a request like:
+
+           http://localhost:8080/{contextpath}/saveCustomer.do
+
+         will be mapped to the "controller" servlet.
+
+         You may define any number of servlet mappings, including zero.
+         It is also legal to define more than one mapping for the same
+         servlet, if you wish to.
+-->
+
+
+    <servlet-mapping>
+        <servlet-name>StickyCaptcha</servlet-name>
+        <url-pattern>/stickyImg</url-pattern>
+    </servlet-mapping>
+
+
+
+
+
+    <servlet-mapping>
+      <servlet-name>LogOut</servlet-name>
+      <url-pattern>/Logout</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet-mapping>
+      <servlet-name>Home</servlet-name>
+      <url-pattern>/common/Home</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+      <servlet-name>JamonReport</servlet-name>
+      <url-pattern>/admin/jamonReport</url-pattern>
+    </servlet-mapping>
+    
+<!-- Generated configuration goes here -->
+<!--@JSP@-->
+
+	<!-- JOSELE: MAPPING A SPRING -->
+	<!-- 
+	De momento declaro un mapeo a páginas *.itest para no entrar en 
+	conflicto con nadie.
+	 -->
+	<servlet-mapping>
+		<servlet-name>itest</servlet-name>
+		<url-pattern>*.itest</url-pattern>
+	</servlet-mapping>	
+	
+	<servlet-mapping>
+		<servlet-name>api</servlet-name>
+		<url-pattern>/api/*</url-pattern>
+	</servlet-mapping>	
+
+	<!-- DWR framework (Ajax + Spring) -->
+	<servlet-mapping>
+	  <servlet-name>dwr-invoker</servlet-name>
+	  <url-pattern>/dwr/*</url-pattern>
+	</servlet-mapping>
+
+<!-- 
+	JSP Configuration Parameters
+-->
+   	<!-- JOSELE: TLDs DE SPRING -->
+	<!-- 
+	Necesito el tag spring:bind en los formularios JSP, por lo que he
+	de incluir el siguiente taglib
+	 -->
+	<jsp-config>
+		<!-- Con esto se incluye el tag "spring" para formularios -->
+		<taglib>
+			<taglib-uri>spring</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/spring.tld</taglib-location>
+		</taglib>
+	</jsp-config>
+	
+<!--    Define the default session timeout for your application,
+         in minutes.  From a servlet or JSP page, you can modify
+         the timeout for a particular session dynamically by using
+         HttpSession.getMaxInactiveInterval(). 
+-->
+
+    <session-config>
+        <!-- 60 minutes -->
+        <session-timeout>60</session-timeout>
+    </session-config>  
+
+<!--
+    Error Pages Configuration
+-->
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/error.jsp</location>
+    </error-page>
+
+<!-- 
+	Welcome file list configuration
+-->
+
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	
+<!--
+    Authorization: Application sections configuration
+-->
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Common Sections</web-resource-name>
+      <url-pattern>/common/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>ADMIN</role-name>
+      <role-name>LEARNER</role-name>
+      <role-name>KID</role-name>
+      <role-name>TUTOR</role-name>
+      <role-name>TUTORAV</role-name>
+    </auth-constraint>
+  </security-constraint>
+  
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Administrator Section</web-resource-name>
+      <url-pattern>/admin/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>ADMIN</role-name>
+    </auth-constraint>
+  </security-constraint>
+  
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Learners Section</web-resource-name>
+      <url-pattern>/learner/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>LEARNER</role-name>
+      <role-name>KID</role-name>
+    </auth-constraint>
+  </security-constraint>
+       
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Tutors Section</web-resource-name>
+      <url-pattern>/tutor/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+    <role-name>TUTORAV</role-name>
+      <role-name>TUTOR</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+<!--
+    Authentication: Login Configuration
+-->
+  <login-config>
+    <auth-method>FORM</auth-method>
+    <realm-name>iTestRealm</realm-name>
+    <form-login-config>
+      <form-login-page>/login.jsp</form-login-page>
+      <form-error-page>/login_error.jsp</form-error-page>
+    </form-login-config>
+  </login-config>
+  
+<!--
+    Application role declaration
+-->
+    <security-role>
+        <role-name>ADMIN</role-name>
+    </security-role>
+    <security-role>
+        <role-name>LEARNER</role-name>
+    </security-role>
+    <security-role>
+        <role-name>KID</role-name>
+    </security-role>
+    <security-role>
+        <role-name>TUTOR</role-name>
+    </security-role>
+    <security-role>
+        <role-name>TUTORAV</role-name>
+    </security-role>
+<!--
+    Application resources declaration
+-->
+    <resource-ref>
+        <description>Database Connection</description>
+        <res-ref-name>jdbc/iTestDB</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+        <resource-ref>
+        <description>Mail Session</description>
+        <res-ref-name>mail/itestSession</res-ref-name>
+        <res-type>javax.mail.Session</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+</web-app>

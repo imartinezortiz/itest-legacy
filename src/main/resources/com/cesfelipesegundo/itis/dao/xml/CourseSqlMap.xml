@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Course">
+	
+	<select id="getAVGStudent" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT AVG(count) 
+		FROM (SELECT 
+				count(idmat) AS count 
+			FROM 
+				grupos g, matriculas m,examenes e
+			WHERE  
+				e.grupo = g.idgrupo AND
+				m.grupo = g.idgrupo
+			    <isNotNull prepend="AND" property="institution">
+					centro = #institution# 
+				</isNotNull>
+				<isNotNull prepend="AND" property="course">
+					asig= #course#
+				</isNotNull>
+				<isNotNull prepend="AND" property="year">
+					anio = #year#
+				</isNotNull>
+			GROUP BY e.idexam
+			) table
+			
+	</select>
+	
+	<select id="getNumExams" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT
+			count(e.idexam)
+		FROM
+			grupos g, examenes e
+		WHERE
+		        e.grupo = g.idgrupo
+			    <isNotNull prepend="AND" property="institution">
+					centro = #institution# 
+				</isNotNull>
+				<isNotNull prepend="AND" property="course">
+					asig= #course#
+				</isNotNull>
+				<isNotNull prepend="AND" property="year">
+					anio = #year#
+				</isNotNull>
+	</select>
+	
+	<select id="getAllStudentGroup" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT 
+			count(idmat) 
+		FROM 
+			grupos g, matriculas m 
+		WHERE  
+			m.grupo = g.idgrupo
+			<isNotNull prepend="AND" property="institution">
+				centro = #institution# 
+			</isNotNull>
+			<isNotNull prepend="AND" property="course">
+				asig= #course#
+			</isNotNull>
+			<isNotNull prepend="AND" property="year">
+				anio = #year#
+			</isNotNull>
+			
+	</select>
+	
+	<select id="getGroupCalifs" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT
+			count(c.idcalif)
+		FROM
+			grupos g, examenes e, califs c
+		WHERE
+				e.grupo = g.idgrupo
+			AND
+	        	c.exam = e.idexam
+	    	AND
+	        	c.nota/(e.nota_max/10)>=#valMin#
+	    	AND
+	      		#valMax#>c.nota/(e.nota_max/10)
+		    <isNotNull prepend="AND" property="institution">
+				centro = #institution# 
+			</isNotNull>
+			<isNotNull prepend="AND" property="course">
+				asig= #course#
+			</isNotNull>
+			<isNotNull prepend="AND" property="year">
+				anio = #year#
+			</isNotNull>
+
+		      
+	</select>
+	<select id="getAllGroupCalifs" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT
+			count(c.idcalif)
+		FROM
+			grupos g, examenes e, califs c
+		WHERE
+			  centro = #institution# 
+				<isNotNull prepend="AND" property="course">
+					asig= #course#
+				</isNotNull>
+				<isNotNull prepend="AND" property="year">
+					anio = #year#
+				</isNotNull>
+		      AND
+		        e.grupo = g.idgrupo
+		      AND
+		        c.exam = e.idexam
+	</select>
+	<select id="getGroupsByCourse" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT 
+			count(idgrupo) 
+		FROM 
+			grupos g 
+			<isNotNull prepend="WHERE" property="institution">
+				centro = #institution# 
+			</isNotNull>
+			<isNotNull prepend="AND" property="course">
+				asig= #course#
+			</isNotNull>
+			<isNotNull prepend="AND" property="year">
+				anio = #year#
+			</isNotNull>
+			
+			
+	</select>
+	
+	
+	<!-- Consulta  -->	
+	<select id="getCourses"  resultClass="com.cesfelipesegundo.itis.model.Course">
+		SELECT 
+			a.idasig as id,
+		 	a.cod as code,
+			a.nombre as name,
+		    a.estudios as studies,
+			a.curso as level,
+			a.comentarios as comments,
+			COUNT(g.idgrupo) as numGroups					
+		 FROM 
+			asignaturas a,
+			grupos g
+		WHERE
+			a.idasig = g.asig
+		GROUP BY
+			a.idasig
+		ORDER BY
+			a.nombre
+	</select>
+	
+	<!-- Consulta  -->	
+	<select id="getCoursesByCenter" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.Course">
+		SELECT DISTINCT
+			a.idasig as id,
+		 	a.cod as code,
+			a.nombre as name,
+		    a.estudios as studies,
+			a.curso as level,
+			a.comentarios as comments
+		 FROM
+			asignaturas a, centros c, grupos g
+		WHERE
+			c.idcentro = #value# AND c.idcentro = g.centro AND g.asig = a.idasig
+    	ORDER BY id
+	</select>
+	
+	<select id="getCourseByCode" parameterClass="java.lang.String"
+		resultClass="com.cesfelipesegundo.itis.model.Course">
+		SELECT
+			a.idasig as id,
+		 	a.cod as code,
+			a.nombre as name,
+		    a.estudios as studies,
+			a.curso as level,
+			a.comentarios as comments
+		FROM 
+			asignaturas a
+		WHERE 
+			a.cod = #value#
+		LIMIT 1
+	</select>
+	
+	<select id="getCourseById" parameterClass="java.lang.Long"
+		resultClass="com.cesfelipesegundo.itis.model.Course">
+		SELECT
+			a.idasig as id,
+		 	a.cod as code,
+			a.nombre as name,
+		    a.estudios as studies,
+			a.curso as level,
+			a.comentarios as comments
+		FROM 
+			asignaturas a
+		WHERE 
+			a.idasig = #value#
+		LIMIT 1
+	</select>
+	
+	<!-- Insercion de asignatura -->
+	<insert id="insertCourse" parameterClass="com.cesfelipesegundo.itis.model.Course">
+		INSERT INTO 
+			asignaturas (cod, nombre, estudios, curso, comentarios) 
+		VALUES
+			(#code#, #name#, #studies#, #level#, #comments#)
+		<selectKey keyProperty="id" resultClass="java.lang.Long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>	
+
+	<select id="getNumGroups" parameterClass="java.lang.Long" resultClass="java.lang.Long">
+		SELECT
+			COUNT(*)
+		FROM 
+			grupos g
+		WHERE
+			g.asig = #value#
+	</select>
+	
+	<!-- Actualiza asignatura -->
+	<update id="updateCourse" parameterClass="com.cesfelipesegundo.itis.model.Course">
+		UPDATE asignaturas
+		SET
+			cod = #code#,
+			nombre = #name#,
+			estudios = #studies#,
+			curso = #level#,
+			comentarios = #comments#		
+		WHERE 
+			idasig = #id#
+	</update>	
+
+	<!-- Borra asignatura-->
+	<delete id="deleteCourse" parameterClass="com.cesfelipesegundo.itis.model.Course">
+		DELETE FROM asignaturas WHERE idasig=#id#
+	</delete>
+	
+	<select id="getCourseByInstitutionAndGroup" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.Course">
+		SELECT
+			a.idasig as id,
+		 	a.cod as code,
+			a.nombre as name,
+		    a.estudios as studies,
+			a.curso as level,
+			a.comentarios as comments
+		FROM
+  			asignaturas a, grupos g
+		WHERE
+  			g.asig = a.idasig AND g.anio = #year# AND g.centro = #idInstitution#
+	</select>
+	
+	<!-- Consulta  -->	
+	<select id="getCoursesFiltered" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.Course">
+		SELECT DISTINCT
+			a.idasig as id,
+		 	a.cod as code,
+			a.nombre as name,
+		    a.estudios as studies,
+			a.curso as level,
+			a.comentarios as comments
+		 FROM
+			asignaturas a
+		WHERE
+			a.idasig = a.idasig
+			<isNotNull prepend="AND" property="codigo">
+				a.cod LIKE #codigo#
+			</isNotNull>
+			<isNotNull prepend="AND" property="nombre">
+				a.nombre LIKE #nombre#
+			</isNotNull>
+			<isNotNull prepend="AND" property="curso">
+				a.curso LIKE #curso#
+			</isNotNull>
+			<isNotNull prepend="AND" property="estudios">
+				a.estudios LIKE #estudios#
+			</isNotNull>
+		GROUP BY
+			a.idasig
+		ORDER BY 
+			a.nombre
+			
+	</select>
+	
+</sqlMap>

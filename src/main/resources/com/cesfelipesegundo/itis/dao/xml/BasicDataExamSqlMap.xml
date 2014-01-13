@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="BasicDataExam">
+	
+	<!-- Consulta parametrizada por id de usuario -->	
+	<!-- Extrae los exámenes pendientes de un alumno -->
+	<select id="getPendingExams" parameterClass="java.lang.Long" resultMap="ModelResults.BasicDataExamResult">
+		SELECT DISTINCT
+			examenes.idexam AS idExam,
+			examenes.titulo AS titleExam,
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 
+		FROM 
+			examenes,
+			grupos,
+			asignaturas,
+			centros
+		WHERE 
+			grupos.idgrupo = examenes.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND
+			examenes.visibilidad = 1 AND
+			<!-- examen activo -->
+			examenes.visibilidad = 1 AND
+			NOW() >= examenes.fecha_ini AND 
+			examenes.fecha_fin >= NOW() AND
+			<!-- El alumno no ha realizado ya el examen -->
+			#value# NOT IN (SELECT califs.alu FROM califs WHERE califs.exam=examenes.idexam) AND
+			<!-- El alumno está matriculado en el grupo al cual el examen va destinado -->
+			#value# IN (SELECT matriculas.alumno FROM matriculas WHERE matriculas.grupo = grupos.idgrupo)
+		ORDER BY nameCourse ASC, nameGroup ASC
+	</select>
+
+	<!-- Muestra los examenes que vayan a activarse en un futuro el grupo, la asignatura y el centro al que pertenecen -->
+	<select id="getNextExamsByUser"  parameterClass="java.util.Map" resultMap="ModelResults.BasicDataExamResult">
+		SELECT DISTINCT
+			examenes.idexam AS idExam,
+			examenes.titulo AS titleExam,
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 
+		FROM
+			examenes,
+			grupos,
+			asignaturas,
+			centros
+		WHERE 
+			grupos.idgrupo = #idGroup# AND
+			grupos.idgrupo = examenes.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND
+			examenes.publicado = 1 AND
+			examenes.fecha_ini >= NOW() AND
+			examenes.fecha_fin >= NOW() AND
+			#userId# NOT IN (SELECT califs.alu FROM califs WHERE califs.exam=examenes.idexam) AND
+			#userId# IN (SELECT matriculas.alumno FROM matriculas WHERE matriculas.grupo = grupos.idgrupo)
+		ORDER BY nameCourse ASC, nameGroup ASC
+			
+	</select>
+	
+	
+	<!-- Consulta parametrizada por id de usuario -->	
+	<!-- Extrae los exámenes hechos por un alumno -->
+	<select id="getExamsForRevision" parameterClass="java.lang.Long" resultMap="ModelResults.BasicDataExamResult">
+		SELECT DISTINCT
+			examenes.idexam AS idExam,
+			examenes.titulo AS titleExam,
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 
+		FROM 
+			examenes,
+			grupos,
+			asignaturas,
+			centros
+		WHERE 
+			grupos.idgrupo = examenes.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND
+			examenes.rev_activa = 1 AND
+			NOW() >= examenes.fecha_ini_rev AND
+			examenes.fecha_fin_rev >= NOW() AND
+			<!-- El alumno ha finalizado ya el examen -->
+			#value# IN (SELECT califs.alu FROM califs WHERE NOW()>=califs.fecha_fin AND califs.exam=examenes.idexam) AND
+			<!-- El examen esta listo para revision -->
+			examenes.rev_activa = 1
+			
+		ORDER BY nameCourse ASC, yearGroup DESC,  nameGroup ASC
+	</select>
+	
+	<!-- Inserta el registro de inicio de examen en califs -->
+	<insert id="addNewGrade" parameterClass="com.cesfelipesegundo.itis.model.Grade">
+	    INSERT INTO 
+	    	califs (alu, exam, ip, nota, fecha_ini, fecha_fin, tiempo)
+	    VALUES 
+	    	(#idStudent#, #idExam#, #ip#, #grade#, #begin#, #end#, #time#)
+    	<selectKey keyProperty="id" resultClass="java.lang.Long">
+      		SELECT LAST_INSERT_ID()
+    	</selectKey>
+  	</insert>
+  	
+  	<!-- Actualiza califs con un objeto tipo Grade-->
+  	<update id="updateGrade" parameterClass="com.cesfelipesegundo.itis.model.Grade">
+	    UPDATE califs 
+    	<dynamic prepend="set">
+      		<isNotNull prepend="," property="ip">
+        		ip = #ip#
+      		</isNotNull>
+      		<isNotNull prepend="," property="grade">
+        		nota = #grade#
+      		</isNotNull>
+      		<isNotNull prepend="," property="begin">
+        		fecha_ini = #begin#
+      		</isNotNull>
+      		<isNotNull prepend="," property="end">
+       			fecha_fin = #end#
+      		</isNotNull>
+      		<isNotNull prepend="," property="time">
+        		tiempo = #time#
+      		</isNotNull>
+    	</dynamic>
+	    WHERE
+	    	exam = #idExam# AND
+	    	alu = #idStudent#
+	</update>
+	
+</sqlMap>

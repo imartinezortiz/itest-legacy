@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Institution">
+
+	<!-- Consulta  -->	
+	
+	<select id="getAllCertifications" resultClass="java.lang.String">
+		SELECT DISTINCT
+			titulacion
+		FROM
+			centros
+	</select>
+	
+	<select id="getInstitutions"  resultClass="com.cesfelipesegundo.itis.model.Institution">
+		SELECT 
+			idcentro AS id,
+			cod AS code,
+			nombre AS name,
+			direccion AS address,
+			localidad AS city,
+			cpostal AS zipCode,
+			provincia AS state,
+			telefono AS phone,
+			fax,
+			email,
+			web,
+			p_contacto AS contactPerson,
+			tlf_contacto AS contactPhone,
+			titulacion AS certification
+		 FROM 
+			centros
+	</select>
+
+	<!-- Consulta parametrizada por id -->	
+	<select id="getInstitution" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.Institution">
+		SELECT 
+			idcentro AS id,
+			cod AS code,
+			nombre AS name,
+			direccion AS address,
+			localidad AS city,
+			cpostal AS zipCode,
+			provincia AS state,
+			telefono AS phone,
+			fax,
+			email,
+			web,
+			p_contacto AS contactPerson,
+			tlf_contacto AS contactPhone,
+			titulacion AS certification 
+		 FROM 
+			centros
+		 WHERE 
+			centros.idcentro = #value# 
+	</select>
+	
+	<!-- Insercion de centro -->
+	<insert id="insertInstitution" parameterClass="com.cesfelipesegundo.itis.model.Institution">
+		INSERT INTO 
+			centros (cod, nombre, direccion, localidad, cpostal, provincia, telefono, fax, email, web, p_contacto, tlf_contacto, titulacion) 
+		VALUES
+			(#code#, #name#, #address#, #city#, #zipCode#, #state#, #phone#, #fax#, #email#, #web#, #contactPerson#, #contactPhone#, #certification#)
+		<selectKey keyProperty="id" resultClass="java.lang.Long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>	
+
+	<!-- Actualiza centro -->
+	<update id="updateInstitution" parameterClass="com.cesfelipesegundo.itis.model.Institution">
+		UPDATE centros
+		SET
+			cod = #code#,
+			nombre = #name#,
+			direccion = #address#,
+			localidad = #city#,
+			cpostal = #zipCode#,
+			provincia = #state#,
+			telefono = #phone#,
+			fax = #fax#,
+			email = #email#,
+			web = #web#,
+			p_contacto = #contactPerson#,
+			tlf_contacto = #contactPhone#,
+			titulacion = #certification# 
+		WHERE 
+			idcentro = #id#
+	</update>	
+
+	<!-- Borra centro-->
+	<delete id="deleteInstitution" parameterClass="com.cesfelipesegundo.itis.model.Institution">
+		DELETE FROM centros WHERE idcentro=#id#
+	</delete>
+	
+	<select id="getTeachersByInstitutionStats" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT DISTINCT
+		    m.profe
+		FROM
+		    grupos g,
+		    imparten m
+		WHERE
+				g.idgrupo = m.grupo
+				<isNotNull prepend="AND" property="idInstitution">
+		    		g.centro = #idInstitution#
+		    	</isNotNull>
+		    	<isNotNull prepend="AND" property="year">
+		    		g.anio = #year#
+		    	</isNotNull>
+		    	<isNotNull prepend="AND" property="idCourse">
+		    		g.asig = #idCourse# 
+		    	</isNotNull>
+		    	
+			
+	</select>
+	
+	<select id="getStudentsByInstitutionStats" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT DISTINCT
+		    m.alumno
+		FROM
+		    grupos g,
+		    matriculas m
+		WHERE
+				g.idgrupo = m.grupo
+		    	<isNotNull prepend="AND" property="idInstitution">
+		    		g.centro = #idInstitution#
+		    	</isNotNull>
+		    	<isNotNull prepend="AND" property="year">
+		    		g.anio = #year#
+		    	</isNotNull>
+		    	<isNotNull prepend="AND" property="idCourse">
+		    		g.asig = #idCourse# 
+		    	</isNotNull>
+		    	
+			
+	</select>
+	<select id="getSubjectsByInstitutionStats" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT DISTINCT
+		    g.asig
+		FROM
+		    grupos g
+				<isNotNull prepend="WHERE" property="idInstitution">
+		    		g.centro = #idInstitution#
+		    	</isNotNull>
+		    	<isNotNull prepend="AND" property="year">
+		    		g.anio = #year#
+		    	</isNotNull>
+		    	<isNotNull prepend="AND" property="idCourse">
+		    		g.asig = #idCourse# 
+		    	</isNotNull>
+			
+	</select>
+	<select id="getGroupsByInstitutionStats" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT DISTINCT
+		    g.idgrupo
+		FROM
+		    grupos g
+		    	<isNotNull prepend="WHERE" property="idInstitution">
+		    		g.centro = #idInstitution#
+		    	</isNotNull>
+		    	<isNotNull prepend="AND" property="year">
+		    		g.anio = #year#
+		    	</isNotNull>
+		    	<isNotNull prepend="AND" property="idCourse">
+		    		g.asig = #idCourse# 
+		    	</isNotNull>
+			
+	</select>
+	<select id="getExamsByInstitutionStats" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT DISTINCT
+		    e.idexam
+		FROM
+		    grupos g,examenes e
+		WHERE
+				e.grupo = g.idgrupo
+		    	<isNotNull prepend="AND" property="idInstitution">
+		    		g.centro = #idInstitution#
+		    	</isNotNull>
+		    	<isNotNull prepend="AND" property="year">
+		    		g.anio = #year#
+		    	</isNotNull>
+		    	<isNotNull prepend="AND" property="idCourse">
+		    		g.asig = #idCourse# 
+		    	</isNotNull>
+			
+	</select>
+	
+	<insert id="insertStudy" parameterClass="java.util.Map">
+		INSERT INTO centros_estudios (centro, estudio)
+		VALUES (#Centro#, #Estudio#)
+		<selectKey keyProperty="id" resultClass="java.lang.Long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	<delete id="deleteStudiesInstitution"  parameterClass="java.lang.Long">
+		DELETE FROM centros_estudios WHERE centro=#value#
+	</delete>
+	<select id="getStudiesList" parameterClass="java.lang.Long" resultClass="java.lang.String">
+		SELECT DISTINCT 
+			c.estudio 
+		FROM 
+			centros_estudios c
+		WHERE
+			c.centro = #value#
+			
+	</select>
+	<!-- Consulta parametrizada por id -->	
+	<select id="getInstitutionFiltered" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.Institution">
+		SELECT 
+			c.idcentro AS id,
+			c.cod AS code,
+			c.nombre AS name,
+			c.direccion AS address,
+			c.localidad AS city,
+			c.cpostal AS zipCode,
+			c.provincia AS state,
+			c.telefono AS phone,
+			c.fax,
+			c.email,
+			c.web,
+			c.p_contacto AS contactPerson,
+			c.tlf_contacto AS contactPhone,
+			c.titulacion AS certification
+		 FROM 
+			centros c
+			<isNotNull prepend="," property="Estudio5">
+				(SELECT centro FROM centros_estudios WHERE estudio =  #Estudio5# ) inf
+			</isNotNull>
+			<isNotNull prepend="," property="Estudio4">
+				(SELECT centro FROM centros_estudios WHERE estudio =  #Estudio4# ) uni
+			</isNotNull>
+			<isNotNull prepend="," property="Estudio3">
+				(SELECT centro FROM centros_estudios WHERE estudio =  #Estudio3# ) bac
+			</isNotNull>
+			<isNotNull prepend="," property="Estudio2">
+				(SELECT centro FROM centros_estudios WHERE estudio =  #Estudio2# ) fp
+			</isNotNull>
+			<isNotNull prepend="," property="Estudio1">
+				(SELECT centro FROM centros_estudios WHERE estudio =  #Estudio1# ) sec
+			</isNotNull>
+			<isNotNull prepend="," property="Estudio0">
+				(SELECT centro FROM centros_estudios WHERE estudio =  #Estudio0# ) pri
+			</isNotNull>
+			
+			
+		 	
+		 WHERE
+		 		c.idcentro = c.idcentro
+			<isNotNull prepend="AND" property="id">
+		    	c.cod = #id# 
+		    </isNotNull>
+		    <isNotNull prepend="AND" property="nombre">
+		    	c.nombre LIKE #nombre# 
+		    </isNotNull>
+		    <isNotNull prepend="AND" property="localidad">
+		    	c.localidad LIKE #localidad#  
+		    </isNotNull>
+		    <isNotNull prepend="AND" property="provincia">
+		    	c.provincia LIKE #provincia#  
+		    </isNotNull>
+		    <isNotNull prepend="AND" property="certification">
+		    	c.titulacion LIKE #certification#  
+		    </isNotNull>
+		    <isNotNull prepend="AND" property="Estudio0">
+		    	c.idcentro = pri.centro
+		    </isNotNull>
+		    <isNotNull prepend="AND" property="Estudio1">
+				c.idcentro = sec.centro    
+			</isNotNull>
+		    <isNotNull prepend="AND" property="Estudio2">
+		    	c.idcentro = fp.centro
+		    </isNotNull>
+		    <isNotNull prepend="AND" property="Estudio3">
+		    	c.idcentro = bac.centro
+		    </isNotNull>
+		    <isNotNull prepend="AND" property="Estudio4">
+	    		c.idcentro = uni.centro
+		    </isNotNull>
+		    <isNotNull prepend="AND" property="Estudio5">
+	    		c.idcentro = inf.centro
+		    </isNotNull>
+		 
+	</select>
+	
+	<select id="getInstitutionsWidthPublicQuestions"  resultClass="com.cesfelipesegundo.itis.model.Institution">
+		SELECT
+			c.idcentro AS id,
+			c.cod AS code,
+			c.nombre AS name,
+			c.direccion AS address,
+			c.localidad AS city,
+			c.cpostal AS zipCode,
+			c.provincia AS state,
+			c.telefono AS phone,
+			c.fax,
+			c.email,
+			c.web,
+			c.p_contacto AS contactPerson,
+			c.tlf_contacto AS contactPhone,
+			c.titulacion AS certification
+		 FROM
+			centros c,
+			grupos g,
+			preguntas p
+	     WHERE
+	      g.centro = c.idcentro AND
+	      p.grupo = g.idgrupo AND
+	      p.visibilidad = 2
+	    GROUP BY
+	      c.idcentro
+	</select>
+	
+	<select id="getInstitutionByUserId" parameterClass="java.lang.Long"  resultClass="com.cesfelipesegundo.itis.model.Institution">
+		(
+SELECT DISTINCT
+			c.idcentro AS id,
+			c.cod AS code,
+			c.nombre AS name,
+			c.direccion AS address,
+			c.localidad AS city,
+			c.cpostal AS zipCode,
+			c.provincia AS state,
+			c.telefono AS phone,
+			c.fax,
+			c.email,
+			c.web,
+			c.p_contacto AS contactPerson,
+			c.tlf_contacto AS contactPhone,
+			c.titulacion AS certification
+		 FROM
+			centros c,
+			grupos g,
+			matriculas m
+	     WHERE
+	     	c.idcentro = g.centro AND
+	     	g.idgrupo = m.grupo AND
+         m.alumno = #value#
+)
+UNION
+(
+SELECT DISTINCT
+			c.idcentro AS id,
+			c.cod AS code,
+			c.nombre AS name,
+			c.direccion AS address,
+			c.localidad AS city,
+			c.cpostal AS zipCode,
+			c.provincia AS state,
+			c.telefono AS phone,
+			c.fax,
+			c.email,
+			c.web,
+			c.p_contacto AS contactPerson,
+			c.tlf_contacto AS contactPhone,
+			c.titulacion AS certification
+		 FROM
+			centros c,
+			grupos g,
+			imparten i
+	     WHERE
+	     	c.idcentro = g.centro AND
+	     	g.idgrupo = i.grupo AND
+         i.profe = #value#
+)
+	    
+	</select>
+</sqlMap>

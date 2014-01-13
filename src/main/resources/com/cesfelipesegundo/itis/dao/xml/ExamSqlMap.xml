@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Exam">
+	
+	<!-- Consulta parametrizada por Id de examen -->
+	<!-- Toma la información de examenes para rellenar la clase Exam -->
+	<select id="getExam" parameterClass="java.util.Map" resultMap="ModelResults.ExamResult">
+		SELECT 
+			examenes.idexam AS idExam,
+			examenes.titulo AS titleExam,
+			examenes.duracion AS durationExam,
+			examenes.nota_max AS maxGradeExam,
+			examenes.corr_parcial AS partialCorrectionExam,
+			examenes.p_preg_fallada AS penQuestionFailedExam,
+			examenes.p_preg_no_resp AS penQuestionNotAnsweredExam,
+			examenes.p_resp_fallada AS penAnswerFailedExam,
+			examenes.cota_calif_preg AS minQuestionGradeExam,
+			examenes.muestra_num_corr AS showNumCorrectAnswersExam,
+			examenes.p_nivel_confianza AS penConfidenceLevel,
+			examenes.r_nivel_confianza AS rewardConfidenceLevel,
+			examenes.nivelConfianza AS confidenceLevel,   
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter,
+			califs.nota AS examGrade,
+			califs.fecha_ini AS startingDateExam
+		FROM 
+			examenes,
+			grupos,
+			asignaturas,
+			centros,
+			califs
+		WHERE 
+			examenes.idexam = #idExam# AND
+			grupos.idgrupo = examenes.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND
+			califs.exam = examenes.idexam AND
+			califs.alu = #idUser#
+		LIMIT 1
+	</select>
+	
+	<!-- Consulta parametrizada por Id de examen -->
+	<!-- Toma la información de examenes para rellenar la clase Exam -->
+	<select id="getAllExamsForId" parameterClass="java.lang.Long" resultMap="ModelResults.ExamResult">
+		SELECT 
+			examenes.idexam AS idExam,
+			examenes.titulo AS titleExam,
+			examenes.duracion AS durationExam,
+			examenes.nota_max AS maxGradeExam,
+			examenes.corr_parcial AS partialCorrectionExam,
+			examenes.p_preg_fallada AS penQuestionFailedExam,
+			examenes.p_preg_no_resp AS penQuestionNotAnsweredExam,
+			examenes.p_resp_fallada AS penAnswerFailedExam,
+			examenes.cota_calif_preg AS minQuestionGradeExam,
+			examenes.muestra_num_corr AS showNumCorrectAnswersExam, 
+			examenes.p_nivel_confianza AS penConfidenceLevel,
+			examenes.r_nivel_confianza AS rewardConfidenceLevel,
+			examenes.nivelConfianza AS confidenceLevel,   
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter,
+			califs.nota AS examGrade,
+			califs.fecha_ini AS startingDateExam 
+		FROM 
+			examenes,
+			grupos,
+			asignaturas,
+			centros,
+			califs
+		WHERE 
+			examenes.idexam = #idexam# AND
+			grupos.idgrupo = examenes.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND
+			califs.exam = examenes.idexam
+	</select>
+	
+	<!-- Dado un id de tema, esta consulta coge todas las preguntas relativas al tema -->
+	<select id="getExamQuestion" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.ExamQuestion">
+		SELECT DISTINCT
+			log_exams.preg AS id,
+			preguntas.titulo AS title,
+			preguntas.enunciado AS text,
+			preguntas.dificultad AS difficulty,
+			preguntas.comentario AS comment,
+			preguntas.n_resp_correctas AS numCorrectAnswers,
+			preguntas.tipo AS type,
+			log_exams.nivel_confianza AS marked
+		FROM 
+			log_exams,
+			preguntas
+		WHERE 
+			log_exams.exam = #idExam# AND
+			log_exams.alu = #idUser# AND
+			log_exams.preg = preguntas.idpreg
+		ORDER BY
+			log_exams.idlogexams ASC
+	</select>
+	
+	<!-- Dado un id de examen y alumno, esta consulta coge todas las preguntas de rellenar relativas al examen y alumnno -->
+	<select id="getExamFillQuestion" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.ExamQuestion">
+		SELECT DISTINCT
+			log_exams_fill.preg AS id,
+			preguntas.titulo AS title,
+			preguntas.enunciado AS text,
+			preguntas.dificultad AS difficulty,
+			preguntas.comentario AS comment,
+			preguntas.n_resp_correctas AS numCorrectAnswers,
+			preguntas.tipo AS type,
+			log_exams_fill.nivel_confianza AS marked,
+			log_exams_fill.resp AS learnerFillAnswer
+		FROM 
+			log_exams_fill,
+			preguntas
+		WHERE 
+			log_exams_fill.exam = #idExam# AND
+			log_exams_fill.alu = #idUser# AND
+			log_exams_fill.preg = preguntas.idpreg
+		ORDER BY
+			log_exams_fill.idlogexamsfill ASC
+	</select>
+
+	<!-- Dado un id de pregunta, esta consulta coge todas los elementos multimedia de la misma. -->
+	<select id="getQuestionMedia" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.MediaElem">
+		SELECT 
+			extra_pregs.idextrap AS id,
+			extra_pregs.ruta AS path,
+			extra_pregs.tipo AS type,
+			extra_pregs.orden AS 'order',
+			extra_pregs.nombre AS name,
+			extra_pregs.ancho AS width,
+			extra_pregs.alto AS height
+		FROM 
+			extra_pregs 
+		WHERE 
+			extra_pregs.preg = #value#
+	</select>
+	
+	<!-- Dado un id de pregunta, esta consulta coge todas los comentarios multimedia de la misma. -->
+	<select id="getCommentMedia" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.MediaElem">
+		SELECT 
+			extra_pregs_comentario.idextrapcom  AS id,
+			extra_pregs_comentario.ruta AS path,
+			extra_pregs_comentario.tipo AS type,
+			extra_pregs_comentario.orden AS 'order',
+			extra_pregs_comentario.nombre AS name,
+			extra_pregs_comentario.ancho AS width,
+			extra_pregs_comentario.alto AS height
+		FROM 
+			extra_pregs_comentario 
+		WHERE 
+			extra_pregs_comentario.preg = #value#
+	</select>
+
+	<!-- Dado un id de examen, usuario y pregunta, esta consulta coge todas las respuestas relativas a ellos -->
+	<select id="getExamAnswer" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.ExamAnswer">
+		SELECT 
+			log_exams.resp AS id,
+			respuestas.texto AS text,
+			log_exams.marcada AS marked,
+			respuestas.solucion AS solution,
+			respuestas.valor AS value
+		FROM 
+			log_exams,
+			respuestas 
+		WHERE 
+			log_exams.exam = #idExam# AND
+			log_exams.alu = #idUser# AND
+			log_exams.preg = #idQuestion# AND
+			respuestas.idresp = log_exams.resp
+	</select>
+	
+	<!-- Dado un id de examen, usuario y pregunta, esta consulta coge todas las respuestas relativas a ellos -->
+	<select id="getExamFillAnswer" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.ExamAnswer">
+		SELECT 
+			respuestas.idresp AS id,
+			respuestas.texto AS text,
+			respuestas.solucion AS solution,
+			respuestas.valor AS value
+		FROM 
+			respuestas
+		WHERE 
+			respuestas.preg = #idQuestion#
+	</select>
+
+	<!-- Dado un id de respuesta, esta consulta coge todas los elementos multimedia de la misma. -->
+	<select id="getAnswerMedia" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.MediaElem">
+		SELECT 
+			extra_resps.idextrar AS id,
+			extra_resps.ruta AS path,
+			extra_resps.tipo AS type,
+			extra_resps.orden AS 'order',
+			extra_resps.nombre AS name,
+			extra_resps.ancho AS width,
+			extra_resps.alto AS height
+		FROM 
+			extra_resps 
+		WHERE 
+			extra_resps.resp = #value#
+	</select>
+
+	<!-- Borra examen (log_exams)-->
+	<delete id="deleteStudentExam" parameterClass="java.util.Map">
+		DELETE FROM log_exams WHERE alu=#stdId# AND exam=#examId#;
+	</delete>
+	<delete id="deleteStudentExamFill" parameterClass="java.util.Map">
+		DELETE FROM log_exams_fill WHERE alu=#stdId# AND exam=#examId#;
+	</delete>
+	
+	<!-- Borra examen (log_exams)-->
+	<delete id="deleteQuestionFromExam" parameterClass="java.util.Map">
+		DELETE FROM log_exams WHERE exam=#examId# AND preg=#idpreg#
+	</delete>
+	
+	<delete id="deleteFillQuestionFromExam" parameterClass="java.util.Map">
+		DELETE FROM log_exams_fill WHERE exam=#examId# AND preg=#idpreg#
+	</delete>
+	
+	<!-- Devuelve una lista de relaciones ID Alumno - ID Examen, 
+	de aquellos examenes en los que apareciese la pregunta con ID pasado por parametro -->
+	<select id="getExamsByQuestion" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.ExamForReview">
+		SELECT DISTINCT
+			C.exam AS idExam,
+			C.alu AS idLearner,
+			C.nota AS preGrade
+		FROM
+			log_exams L,califs C, log_exams_fill F
+		WHERE
+			(L.preg = #value# AND L.exam = C.exam AND L.alu = C.alu) OR
+			(F.preg = #value# AND F.exam = C.exam AND F.alu = C.alu)
+	</select>
+	
+	<select id="getExamsByIdExam" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.ExamForReview">
+		SELECT
+			C.exam AS idExam,
+			C.alu AS idLearner,
+			C.nota AS preGrade
+		FROM
+			califs C
+		WHERE
+			C.exam = #value#
+	</select>
+	
+	<select id="getNextQuestion" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.ExamQuestion"><![CDATA[
+		SELECT 
+			L.preg AS id,
+			P.titulo AS title,
+			P.enunciado AS text,
+			P.dificultad AS difficulty,
+			P.comentario AS comment,
+			P.n_resp_correctas AS numCorrectAnswers,
+			p.tipo AS type,
+			L.nivel_confianza AS marked
+		FROM 
+			log_exams L,
+			preguntas P
+		WHERE 
+			L.exam = 1 AND
+			L.alu = 131 AND
+			L.preg = P.idpreg AND
+			L.idlogexams = (	SELECT MIN(LE.idlogexams)
+								FROM log_exams LE
+								WHERE
+									LE.exam = L.exam AND
+									LE.alu = L.alu AND
+									LE.preg <> #lastId#  ); 
+	]]></select>
+	
+		<select id="selectExamByGroupAndUser" parameterClass="java.util.Map" resultMap="ModelResults.ExamResult">
+		SELECT 
+			examenes.idexam AS idExam,
+			examenes.titulo AS titleExam,
+			examenes.duracion AS durationExam,
+			examenes.nota_max AS maxGradeExam,
+			examenes.corr_parcial AS partialCorrectionExam,
+			examenes.p_preg_fallada AS penQuestionFailedExam,
+			examenes.p_preg_no_resp AS penQuestionNotAnsweredExam,
+			examenes.p_resp_fallada AS penAnswerFailedExam,
+			examenes.cota_calif_preg AS minQuestionGradeExam,
+			examenes.muestra_num_corr AS showNumCorrectAnswersExam, 
+			examenes.p_nivel_confianza AS penConfidenceLevel,
+			examenes.r_nivel_confianza AS rewardConfidenceLevel,
+			examenes.nivelConfianza AS confidenceLevel,   
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter,
+			califs.nota AS examGrade,
+			califs.fecha_ini AS startingDateExam 
+		FROM 
+			examenes,
+			grupos,
+			asignaturas,
+			centros,
+			califs
+		WHERE 
+			examenes.grupo = #group# AND
+			grupos.idgrupo = examenes.grupo AND
+			examenes.idexam = califs.exam AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND
+			califs.alu = #user#  
+			
+		ORDER BY 
+			examenes.fecha_fin DESC
+			
+	</select>
+	
+	<select id="getExamIds" parameterClass="java.lang.Long" resultClass="java.lang.Long">
+		SELECT DISTINCT 
+			exam 
+		FROM 
+			log_exams l 
+		WHERE 
+			preg = #value#;
+	</select>
+
+	<select id="getExamCalifs" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT
+			count(c.idcalif)
+		FROM
+			examenes e, califs c
+		WHERE
+			  e.idexam = #idexam#
+		      AND
+		        c.exam = e.idexam
+		      AND
+		        c.nota/(e.nota_max/10)>=#valMin#
+		      AND
+		      	#valMax#>c.nota/(e.nota_max/10);
+	</select>
+	
+	<select id="getAllStudentGroup" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT 
+			count(idmat) 
+		FROM 
+			grupos g, matriculas m, examenes e
+		WHERE  
+			m.grupo = g.idgrupo	AND
+			e.grupo = g.idgrupo AND
+			e.idexam = #idexam#
+			
+	</select>
+	
+	<select id="getNumExams" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT
+			COUNT(idcalif)
+		FROM 
+			califs
+		WHERE
+			exam = #idexam#
+	</select>
+</sqlMap>

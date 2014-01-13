@@ -1,0 +1,21 @@
+.buttonBBCode {
+	border-width:0px;
+	margin:5px;
+	text-align:center;
+	font-weight:bold;
+	font-size:12pt;
+	font-family:arial;
+	background-color: transparent;
+	color:#000000;
+}
+
+.buttonBBCode:hover{
+	border-width:0px;
+	margin:5px;
+	text-align:center;
+	font-weight:bold;
+	font-size:12pt;
+	font-family:arial;
+	background-color:#72F9FF;
+	color:#000000;
+}

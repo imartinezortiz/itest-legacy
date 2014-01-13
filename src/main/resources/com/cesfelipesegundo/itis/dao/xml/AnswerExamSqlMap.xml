@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="AnswerExam">
+	
+	<insert id="addNewAnswerExam" parameterClass="com.cesfelipesegundo.itis.model.AnswerExam">
+		INSERT INTO 
+			log_exams (exam, alu, preg, resp, marcada, puntos, hora_resp)
+		VALUES
+			(#idExam#, #idStudent#, #idQuestion#, #idAnswer#, #marked#, #grade#, #answerTime#)
+		<selectKey keyProperty="id" resultClass="java.lang.Long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<insert id="addNewExamFillAnswer" parameterClass="java.util.Map">
+		INSERT INTO 
+			log_exams_fill (exam, alu, preg, resp, puntos, hora_resp)
+		VALUES
+			(#idExam#, #idStudent#, #idQuestion#, #textAnswer#, #grade#, #answerTime#)
+		<selectKey keyProperty="id" resultClass="java.lang.Long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<update id="updateAnswerExam" parameterClass="com.cesfelipesegundo.itis.model.AnswerExam">
+		UPDATE log_exams 
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="marked">
+				marcada = #marked#
+			</isNotNull>
+			<isNotNull prepend="," property="grade">
+				puntos = #grade#
+			</isNotNull>
+			<isNotNull prepend="," property="answerTime">
+				hora_resp = #answerTime#
+			</isNotNull>
+		</dynamic>
+		WHERE 
+			exam = #idExam# AND
+			alu = #idStudent# AND
+			preg = #idQuestion# AND
+			resp = #idAnswer#
+	</update>
+	
+	<select id="selectAnswerExam" parameterClass="com.cesfelipesegundo.itis.model.AnswerExam" resultClass="com.cesfelipesegundo.itis.model.AnswerExam">
+		SELECT
+			exam AS idExam,
+			alu AS idStudent,
+			preg AS idQuestion,
+			resp AS idAnswer,
+			puntos AS grade,
+			hora_resp AS answerTime,
+			marcada AS marked
+		FROM
+			log_exams
+		WHERE
+			exam = #idExam# AND
+			alu = #idStudent# AND
+			preg = #idQuestion# AND
+			resp = #idAnswer#
+	</select>
+	
+	<update id="updateExamFillAnswer" parameterClass="java.util.Map">
+		UPDATE log_exams_fill 
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="grade">
+				puntos = #grade#
+			</isNotNull>
+			<isNotNull prepend="," property="answerTime">
+				hora_resp = #answerTime#
+			</isNotNull>
+			<isNotNull prepend="," property="textAnswer">
+				resp = #textAnswer#
+			</isNotNull>
+		</dynamic>
+		WHERE 
+			exam = #idExam# AND
+			alu = #idStudent# AND
+			preg = #idQuestion#
+	</update>
+	
+	<update id="updateConfidenceLevel" parameterClass="java.util.Map">
+		UPDATE log_exams 
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="checked">
+				nivel_confianza = #checked#
+			</isNotNull>
+		</dynamic>
+		WHERE 
+			exam = #examId# AND
+			alu = #userId# AND
+			preg = #questionId#
+	</update>
+	
+	<update id="updateConfidenceLevelFillQuestion" parameterClass="java.util.Map">
+		UPDATE log_exams_fill 
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="checked">
+				nivel_confianza = #checked#
+			</isNotNull>
+		</dynamic>
+		WHERE 
+			exam = #examId# AND
+			alu = #userId# AND
+			preg = #questionId#
+	</update>
+
+</sqlMap>

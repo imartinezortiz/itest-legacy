@@ -1,0 +1,330 @@
+body {
+	margin: 0; padding: 0; background-color: white;
+}
+
+/******************************************************************************************************************************************************
+************************************************ Posicionamiento de regiones *******************************************************************
+******************************************************************************************************************************************************/
+
+/* Reglas generales con posiciones absolutas para navegadores que no admiten CSS2 */
+
+#cabecera  { 	
+	position: absolute; top:0; left: 0; right:0; width: 100%; z-index:2; height: 50px;
+}
+
+#logo1, #logo2 {
+	position: absolute; height: 50px; width: 50%; top: 0; z-index:3;
+	background-color:transparent;
+}
+
+#logo1 {
+	text-align: left; left: 0;
+}
+
+#logo2 {
+	text-align: right; right: 0;
+}
+
+#menu {
+	position: absolute; width: 100%; top: 50px; height: 20px; left: 0; right: 0; z-index:4;
+}
+
+#fecha {
+	position:absolute; top: 52px; right: 5px; z-index:5;
+}
+
+#contenido {
+	position: absolute; top: 90px; left: 2%; margin: 0; width: 96%; z-index:1; bottom: 0;
+}
+
+#barra_creditos {
+	position: fixed; top: 370px; width: 100%; height: 20px; text-align: center; background-color: #FFFFFF; z-index:5;
+}
+
+#creditos {
+	position: absolute; top: 390px; left: 2%; margin: 0; width: 96%;
+}
+
+object { z-index:1; }
+
+/* Modificacion de reglas para usar posicionamiento fijo en navegadores que admitan CSS2 */
+
+body > #cabecera {	position: fixed; }
+
+body > #logo1, body > #logo2 { position: fixed; }
+
+body > #menu {	position: fixed; }
+
+#menu > #fecha 	{	position: fixed; }
+
+
+/******************************************************************************************************************************************************
+************************************************ Presentacion de la lista del menu ***************************************************************
+******************************************************************************************************************************************************/
+
+/* Posicionamiento como texto con margenes entre los elementos para navegadores que no admiten CSS2 */
+
+#menu ul {
+	display: block; margin: 0; padding: 0 5px; vertical-align: top; text-align: left;
+}
+
+#menu li {
+	display: inline; margin:0; padding: 3px 2em; text-align: center; height: 100%;
+}
+
+/* Modificacion de reglas para mostrar como tabla para navegadores que admiten CSS2 */
+
+body > #menu { display: table; }
+
+body > #menu ul {	display: table-row; }
+
+body > #menu li { display: table-cell; margin: 0; }
+
+
+/******************************************************************************************************************************************************
+********************************************************************* Estilo **************************************************************************
+******************************************************************************************************************************************************/
+
+
+#cabecera {
+	background-color: white;
+	margin: 0; padding: 5px 175px;
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size: 17px;
+}
+
+#cabecera:first-line {
+	font-weight: bold;
+}
+
+#cabecera a {
+	text-decoration: none; color: #990000;
+}
+
+#cabecera a:hover {
+	color: rgb(156,126,90);
+}
+
+
+#logo1, #logo2 {
+	margin: 0; padding: 5px 15px;
+}
+
+#logo2 {
+	padding: 0 15px;
+}
+
+#logo1 img, #logo2 img {
+	border: none; 
+}
+
+#logo1 img {
+	height: 40px;
+}
+
+#logo2 img {
+	height: 50px;
+}
+
+
+#menu {
+	margin: 0; padding: 0;
+	background-color: #990000; color: white; 
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+
+#menu li a {
+	color: white; text-decoration: none; font-weight: bold; border: outset 2px rgb(170,170,170); padding: 0 1em; background-color: #990000;
+}
+
+#menu li a:hover {
+	color: black; background-color: #FFDDDD; border: outset 2px black;
+}
+
+
+#contenido {
+	margin: 0; padding: 0;
+	text-align:center;
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+}
+
+#barra_creditos {
+	margin: 0; padding: 5px 0px 0px 0px;
+	background-color: #000000; color: white; 
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-weight: bold;
+}
+
+
+#creditos {
+	margin: 0; padding: 0;
+}
+
+#creditos td {
+    text-align: center;
+    font-size: 9pt;
+   	font-family:Verdana, Arial, Helvetica, sans-serif;
+   	vertical-align: top;
+}
+
+.botonera fieldset {
+	padding: 0; margin: 0;
+}
+
+.botonera td {
+	text-align: right;
+}
+
+form fieldset {
+	padding: 10pt; text-align: center; margin: 10pt;
+}
+
+.tablaformulario {
+	width: 100%; margin-top: 20pt;
+}
+
+.tablaformulario th {
+	padding: 0 1em; text-align: right; font-size:11pt; vertical-align: top;
+}
+
+.tablaformulario td {
+	text-align: left; vertical-align: top; font-size: 11pt;
+}
+
+.tablaformulario input, .tablaformulario textarea {
+	width: 100%;
+}
+
+/* ***************** Tablas de datos *********************** */
+.tabladatos {
+	width: 100%; text-align: left; font-size: 10.5pt;
+}
+
+.tabladatos th {
+	background-color: #dedebb; text-align: left;
+}
+
+.tabladatos a {
+	color: black;
+}
+
+.tabladatos a:hover {
+	color:#FF0000;
+}
+
+
+/* Resaltado de la fila actual */
+.tabladatos tr:hover {
+	background-color: #FFFF00;
+}
+
+/* Fila no resaltada */
+.tabladatos tr.noresalt:hover {
+	background-color: transparent;
+}
+
+.tablaminiformulario {
+	width: 100%; text-align: left; font-size: 10pt;
+}
+
+.lineatexto {
+	width: 100%;
+}
+
+.accesorapido {
+	text-decoration: underline;
+}
+
+.formfoto input {
+	margin: 0.5em;
+}
+
+.formfoto img {
+	float: left;
+}
+
+legend{
+		font-size:12pt; font-weight:bold;
+}
+
+.listaopciones a{
+		text-decoration:none; color:#660033;
+}
+
+.listaopciones li {
+	display: block; margin: 2em; font-size: 12pt;
+}
+
+.listaopciones a:hover{
+	color:#330099; background-color:#FFFFCC; font-weight: bold;
+}
+
+.tabs th {
+	background-color: #cccccc;
+	border: solid #dedebb;
+}
+
+.tabs .selected {
+	background-color: #dedebb;
+}
+
+.noresalt table:hover{
+			background-color: white;
+		}
+		
+		
+.nested tr:hover {
+			background-color: #FFFF00;
+		}
+		
+#aviso {
+	
+}
+.aviso td {
+	text-align: center; color: red;
+}
+
+/* ******************* Div to avoid double-click ********************** */
+/* Trasparent, full screen */
+#The_colorPicker{
+	position: fixed; top:0; left: 0; right:0; width: 100%; z-index:2;
+	background-color: transparent;
+	display:none;
+}
+
+#divDclick  { 	
+	position: fixed; top:0; left: 0; right:0; width: 100%; z-index:2; height: 100%;
+	background-color: transparent;
+	display:none;
+}
+
+/* Opaque, just for a message */
+#divDclickMsg {
+	position: absolute; top:30%; left: 35%; right:0; width: 30%; height: 20%;
+	background-color: white;
+	border:1px solid black;
+	text-align: center;
+}
+
+
+/* *********************** Change password fieldset ********************** */
+#changePassFieldset {
+	margin-top: 10%;
+	margin-left: 20%;
+	margin-right: 20%;
+}
+
+/* ********************** Floating div style ************************* */
+.floatingDiv { 	
+	position: fixed; top:0; left: 0; right:0; width: 100%; z-index:2; height: 100%;
+	background-color: transparent;
+}
+.floatingDivBody{
+	position: absolute; top:20%; left: 20%; right:0; width: 60%; height: 70%;
+	background-color: white;
+	border:1px solid black;
+	text-align: center;
+}

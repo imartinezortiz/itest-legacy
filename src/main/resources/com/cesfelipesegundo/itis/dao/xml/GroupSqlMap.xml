@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Group">
+
+	<!-- Consulta parametrizada por Id de usuario -->	
+	<select id="getTeachedGroups" parameterClass="java.lang.Long" resultMap="ModelResults.GroupResult">
+		SELECT 
+			imparten.grupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 			
+		FROM 
+			imparten,
+			grupos,
+			asignaturas,
+			centros 
+		WHERE 
+			imparten.profe = #value# AND
+			grupos.idgrupo = imparten.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro
+		ORDER BY
+			grupos.anio DESC, asignaturas.nombre, grupos.grupo
+	</select>
+
+<!-- Consulta parametrizada por Id de usuario -->	
+	<select id="getMatriculatedGroups" parameterClass="java.lang.Long" resultMap="ModelResults.GroupResult">
+		SELECT 
+			matriculas.grupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 			
+		FROM 
+			matriculas,
+			grupos,
+			asignaturas,
+			centros 
+		WHERE 
+			matriculas.alumno = #value# AND
+			grupos.idgrupo = matriculas.grupo AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro
+		ORDER BY
+			grupos.anio DESC, asignaturas.nombre, grupos.grupo
+	</select>
+
+
+	<!-- Consulta parametrizada por id de grupo-->	
+	<select id="getGroup" parameterClass="java.lang.Long" resultMap="ModelResults.GroupResult">
+		SELECT 
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 			
+		FROM 
+			grupos,
+			asignaturas,
+			centros 
+		WHERE 
+			grupos.idgrupo = #value# AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro
+		LIMIT 1
+	</select>
+
+	<!-- Consulta parametrizada por group -->	
+	<select id="fillCourse" parameterClass="java.lang.Long" resultClass="com.cesfelipesegundo.itis.model.Course">
+		SELECT 
+			grupos.asig AS id,
+			asignaturas.nombre AS name 
+		FROM 
+			grupos,
+			asignaturas
+		WHERE 
+			grupos.idgrupo = #value# AND
+			asignaturas.idasig = grupos.asig
+		LIMIT 1
+	</select>
+
+	<!-- Consulta parametrizada por id de grupo -->	
+	<!-- Coge todos los estudiantes matriculados en un grupo y los -->
+	<!-- devuelve como lista de model.User -->
+	<select id="getStudentsByGroupId" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT 
+			matriculas.alumno AS id,
+			usuarios.usuario AS userName,
+			usuarios.apes AS surname,
+			usuarios.nombre AS name,
+			permisos.permiso as role,
+			usuarios.email as email,
+			usuarios.dni as persId,
+			passw as passwd
+		FROM 
+			matriculas,
+			usuarios,
+			permisos
+		WHERE 
+			matriculas.grupo = #groupId# AND
+			usuarios.idusu = matriculas.alumno AND
+			usuarios.usuario = permisos.usuario
+		$orderBy$
+	</select>
+	
+	<!-- Consulta parametrizada por id de grupo -->	
+	<!-- Coge todos los estudiantes NO matriculados en el grupo, pero del mismo centro de estudios y los -->
+	<!-- devuelve como lista de model.User. OJO: solo estudiantes... -->
+	<select id="getStudentsNotInGroupById" parameterClass="com.cesfelipesegundo.itis.model.Group" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT
+			usuarios.idusu AS id,
+			usuarios.usuario AS userName,
+			usuarios.apes AS surname,
+			usuarios.nombre AS name,
+			permisos.permiso as role,
+			usuarios.email as email,
+			usuarios.dni as persId,
+			passw as passwd
+		FROM 
+			usuarios,permisos
+		WHERE
+			usuarios.usuario = permisos.usuario AND
+			usuarios.centro = #institution.id# AND
+			(permisos.permiso = 'LEARNER' OR permisos.permiso = 'KID') AND
+			usuarios.idusu NOT IN (SELECT alumno FROM matriculas WHERE matriculas.grupo = #id#)
+		ORDER BY
+			usuarios.apes ASC
+	</select>
+	
+	<!-- Consulta parametrizada por id de grupo y role -->	
+	<!-- Coge todos los estudiantes NO matriculados en un grupo, pero del mismo centro de estudios y los -->
+	<!-- devuelve como lista de model.User -->
+	<select id="getStudentsNotInGroupByIdAndRole" parameterClass="java.util.Map" resultClass="com.cesfelipesegundo.itis.model.User">
+		SELECT
+			usuarios.idusu AS id,
+			usuarios.usuario AS userName,
+			usuarios.apes AS surname,
+			usuarios.nombre AS name,
+			permisos.permiso as role,
+			usuarios.email as email,
+			usuarios.dni as persId,
+			passw as passwd
+		FROM 
+			usuarios,permisos
+		WHERE
+			usuarios.usuario = permisos.usuario AND
+			usuarios.centro = #institutionId# AND
+			permisos.permiso = #roleId# AND
+			usuarios.idusu NOT IN (SELECT alumno FROM matriculas WHERE matriculas.grupo = #groupId#)
+		ORDER BY
+			usuarios.apes ASC
+	</select>
+	
+	<select id="getInstitutionGroups" parameterClass="java.lang.Long" resultMap="ModelResults.GroupResult">
+		SELECT 
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 
+		FROM 
+			grupos,
+			asignaturas,
+			centros 
+		WHERE 
+			centros.idcentro = #value# AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro
+		ORDER BY
+			grupos.anio DESC, asignaturas.nombre, grupos.grupo
+	</select>
+	
+	<select id="getCourseGroups" parameterClass="java.lang.Long" resultMap="ModelResults.GroupResult">
+		SELECT 
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 
+		FROM 
+			grupos,
+			asignaturas,
+			centros 
+		WHERE 
+			asignaturas.idasig = #value# AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro
+		ORDER BY
+			grupos.anio DESC, asignaturas.nombre, grupos.grupo
+	</select>
+
+<!-- Insercion de grupo -->
+	<insert id="insertGroup" parameterClass="com.cesfelipesegundo.itis.model.Group">
+		INSERT INTO 
+			grupos (asig, grupo, anio, centro, tipo_alumno) 
+		VALUES
+			(#course.id#, #name#, #year#, #institution.id#, #studentType#)
+		<selectKey keyProperty="id" resultClass="java.lang.Long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>	
+
+	<!-- Actualiza grupo -->
+	<update id="updateGroup" parameterClass="com.cesfelipesegundo.itis.model.Group">
+		UPDATE grupos
+		SET
+			asig = #course.id#,
+			grupo = #name#,
+			anio = #year#,
+			centro = #institution.id#,
+			tipo_alumno = #studentType#
+		WHERE 
+			idgrupo = #id#
+	</update>	
+
+	<!-- Borra grupo-->
+	<delete id="deleteGroup" parameterClass="com.cesfelipesegundo.itis.model.Group">
+		DELETE FROM grupos WHERE idgrupo=#id#
+	</delete>
+	
+	<!-- Consulta parametrizada por id de grupo-->	
+	<select id="getUserGroups" parameterClass="java.lang.Long" resultMap="ModelResults.GroupResult">
+		SELECT 
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 			
+		FROM 
+			grupos,
+			asignaturas,
+			centros,
+			matriculas,
+			usuarios 
+		WHERE 
+			asignaturas.idasig = grupos.asig AND
+			grupos.idgrupo = matriculas.grupo AND
+			matriculas.alumno = usuarios.idusu AND
+		  	centros.idcentro = grupos.centro AND
+		  	usuarios.idusu = #value#
+		ORDER BY grupos.anio DESC, asignaturas.nombre, grupos.grupo
+	</select>
+	
+	<select id="getInstitutionCourseGroups" parameterClass="java.util.Map" resultMap="ModelResults.GroupResult">
+		SELECT 
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 
+		FROM 
+			grupos,
+			asignaturas,
+			centros 
+		WHERE 
+			centros.idcentro = #center# AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND
+			asignaturas.idasig =#course#
+		ORDER BY
+			grupos.anio DESC, asignaturas.nombre, grupos.grupo
+	</select>
+	
+	<select id="getAllGroups" resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*)
+		FROM 
+			grupos
+	</select>
+	<select id="getGroupsByFilter" parameterClass="java.util.Map" resultMap="ModelResults.GroupResult">
+		SELECT 
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 
+		FROM 
+			grupos,
+			asignaturas,
+			centros 
+		WHERE 
+			centros.idcentro = #Institution# AND
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro
+			<isNotNull prepend="AND" property="course">
+				asignaturas.nombre LIKE #course#
+			</isNotNull>
+			<isNotNull prepend="AND" property="group">
+				grupos.grupo LIKE #group#
+			</isNotNull>
+			<isNotNull prepend="AND" property="year">
+				grupos.anio LIKE #year#
+			</isNotNull>
+		ORDER BY
+			asignaturas.nombre
+	</select>
+
+	<select id="getFilteredGroups" parameterClass="java.util.Map" resultMap="ModelResults.GroupResult">
+		SELECT 
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 
+		FROM 
+			grupos,
+			asignaturas,
+			centros 
+		WHERE 
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro
+			<isNotNull prepend="AND" property="course">
+				asignaturas.nombre LIKE #course#
+			</isNotNull>
+			<isNotNull prepend="AND" property="group">
+				grupos.grupo LIKE #group#
+			</isNotNull>
+			<isNotNull prepend="AND" property="year">
+				grupos.anio LIKE #year#
+			</isNotNull>
+			<isNotNull prepend="AND" property="id">
+				grupos.idgrupo LIKE #id#
+			</isNotNull>
+		ORDER BY
+			asignaturas.nombre
+	</select>
+	
+	<select id="getTutorInfoGroup" parameterClass="java.lang.Long" resultMap="ModelResults.GroupResult">
+		SELECT 
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 
+		FROM 
+			grupos,
+			asignaturas,
+			centros,
+			imparten 
+		WHERE 
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND
+			imparten.grupo = grupos.idgrupo AND
+			imparten.profe = #value#
+			
+	</select>
+	<select id="getLearnerInfoGroup" parameterClass="java.lang.Long" resultMap="ModelResults.GroupResult">
+		SELECT 
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 
+		FROM 
+			grupos,
+			asignaturas,
+			centros,
+			matriculas 
+		WHERE 
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND
+			matriculas.grupo = grupos.idgrupo AND
+			matriculas.alumno = #value#
+			
+	</select>
+	
+	<select id="getGroupsDetails" parameterClass="java.util.HashMap" resultClass="com.cesfelipesegundo.itis.model.GroupDetails">
+		SELECT
+			g.idgrupo AS idGroup,
+			g.grupo AS groupName,
+			g.anio AS year,
+			a.nombre AS subjectName,
+			c.nombre AS centerName
+		FROM 
+			grupos g,
+			asignaturas a,
+			centros c
+		WHERE
+			g.centro = c.idcentro	AND
+			g.asig = a.idasig
+			<isNotNull prepend="AND" property="institution">
+				g.centro = #institution# 
+			</isNotNull>
+			<isNotNull prepend="AND" property="course">
+				g.asig= #course#
+			</isNotNull>
+			<isNotNull prepend="AND" property="year">
+				g.anio = #year#
+			</isNotNull>
+		ORDER BY 
+			a.nombre
+	</select>
+	<select id="getNumQuestionForGroup" parameterClass="java.lang.Long" resultClass="java.lang.Integer">
+		SELECT
+			COUNT(p.idpreg)
+		FROM
+			preguntas p
+		WHERE
+			p.grupo = #value#
+	</select>
+	
+	<select id="getNumThemesForGroup" parameterClass="java.lang.Long" resultClass="java.lang.Integer">
+		SELECT
+			COUNT(t.idtema)
+		FROM
+			temas t
+		WHERE
+			t.grupo= #value#
+	</select>
+	<select id="getTeachersByGroup" parameterClass="java.lang.Long" resultClass="java.lang.String">
+		SELECT
+			CONCAT(u.apes,', ',u.nombre)
+		FROM
+			usuarios u,
+			imparten i
+		WHERE
+			i.grupo = #value#	AND
+			u.idusu = i.profe
+	</select>
+	
+	<select id="getGroupData" parameterClass="java.lang.String" resultMap="ModelResults.GroupResult">
+		SELECT 
+			grupos.idgrupo AS idGroup,
+			grupos.grupo AS nameGroup,
+			grupos.anio AS yearGroup,
+			grupos.tipo_alumno AS studentTypeGroup,
+			asignaturas.idasig AS idCourse,
+			asignaturas.nombre AS nameCourse,
+			asignaturas.cod AS codeCourse,
+			asignaturas.estudios AS studiesCourse,
+			asignaturas.curso AS levelCourse,
+			centros.idcentro AS idCenter,
+			centros.cod AS codeCenter,
+			centros.nombre AS nameCenter,
+			centros.direccion AS addressCenter,
+			centros.localidad AS cityCenter,
+			centros.cpostal AS zipCodeCenter,
+			centros.provincia AS stateCenter,
+			centros.telefono AS phoneCenter,
+			centros.fax AS faxCenter,
+			centros.email AS emailCenter,
+			centros.web AS webCenter,
+			centros.p_contacto AS contactPersonCenter,
+			centros.tlf_contacto AS contactPhoneCenter 
+		FROM 
+			grupos,
+			asignaturas,
+			centros 
+		WHERE 
+			asignaturas.idasig = grupos.asig AND
+			centros.idcentro = grupos.centro AND
+			grupos.grupo = #value#
+	</select>
+	<select id="isUserInGroup" parameterClass="java.util.HashMap" resultClass="java.lang.Boolean">
+		SELECT
+			COUNT(*)
+		FROM 
+			matriculas m
+		WHERE
+			m.alumno = #idUser# AND
+			m.grupo = #idGroup#
+	</select>
+</sqlMap>

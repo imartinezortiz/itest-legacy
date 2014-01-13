@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ModelResults">
+	
+	<resultMap id="BasicDataExamResult" class="com.cesfelipesegundo.itis.model.BasicDataExam">
+		<result property="id" column="idExam"/>
+		<result property="title" column="titleExam"/>
+		<result property="group" resultMap="ModelResults.GroupResult"/>
+	</resultMap>
+
+	<resultMap id="ConfigExamSubjectResult" class="com.cesfelipesegundo.itis.model.ConfigExamSubject">
+		<result property="id" column="idtemaexam"/>
+		<result property="cexam" column="exam" select="ConfigExam.selectConfigExam"/>
+		<result property="subject.id" column="idtema"/>
+		<result property="subject.subject" column="tema"/>
+		<result property="subject.order" column="orden"/>
+		<result property="questionsNumber" column="n_pregs"/>
+		<result property="answersxQuestionNumber" column="n_resp_x_preg"/>
+		<result property="maxDifficulty" column="dificultad_max"/>
+		<result property="minDifficulty" column="dificultad_min"/>
+		<result property="questionType" column="questionType"/>
+	</resultMap>
+
+	<resultMap id="ConfigExamResult" class="com.cesfelipesegundo.itis.model.ConfigExam">
+		<result property="id" column="idExam"/>
+		<result property="title" column="titleExam"/>
+		<result property="visibility" column="visibilityExam"/>
+		<result property="questionDistribution" column="questionDistributionExam"/>
+		<result property="duration" column="durationExam"/>
+		<result property="startDate" column="startDateExam"/>
+		<result property="endDate" column="endDateExam"/>
+		<result property="weight" column="weightExam"/>
+		<result property="maxGrade" column="maxGradeExam"/>
+		<result property="activeReview" column="activeReviewExam"/>
+		<!-- Testing purposes: <result property="subjects" column="idExam" select="ConfigExam.selectConfigExamSubjectsByExamId"/> -->
+		<result property="group" resultMap="ModelResults.GroupResult"/>
+		<result property="partialCorrection" column="partialCorrectionExam"/>
+		<result property="showNumCorrectAnswers" column="showNumCorrectAnswersExam"/>
+		<result property="penQuestionFailed" column="penQuestionFailedExam"/>
+		<result property="penQuestionNotAnswered" column="penQuestionNotAnsweredExam"/>
+		<result property="penAnswerFailed" column="penAnswerFailedExam"/>
+		<result property="minQuestionGrade" column="minQuestionGradeExam"/>
+		<result property="startDateRevision" column="startDateRevExam"/>
+		<result property="endDateRevision" column="endDateRevExam"/>
+		<result property="penConfidenceLevel" column="penConfidenceLevel"/>
+		<result property="rewardConfidenceLevel" column="rewardConfidenceLevel"/>
+		<result property="published" column="published"/>
+		<result property="confidenceLevel" column="confidenceLevel"/>
+		<result property="confidenceLevel" column="confidenceLevel"/>
+		<result property="customized" column="customized"/>
+	</resultMap>
+
+	<resultMap id="CourseResult" class="com.cesfelipesegundo.itis.model.Course">
+		<result property="id" column="idCourse"/>
+		<result property="name" column="nameCourse"/>
+		<result property="code" column="codeCourse"/>
+		<result property="studies" column="studiesCourse"/>
+		<result property="level" column="levelCourse"/>
+	</resultMap>
+
+	<resultMap id="ExamResult" class="com.cesfelipesegundo.itis.model.Exam">
+		<result property="id" column="idExam"/>
+		<result property="title" column="titleExam"/>
+		<result property="duration" column="durationExam"/>
+		<result property="maxGrade" column="maxGradeExam"/>
+		<result property="group" resultMap="ModelResults.GroupResult"/>
+		<result property="examGrade" column="examGrade"/>
+		<result property="partialCorrection" column="partialCorrectionExam"/>
+		<result property="penQuestionFailed" column="penQuestionFailedExam"/>
+		<result property="penQuestionNotAnswered" column="penQuestionNotAnsweredExam"/>
+		<result property="penAnswerFailed" column="penAnswerFailedExam"/>
+		<result property="minQuestionGrade" column="minQuestionGradeExam"/>
+		<result property="showNumCorrectAnswers" column="showNumCorrectAnswersExam"/>
+		<result property="penConfidenceLevel" column="penConfidenceLevel"/>
+		<result property="rewardConfidenceLevel" column="rewardConfidenceLevel"/>
+		<result property="confidenceLevel" column="confidenceLevel"/>
+		<result property="startingDateExam" column="startingDateExam"/>
+	</resultMap>
+	
+	<resultMap id="GroupResult" class="com.cesfelipesegundo.itis.model.Group">
+		<result property="id" column="idGroup"/>
+		<result property="name" column="nameGroup"/>
+		<result property="year" column="yearGroup"/>
+		<result property="course" resultMap="ModelResults.CourseResult"/>
+		<result property="institution" resultMap="ModelResults.InstitutionResult"/>
+		<!-- Database V. 3.5 -->
+		<result property="studentType" column="studentTypeGroup"/>
+	</resultMap>
+
+	<resultMap id="InstitutionResult" class="com.cesfelipesegundo.itis.model.Institution">
+		<result property="id" column="idCenter"/>
+		<result property="code" column="codeCenter"/>
+		<result property="name" column="nameCenter"/>
+		<result property="address" column="addressCenter"/>
+		<result property="city" column="cityCenter"/>
+		<result property="zipCode" column="zipCodeCenter"/>
+		<result property="state" column="stateCenter"/>
+		<result property="phone" column="phoneCenter"/>
+		<result property="fax" column="faxCenter"/>
+		<result property="email" column="emailCenter"/>
+		<result property="web" column="webCenter"/>
+		<result property="contactPerson" column="contactPersonCenter"/>
+		<result property="contactPhone" column="contactPhoneCenter"/>
+	</resultMap>
+	
+	<resultMap id="TemplateExamQuestionResult" class="com.cesfelipesegundo.itis.model.TemplateExamQuestion">
+		<result property="id" column="idQuestion"/>
+		<result property="title" column="titleQuestion"/>
+		<result property="text" column="textQuestion"/>
+		<result property="difficulty" column="difficultyQuestion"/>
+		<result property="visibility" column="visibilityQuestion"/>
+		<result property="comment" column="commentQuestion"/>
+		<result property="active" column="activeQuestion"/>
+		<result property="numCorrectAnswers" column="numCorrectAnswersQuestion"/>
+		<result property="usedInExam" column="usedInExamQuestion"/>
+		<result property="group" resultMap="ModelResults.GroupResult"/>
+		<result property="subject.id" column="idSubject"/>
+		<result property="subject.subject" column="subjectSubject"/>
+		<result property="subject.order" column="orderSubject"/>
+		<result property="type" column="type"/>
+	</resultMap>
+
+	<resultMap id="TemplateExamResult" class="com.cesfelipesegundo.itis.model.TemplateExam">
+		<result property="id" column="idExam"/>
+		<result property="title" column="titleExam"/>
+		<result property="visibility" column="visibilityExam"/>
+		<result property="questionDistribution" column="questionDistributionExam"/>
+		<result property="duration" column="durationExam"/>
+		<result property="startDate" column="startDateExam"/>
+		<result property="endDate" column="endDateExam"/>
+		<result property="maxGrade" column="maxGradeExam"/>
+		<result property="activeReview" column="activeReviewExam"/>
+		<result property="group" resultMap="ModelResults.GroupResult"/>
+		<result property="partialCorrection" column="partialCorrectionExam"/>
+		<result property="penQuestionFailed" column="penQuestionFailedExam"/>
+		<result property="penQuestionNotAnswered" column="penQuestionNotAnsweredExam"/>
+		<result property="penAnswerFailed" column="penAnswerFailedExam"/>
+		<result property="minQuestionGrade" column="minQuestionGradeExam"/>
+		<result property="showNumCorrectAnswers" column="showNumCorrectAnswersExam"/>
+		<result property="confidenceLevel" column="confidenceLevel"/>
+	</resultMap>
+	
+	<resultMap id="ExamGlobalInfoResul" class="com.cesfelipesegundo.itis.model.ExamGlobalInfo">
+		<result property="examId" column="examId"/>
+		<result property="examTitle" column="examTitle"/>
+		<result property="startDate" column="startDate"/>
+		<result property="endDate" column="endDate"/>
+		<result property="nameGroup" column="nameGroup"/>
+		<result property="academicYear" column="academicYear"/>
+		<result property="subject" column="subject"/>
+		<result property="center" column="center"/>
+		<result property="teacher" column="teachers"/>
+	</resultMap>
+	
+	<resultMap id="UserResul" class="com.cesfelipesegundo.itis.model.User">
+		<result property="id" column="idusu"/>
+		<result property="userName" column="userName"/>
+		<result property="surname" column="surname"/>
+		<result property="name" column="name"/>
+		<result property="role" column="role"/>
+		<result property="email" column="email"/>
+		<result property="persId" column="persId"/>
+		<result property="passwd" column="passwd"/>
+	</resultMap>
+	
+	<resultMap id="ConectionsResul" class="com.cesfelipesegundo.itis.model.Conection">
+		<result property="id" column="idConection"/>
+		<result property="date" column="date"/>
+		<result property="user" resultMap="ModelResults.UserResul"/>
+		<result property="ip" column="ip"/>
+	</resultMap>
+</sqlMap>
