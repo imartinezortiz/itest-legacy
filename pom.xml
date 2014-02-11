@@ -4,10 +4,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 	>
 	<modelVersion>4.0.0</modelVersion>
-
 	<groupId>es.itest</groupId>
 	<artifactId>itest</artifactId>
-	<version>3.0</version>
+	<version>1.0</version>
 	<packaging>war</packaging>
 
 	<name>iTest</name>
@@ -19,6 +18,12 @@
 		<ibatis.version>2.3.4.726</ibatis.version>
 		<jstl.version>1.1.1</jstl.version>
 	</properties>
+	<repositories>
+		<repository>
+			<id>itest-legacy-mvn-repo</id>
+			<url>https://raw.github.com/iTest-UCM/itest-legacy/mvn-repo/mvn-repo/</url>
+		</repository>
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
