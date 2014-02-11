@@ -1,4 +1,4 @@
-itest-legacy
+itest-legacy [![Build Status](https://travis-ci.org/imartinezortiz/itest-legacy.png)](https://travis-ci.org/imartinezortiz/itest-legacy)
 ===========
 
 This repsitory contains the **legacy** version of the iTest application. This repository has been created for historical purposes.
