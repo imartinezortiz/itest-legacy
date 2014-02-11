@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>be.ugent.caagt</groupId>
+  <artifactId>jmathtex</artifactId>
+  <versioning>
+    <release>0.7pre</release>
+    <versions>
+      <version>0.7pre</version>
+    </versions>
+    <lastUpdated>20131230225913</lastUpdated>
+  </versioning>
+</metadata>
