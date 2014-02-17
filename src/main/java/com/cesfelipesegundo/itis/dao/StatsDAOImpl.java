@@ -17,13 +17,14 @@ import com.cesfelipesegundo.itis.model.AnswerData;
 import com.cesfelipesegundo.itis.model.AnswerStats;
 import com.cesfelipesegundo.itis.model.AnsweredQuestionData;
 import com.cesfelipesegundo.itis.model.CalifData;
-import com.cesfelipesegundo.itis.model.ConfigExam;
-import com.cesfelipesegundo.itis.model.Exam;
-import com.cesfelipesegundo.itis.model.ExamAnswer;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.QuestionStats;
 import com.cesfelipesegundo.itis.model.comparators.AnswerStatsComparator;
 import com.cesfelipesegundo.itis.model.comparators.QuestionStatsTextComparator;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.test.business.entity.ItemSessionResponse;
+import es.itest.engine.test.business.entity.TestSession;
+import es.itest.engine.test.business.entity.TestSessionTemplate;
 
 public class StatsDAOImpl extends SqlMapClientDaoSupport implements StatsDAO {
 	private static final Log log = LogFactory.getLog(StatsDAOImpl.class);
@@ -123,7 +124,7 @@ public class StatsDAOImpl extends SqlMapClientDaoSupport implements StatsDAO {
 	
 			
 		
-	public List<AnsweredQuestionData> getAnsweredQuestionsData(ConfigExam exam)
+	public List<AnsweredQuestionData> getAnsweredQuestionsData(TestSessionTemplate exam)
 	{
 		List<AnsweredQuestionData> results = super.getSqlMapClientTemplate().queryForList("Grade.selectAnsweredQuestionDatasByExamId", exam.getId());
 		for(AnsweredQuestionData result : results) {
@@ -198,7 +199,7 @@ public class StatsDAOImpl extends SqlMapClientDaoSupport implements StatsDAO {
 	}
 
 	public void fillQuestionStatsByExam(List<QuestionStats> questionStats,
-			ConfigExam currentExam) {
+			TestSessionTemplate currentExam) {
 		List<AnswerData> answerData = getSqlMapClientTemplate().queryForList("Grade.getAnswerTestStatsByExam",currentExam.getId());
 		List<AnswerData> answerData2 = getSqlMapClientTemplate().queryForList("Grade.getAnswerFillStatsByExam",currentExam.getId());
 		answerData.addAll(answerData2);

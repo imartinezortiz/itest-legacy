@@ -11,8 +11,9 @@ import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 
 import com.cesfelipesegundo.itis.dao.api.AnswerExamDAO;
 import com.cesfelipesegundo.itis.model.AnswerExam;
-import com.cesfelipesegundo.itis.model.ExamAnswer;
-import com.cesfelipesegundo.itis.model.TemplateExamAnswer;
+
+import es.itest.engine.test.business.entity.ItemResponse;
+import es.itest.engine.test.business.entity.ItemSessionResponse;
 
 public class AnswerExamDAOImpl extends SqlMapClientDaoSupport implements AnswerExamDAO {
 	private static final Log log = LogFactory.getLog(AnswerExamDAOImpl.class);
@@ -107,7 +108,7 @@ public class AnswerExamDAOImpl extends SqlMapClientDaoSupport implements AnswerE
 	}
 
 	
-	public int updateExamAnswer(Long idexam, Long iduser, Long idquestion, ExamAnswer eAnswer) {
+	public int updateExamAnswer(Long idexam, Long iduser, Long idquestion, ItemSessionResponse eAnswer) {
 		AnswerExam answer = new AnswerExam();
 		answer.setAnswerTime(null);
 		if(eAnswer.getMarked()){
@@ -162,7 +163,7 @@ public class AnswerExamDAOImpl extends SqlMapClientDaoSupport implements AnswerE
 		this.updateAnswerExam(answer);
 	}
 
-	public void updateUsedInExam(TemplateExamAnswer templateAnswer) {
+	public void updateUsedInExam(ItemResponse templateAnswer) {
 		int rows = getSqlMapClientTemplate().update("TemplateExam.updateTemplateExamAnswerUsedInExam", templateAnswer);
 	}
 

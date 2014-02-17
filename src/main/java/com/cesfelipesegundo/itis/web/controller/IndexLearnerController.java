@@ -9,10 +9,11 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.Controller;
 
 import com.cesfelipesegundo.itis.biz.api.LearnerManagementService;
-import com.cesfelipesegundo.itis.model.BasicDataExam;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.User;
 import com.cesfelipesegundo.itis.web.Constants;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.test.business.entity.TestDetails;
 
 
    public class IndexLearnerController implements Controller {
@@ -50,7 +51,7 @@ import com.cesfelipesegundo.itis.web.Constants;
 			// Learner KID: tiene interfaz especial:
 			if (user.getRole().equals(new String(Constants.KID))) {
 				// Obtención de la lista de exámenes disponibles para este alumno a través del gestor de servicios
-				List<BasicDataExam> pendingExamslist = learnerManagementService.getPendingExams(user.getId());
+				List<TestDetails> pendingExamslist = learnerManagementService.getPendingTests(user.getId());
 				
 				// Nombre lógico: index_kid
 				 mav.setViewName("learner/index_kid");

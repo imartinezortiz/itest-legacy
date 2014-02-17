@@ -2,7 +2,7 @@ package com.cesfelipesegundo.itis.model.comparators;
 
 import java.util.Comparator;
 
-import com.cesfelipesegundo.itis.model.Group;
+import es.itest.engine.course.business.entity.Group;
 
 public class GroupYearComparator extends UTF8Adapter implements Comparator {
 

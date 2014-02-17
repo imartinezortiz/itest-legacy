@@ -17,17 +17,18 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.cesfelipesegundo.itis.biz.api.LearnerManagementService;
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
-import com.cesfelipesegundo.itis.model.ConfigExam;
-import com.cesfelipesegundo.itis.model.ConfigExamSubject;
 import com.cesfelipesegundo.itis.model.CustomExamUser;
-import com.cesfelipesegundo.itis.model.ExamForReview;
-import com.cesfelipesegundo.itis.model.Group;
-import com.cesfelipesegundo.itis.model.Subject;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
-import com.cesfelipesegundo.itis.model.TemplateExamSubject;
 import com.cesfelipesegundo.itis.model.User;
 import com.cesfelipesegundo.itis.model.comparators.ConfigExamSubjectComparator;
 import com.cesfelipesegundo.itis.web.Constants;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.course.business.entity.Subject;
+import es.itest.engine.course.business.entity.TestSessionTemplateSubject;
+import es.itest.engine.test.business.entity.Item;
+import es.itest.engine.test.business.entity.TestSessionForReview;
+import es.itest.engine.test.business.entity.TestSessionTemplate;
+import es.itest.engine.test.business.entity.TestSubject;
 
 /**
  * It manages the main operations related to the new or edited exams.
@@ -53,18 +54,18 @@ public class TutorExamManagementController {
     /**
      * Exam being managed (added or edited) by the tutor
      */
-    private ConfigExam currentTutorExam;
+    private TestSessionTemplate currentTutorExam;
     
     /**
      * List of Subjects
      */
-    private List<TemplateExamSubject> courseSubjectsList;
+    private List<TestSubject> courseSubjectsList;
     
     /* ******** Getters and setters ******** */
     
     
 
-	public List<TemplateExamSubject> getCourseSubjectsList() {
+	public List<TestSubject> getCourseSubjectsList() {
 		return courseSubjectsList;
 	}
 
@@ -77,15 +78,15 @@ public class TutorExamManagementController {
 		this.learnerManagementService = learnerManagementService;
 	}
 
-	public void setCourseSubjectsList(List<TemplateExamSubject> courseSubjectsList) {
+	public void setCourseSubjectsList(List<TestSubject> courseSubjectsList) {
 		this.courseSubjectsList = courseSubjectsList;
 	}
 
-	public ConfigExam getCurrentTutorExam() {
+	public TestSessionTemplate getCurrentTutorExam() {
 		return currentTutorExam;
 	}
 
-	public void setCurrentTutorExam(ConfigExam currentTutorExam) {
+	public void setCurrentTutorExam(TestSessionTemplate currentTutorExam) {
 		this.currentTutorExam = currentTutorExam;
 	}
 
@@ -248,8 +249,8 @@ public class TutorExamManagementController {
 	 * Includes a new theme in the exam configuration
 	 * @return list of included themes
 	 */
-	public List<ConfigExamSubject> addConfigExamTheme(String idSubject, String answersxQuestionNumber, String maxDifficulty, String minDifficulty, String questionsNumber, String questionType) { 
-		ConfigExamSubject subject = new ConfigExamSubject();
+	public List<TestSessionTemplateSubject> addConfigExamTheme(String idSubject, String answersxQuestionNumber, String maxDifficulty, String minDifficulty, String questionsNumber, String questionType) { 
+		TestSessionTemplateSubject subject = new TestSessionTemplateSubject();
 		subject.setAnswersxQuestionNumber(Integer.valueOf(answersxQuestionNumber));
 		subject.setMaxDifficulty(Integer.valueOf(maxDifficulty));
 		subject.setMinDifficulty(Integer.valueOf(minDifficulty));
@@ -261,8 +262,8 @@ public class TutorExamManagementController {
 		sub.setId(Long.valueOf(idSubject));
 		// TODO: the data of the subject should come from the DB by ID
 		// Find the title of the theme:
-		Iterator<TemplateExamSubject> iter = courseSubjectsList.iterator();
-		TemplateExamSubject tce = null;	// Subject
+		Iterator<TestSubject> iter = courseSubjectsList.iterator();
+		TestSubject tce = null;	// Subject
 		boolean aFound = false;
 		
 		while (iter.hasNext() && (!aFound)) {
@@ -284,7 +285,7 @@ public class TutorExamManagementController {
 		// Saving ...
 		tutorManagementService.saveSubjectToExam(currentTutorExam, subject);
 		// Adding to current exam:
-		if (currentTutorExam.getSubjects() == null) currentTutorExam.setSubjects(new ArrayList<ConfigExamSubject>());
+		if (currentTutorExam.getSubjects() == null) currentTutorExam.setSubjects(new ArrayList<TestSessionTemplateSubject>());
 		currentTutorExam.getSubjects().add(subject);
 		
 		Collections.sort(currentTutorExam.getSubjects(), new ConfigExamSubjectComparator());
@@ -298,14 +299,14 @@ public class TutorExamManagementController {
 	 * Deletes a theme from the exam configuration
 	 * @return list of included themes
 	 */
-	public List<ConfigExamSubject> deleteConfigExamTheme(String idSubject,long idGroup) {
+	public List<TestSessionTemplateSubject> deleteConfigExamTheme(String idSubject,long idGroup) {
 			
 		// The theme can only be deleted when the exam configuration was saved before
-		List<ConfigExamSubject> subjects = currentTutorExam.getSubjects();
+		List<TestSessionTemplateSubject> subjects = currentTutorExam.getSubjects();
 
         // Find the theme to be deleted:
-		Iterator<ConfigExamSubject> iterSce = subjects.iterator();
-		ConfigExamSubject sce = null;	// Subject config exam
+		Iterator<TestSessionTemplateSubject> iterSce = subjects.iterator();
+		TestSessionTemplateSubject sce = null;	// Subject config exam
 		boolean aFound = false;
 		
 		while (iterSce.hasNext() && (!aFound)) {
@@ -336,12 +337,12 @@ public class TutorExamManagementController {
 		// The same view as the new exam one, but with the currentTutorExam precharged 
 		// We have to copy the current Exam configuration 
 		currentTutorExam.setTitle(currentTutorExam.getTitle()+" Copia");
-		ConfigExam examenCopia = tutorManagementService.configExamCopy(currentTutorExam);
+		TestSessionTemplate examenCopia = tutorManagementService.configExamCopy(currentTutorExam);
 		log.info("Duplicado el examen: "+currentTutorExam.getId()+" al nuevo examen: "+examenCopia.getId());
 		
 		// The rest of the elements for the view have to be added:
 		// List of themes for the course of this group 
-		List<TemplateExamSubject> thlist = tutorManagementService.getCourseSubjects(currentTutorExam.getGroup());
+		List<TestSubject> thlist = tutorManagementService.getCourseSubjects(currentTutorExam.getGroup());
 
 		// Set the current exam configuration:
 		this.setCurrentTutorExam(examenCopia);
@@ -370,8 +371,8 @@ public class TutorExamManagementController {
 		return mav;
 	}	
 	
-	public List<ExamForReview> recorrectExam (long idExam){
-		List<ExamForReview> reviewExam = learnerManagementService.examReviewByIdExam(idExam);
+	public List<TestSessionForReview> recorrectExam (long idExam){
+		List<TestSessionForReview> reviewExam = learnerManagementService.examReviewByIdExam(idExam);
 		return reviewExam;
 	}
 	

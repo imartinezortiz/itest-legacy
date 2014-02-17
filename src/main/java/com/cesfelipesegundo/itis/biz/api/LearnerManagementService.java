@@ -4,19 +4,20 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import com.cesfelipesegundo.itis.model.BasicDataExam;
-import com.cesfelipesegundo.itis.model.ConfigExam;
 import com.cesfelipesegundo.itis.model.CustomExamUser;
-import com.cesfelipesegundo.itis.model.Exam;
-import com.cesfelipesegundo.itis.model.ExamForReview;
 import com.cesfelipesegundo.itis.model.ExamGlobalInfo;
-import com.cesfelipesegundo.itis.model.ExamQuestion;
 import com.cesfelipesegundo.itis.model.Grade;
-import com.cesfelipesegundo.itis.model.Group;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
 import com.cesfelipesegundo.itis.model.User;
 import com.lowagie.text.DocumentException;
 import com.mysql.jdbc.exceptions.MySQLTransactionRollbackException;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.test.business.entity.Item;
+import es.itest.engine.test.business.entity.ItemSession;
+import es.itest.engine.test.business.entity.TestDetails;
+import es.itest.engine.test.business.entity.TestSession;
+import es.itest.engine.test.business.entity.TestSessionForReview;
+import es.itest.engine.test.business.entity.TestSessionTemplate;
 
 /**
  * Interfaz para gestión de alumnos
@@ -33,20 +34,20 @@ public interface LearnerManagementService {
 	 * @param id del alumno
 	 * @return Lista de exámenes disponibles para ser realizados por el alumno, ordenados por nombre de asignatura. 
 	 */
-	List<BasicDataExam> getPendingExams(Long id);
+	List<TestDetails> getPendingTests(Long id);
 	
 	
 	/**
 	 * Method to obtain the data of an already done exam: questions, answers,
 	 * comments, grade, marked answers, correct answers, time employed...
 	 * 
-	 * @param idexam
+	 * @param testSessionId
 	 *            id of the configuration of the exam previously performed
 	 * @param iduser,
 	 *            id of the user of the exam previously performed
 	 * @return grade exam
 	 */
-	Grade getExamGrade(Long idexam, Long iduser);
+	Grade getTestSessionGrade(long testSessionId, long examineeId);
 	
 	/**
 	 * Devuelve una lista con los datos de los exámenes que el alumno ha realizado hasta la fecha actual, si están en su periodo de
@@ -54,7 +55,7 @@ public interface LearnerManagementService {
 	 * @param id del alumno
 	 * @return Lista de exámenes en periodo de revisión ya realizados por el alumno, ordenados por nombre de asignatura.
 	 */
-	List<BasicDataExam> getExamsForRevision(Long id);
+	List<TestDetails> getTestSessionsForReview(Long id);
 	
 	/**
 	 * Obtains a new exam for the learner taking into account the configuration idexam
@@ -67,71 +68,71 @@ public interface LearnerManagementService {
 	 * @return Examen, lista de preguntas con contenido multimedia y respuestas asociadas, ordenadas por tema.
 	 * 			null there exists a previous exam of the same student.
 	 */
-	Exam getNewExam(User learner, Long idexam, String ipAddress);
+	TestSession createTestSession(User examinee, long testId, String ipAddress);
 
 	/**
 	 * Updates the database in order to register an answer as "marked" or "not marked" in relation to a question, exam and learner
-	 * @param idexam
-	 * @param iduser
-	 * @param idquestion
-	 * @param idanswer
+	 * @param testId
+	 * @param examineeId
+	 * @param itemSessionId
+	 * @param itemSessionResponseId
 	 * @param marked
 	 * @return number of rows updated
 	 */  
 	
-	int updateExamAnswer(Long idexam, Long iduser, Long idquestion, Long idanswer, Boolean marked);
+	int updateItemSessionResponse(long testId, long examineeId, long itemSessionId, long itemSessionResponseId, boolean marked);
 
 	/**
 	 * This method should:
 	 *  - Obtain the final grade of the exam
 	 *  - Update the corresponding rows of log_exams table
 	 *  - Update the information of table califs: fecha_fin and nota
-	 * @param id of the user (learner)
+	 * @param examineeId of the user (learner)
 	 * @param currentExam, that is, the object consisting in the exam performed by the user
 	 * @return Final grade of the exam
 	 */
-	Double gradeExam(Long id, Exam currentExam);
+	Double gradeTestSession(long examineeId, TestSession testSession);
 
 	/** 
 	 * Method to obtain the data of an already done exam: questions, answers, comments, grade, marked answers, correct answers,
 	 * time employed...
-	 * @param user that performed the exam
+	 * @param examinee that performed the exam
 	 * @param idexam, id of the configuration of the exam previously performed
 	 * @return
 	 */
-	Exam getAlreadyDoneExam(User user, Long idexam);
+	TestSession getAlreadyDoneExam(User examinee, long testSessionId);
 	
 	/**
 	 * 
 	 * Obtain the next question for an exam
 	 * 
-	 * @param user User that takes the exam
+	 * @param examinee User that takes the exam
 	 * 
-	 * @param idExam Exam identifier
+	 * @param testSessionId Exam identifier
 	 * 
-	 * @param lastQuestionId Last question shown to the candidate
+	 * @param lastItemSessionId Last question shown to the candidate
 	 * 
 	 * @return Returns the next question if there is one or <code>null</code> if
 	 * there is no more question to take.
 	 */
-	public ExamQuestion getNextQuestion(User user, Long idExam, Long lastQuestionId);
+	public ItemSession getNextQuestion(User examinee, long testSessionId, long lastItemSessionId);
 	
 	
 	/**
 	 * Calculate the grade for a previewed exam
 	 * 
-	 * @param previewedExam Previewed exam
+	 * @param testSessionPreview Previewed exam
 	 * @return
 	 */
-	public Double gradePreviewedExam(Exam previewedExam );
+	public Double gradeTestSessionPreview(TestSession testSessionPreview );
 	
 	/**
 	 * Generate an exam from a configuration without storing it in the database
 	 * 
-	 * @param idexam id of the exam to be previewed
+	 * @param testId id of the exam to be previewed
 	 * @return
 	 */
-	public Exam getPreviewExam(Long idexam);
+	public TestSession createTestSessionPreview(long testId);
 	
 	/** Reviews all the exams containing the question passed by parameter
 	 * If a question was incorrectly introduced into DB, or had an error on its answers;
@@ -141,7 +142,7 @@ public interface LearnerManagementService {
 	 * @param question Question changed
 	 * @return Reviewed exam list
 	 */
-	public List<ExamForReview> examReviewByQuestion(TemplateExamQuestion question);
+	public List<TestSessionForReview> examReviewByQuestion(Item question);
 	
 	/** Reviews all the exams
 	 * If a question was incorrectly introduced into DB, or had an error on its answers;
@@ -149,7 +150,7 @@ public interface LearnerManagementService {
 	 * @param idExam id of the Exam
 	 * @return Reviewed exam list
 	 */
-	public List<ExamForReview> examReviewByIdExam(long idExam);
+	public List<TestSessionForReview> examReviewByIdExam(long idExam);
 	
 	/** Generates a PDF file from question given as parameter
 	 * @param question TemplateExamQuestion object to be parsed to PDF
@@ -157,7 +158,7 @@ public interface LearnerManagementService {
 	 * @throws NullPointerException If the question object given is a null pointer
 	 * @throws DocumentException If the IText library can not parse PDF document
 	 * @throws IOException If was not possible to access to file system*/
-	public ByteArrayOutputStream parse2PDF(TemplateExamQuestion question) throws NullPointerException,DocumentException,IOException;
+	public ByteArrayOutputStream parse2PDF(Item question) throws NullPointerException,DocumentException,IOException;
 	
 	
 	/** Generates a PDF file from exam given as parameter
@@ -167,14 +168,14 @@ public interface LearnerManagementService {
 	 * @throws DocumentException If the IText library can not parse PDF document
 	 * @throws IOException If was not possible to access to file system
 	 */
-	public ByteArrayOutputStream parse2PDF(Exam exam) throws NullPointerException,DocumentException,IOException;
+	public ByteArrayOutputStream parse2PDF(TestSession exam) throws NullPointerException,DocumentException,IOException;
 
 	/**
 	 * Returns the exam with the given id
 	 * @param id The id of the exam
 	 * @return exam 
 	 * */
-	public Exam getExam(Long idexam, Long idalum);
+	public TestSession getTestSession(long testSessionId, long examineeId);
 	
 	/**
 	 * Returns the groups where is register the user
@@ -203,7 +204,7 @@ public interface LearnerManagementService {
 	 * @param exam empty config exam
 	 * @return the config exam
 	 * */
-	public ConfigExam getConfigExamFromId(ConfigExam exam);
+	public TestSessionTemplate getConfigExamFromId(TestSessionTemplate exam);
 	
 	/**
 	 * Return a list of Exams to this user for this group
@@ -211,7 +212,7 @@ public interface LearnerManagementService {
 	 * @idgroup Group's id
 	 * @return the exam list of the user to this group
 	 * */
-	public List<Exam>getAlreadyDoneExamGradeByGroup(long iduser, long idgroup);
+	public List<TestSession>getAlreadyDoneExamGradeByGroup(long iduser, long idgroup);
 	
 	/**
 	 * Return a list of grades to this user for this group
@@ -225,7 +226,7 @@ public interface LearnerManagementService {
 	 * Return a list width the next exams from this user
 	 * @return
 	 * */
-	public List<BasicDataExam> getNextExams(long userId, long idGroup);
+	public List<TestDetails> getNextExams(long userId, long idGroup);
 	
 	/**
 	 * Returns the list of tutors of a group
@@ -239,7 +240,7 @@ public interface LearnerManagementService {
 	 * @param idexam
 	 * @return the list of exams
 	 */
-	public List<Exam> getAllExams(Long idexam);
+	public List<TestSession> getAllExams(Long idexam);
 	
 	/**
 	 * Updates the confidence level for a question exam
@@ -253,14 +254,14 @@ public interface LearnerManagementService {
 	/**
 	 * Add the answers from idquestion from currentExam to the log_exams' table
 	 * */
-	public void addNewExamAnswer2LogExams(Exam currentExam,long idlearner,long idquestion,long startingDate);
+	public void addNewExamAnswer2LogExams(TestSession currentExam,long idlearner,long idquestion,long startingDate);
 
 	/**
 	 * Check if the exam was correctly saved into the 'log_exams' table
 	 * @throws MySQLTransactionRollbackException 
 	 * @throws Exception 
 	 * */
-	public void checkExam(Exam currentExam, long iduser) throws MySQLTransactionRollbackException, Exception;
+	public void checkExam(TestSession currentExam, long iduser) throws MySQLTransactionRollbackException, Exception;
 	
 	/**
 	 * Return an User width the same id as idUser
@@ -289,7 +290,7 @@ public interface LearnerManagementService {
 	 * @param currentExam, that is, the object consisting in the exam performed by the user
 	 * @return Final grade of the exam
 	 */
-	Double reGradeExam(Long idStd, Exam ex);
+	Double reGradeExam(Long idStd, TestSession ex);
 
 	/**
 	 * Updates in the data base the changes in a fill answer in the given question for the current

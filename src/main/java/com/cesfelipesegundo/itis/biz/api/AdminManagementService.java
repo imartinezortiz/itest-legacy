@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.cesfelipesegundo.itis.model.Conection;
 import com.cesfelipesegundo.itis.model.CourseStats;
-import com.cesfelipesegundo.itis.model.Exam;
 import com.cesfelipesegundo.itis.model.ExamGlobalInfo;
 import com.cesfelipesegundo.itis.model.GroupDetails;
 import com.cesfelipesegundo.itis.model.Institution;
@@ -14,8 +13,10 @@ import com.cesfelipesegundo.itis.model.InstitutionStats;
 import com.cesfelipesegundo.itis.model.InstitutionStudies;
 import com.cesfelipesegundo.itis.model.User;
 import com.cesfelipesegundo.itis.model.Course;
-import com.cesfelipesegundo.itis.model.Group;
 import com.mysql.jdbc.exceptions.MySQLTransactionRollbackException;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.test.business.entity.TestSession;
 
 /**
  * Interfaz para gestión de administradores
@@ -404,11 +405,11 @@ public interface AdminManagementService {
 	 * @param idexam, id of the configuration of the exam previously performed
 	 * @return
 	 */
-	public Exam getAlreadyDoneExam(User user, long idexam);
+	public TestSession getAlreadyDoneExam(User user, long idexam);
 
-	Exam getNewExam(User user, long idExam, String remoteAddr);
+	TestSession getNewExam(User user, long idExam, String remoteAddr);
 
-	void checkExam(Exam ex, long iduser) throws MySQLTransactionRollbackException, Exception;
+	void checkExam(TestSession ex, long iduser) throws MySQLTransactionRollbackException, Exception;
 	
 	/**
 	 * Returns a list width institutions with at least one public question

@@ -19,18 +19,19 @@ import org.springframework.web.servlet.ModelAndView;
 import com.cesfelipesegundo.itis.biz.MailSenderManagementServiceImpl;
 import com.cesfelipesegundo.itis.biz.api.LearnerManagementService;
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
-import com.cesfelipesegundo.itis.model.BasicDataExam;
-import com.cesfelipesegundo.itis.model.ConfigExam;
 import com.cesfelipesegundo.itis.model.CustomExamUser;
-import com.cesfelipesegundo.itis.model.Exam;
-import com.cesfelipesegundo.itis.model.ExamAnswer;
-import com.cesfelipesegundo.itis.model.ExamQuestion;
 import com.cesfelipesegundo.itis.model.Grade;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.Message;
 import com.cesfelipesegundo.itis.model.User;
 import com.cesfelipesegundo.itis.web.Constants;
 import com.lowagie.text.DocumentException;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.test.business.entity.ItemSession;
+import es.itest.engine.test.business.entity.ItemSessionResponse;
+import es.itest.engine.test.business.entity.TestDetails;
+import es.itest.engine.test.business.entity.TestSession;
+import es.itest.engine.test.business.entity.TestSessionTemplate;
 
 /**
  * Clase delegada, encargada de la transición entre la pantalla principal del alumno y el examen seleccionado.
@@ -70,7 +71,7 @@ public class LearnerExamController {
 	 * @uml.property  name="currentExam"
 	 * @uml.associationEnd  
 	 */
-    private Exam currentExam;
+    private TestSession currentExam;
 
     /**
      * Current grade: necessary to avoid errors when the grade page is reloaded
@@ -145,7 +146,7 @@ public class LearnerExamController {
 	 * @return currentExam
 	 * @uml.property  name="currentExam"
 	 */
-	public Exam getCurrentExam() {
+	public TestSession getCurrentExam() {
 		return currentExam;
 	}
 
@@ -154,7 +155,7 @@ public class LearnerExamController {
 	 * @param currentExam
 	 * @uml.property  name="currentExam"
 	 */
-	public void setCurrentExam(Exam currentExam) {
+	public void setCurrentExam(TestSession currentExam) {
 		this.currentExam = currentExam;
 	}
 	
@@ -230,7 +231,7 @@ public class LearnerExamController {
 		// If ok, continue
 		Long idexam = Long.valueOf(idex);
 		// Petición de generación de un examen para este usuario, con la configuración que diga el idexam y la IP del cliente:		
-		Exam exam =learnerManagementService.getPreviewExam(idexam);
+		TestSession exam =learnerManagementService.createTestSessionPreview(idexam);
 		mav.addObject("idexam",idexam);
 		mav.addObject("exam",exam);
 		mav.setViewName("learner/exam_details");		
@@ -285,7 +286,7 @@ public class LearnerExamController {
 			//mav = endExam(request, response);
 			
 		} 
-		Exam ex = null;
+		TestSession ex = null;
 		// Then, checking if the exam is already done:
 		if (learnerManagementService.getAlreadyDoneExam(user, idexam) != null) {
 			if(currentExam!=null){
@@ -303,7 +304,7 @@ public class LearnerExamController {
 			
 		} else{
 			try{
-				ex = learnerManagementService.getNewExam(user, idexam ,request.getRemoteAddr());
+				ex = learnerManagementService.createTestSession(user, idexam ,request.getRemoteAddr());
 				if (ex == null) {					
 					
 					examLog.error("Examen concurrente !! - Alumno: "+ user.getUserName()+"("+ user.getId()+") - Examen finalizado");
@@ -336,7 +337,7 @@ public class LearnerExamController {
 			return mav;
 			
 		} else {
-			ConfigExam exam = new ConfigExam();
+			TestSessionTemplate exam = new TestSessionTemplate();
 			exam.setId(idexam);
 			exam = learnerManagementService.getConfigExamFromId(exam);
 			List<Message> messages = tutorManagementService.validate(exam);
@@ -424,7 +425,7 @@ public class LearnerExamController {
 		ModelAndView mav = new ModelAndView();
 		
 		// Get question to show
-		ExamQuestion question = null;
+		ItemSession question = null;
 		int questionIndex;
 		try {
 			questionIndex = Integer.valueOf(request.getParameter("nextQuestionIndex"));
@@ -504,14 +505,14 @@ public class LearnerExamController {
 		Long idGroup = Long.parseLong(request.getParameter("group"));
 		
 		// Obtención de la lista de exámenes disponibles para este alumno a través del gestor de servicios
-		List<BasicDataExam> pendingExamslist = learnerManagementService.getPendingExams(user.getId());
-		List<ConfigExam> pendingConfigExams = new ArrayList<ConfigExam>();
+		List<TestDetails> pendingExamslist = learnerManagementService.getPendingTests(user.getId());
+		List<TestSessionTemplate> pendingConfigExams = new ArrayList<TestSessionTemplate>();
 		for(int i=0;i<pendingExamslist.size();i++){
 			if(pendingExamslist.get(i).getGroup().getId().compareTo(idGroup)!=0){
 				pendingExamslist.remove(i);
 				i--;
 			}else{
-				ConfigExam configExam = new ConfigExam();
+				TestSessionTemplate configExam = new TestSessionTemplate();
 				configExam.setId(pendingExamslist.get(i).getId());
 				configExam = learnerManagementService.getConfigExamFromId(configExam);
 				if(configExam.isCustomized()){
@@ -529,8 +530,8 @@ public class LearnerExamController {
 			}
 		}
 		// Obtención de la lista de exámenes a revisar para este alumno:
-		List<BasicDataExam> doneExamslist = learnerManagementService.getExamsForRevision(user.getId());
-		List<Exam> doneExamsDetailslist = new ArrayList<Exam>();
+		List<TestDetails> doneExamslist = learnerManagementService.getTestSessionsForReview(user.getId());
+		List<TestSession> doneExamsDetailslist = new ArrayList<TestSession>();
 		List<Grade> califData = new ArrayList<Grade>();
 		for(int i=0;i<doneExamslist.size();i++){
 			if(doneExamslist.get(i).getGroup().getId().compareTo(idGroup)!=0){
@@ -538,15 +539,15 @@ public class LearnerExamController {
 				i--;
 			}else{
 				califData.add(learnerManagementService.getGradeByIdExam(doneExamslist.get(i).getId(),user.getId()));
-				doneExamsDetailslist.add(learnerManagementService.getPreviewExam(doneExamslist.get(i).getId()));
+				doneExamsDetailslist.add(learnerManagementService.createTestSessionPreview(doneExamslist.get(i).getId()));
 			}
 		}
 		
 		// Obtención de la lista con los próximos examenes
-		List<BasicDataExam> nextExamslist = learnerManagementService.getNextExams(user.getId(),idGroup);
-		List<ConfigExam> nextConfigExams = new ArrayList<ConfigExam>();
+		List<TestDetails> nextExamslist = learnerManagementService.getNextExams(user.getId(),idGroup);
+		List<TestSessionTemplate> nextConfigExams = new ArrayList<TestSessionTemplate>();
 		for (int i=0;i<nextExamslist.size();i++){
-			ConfigExam configExam = new ConfigExam();
+			TestSessionTemplate configExam = new TestSessionTemplate();
 			configExam.setId(nextExamslist.get(i).getId());
 			configExam = learnerManagementService.getConfigExamFromId(configExam);
 			if(configExam.isCustomized()){
@@ -562,7 +563,7 @@ public class LearnerExamController {
 			}
 		}
 		
-		List<Exam> alreadyDoneExams = learnerManagementService.getAlreadyDoneExamGradeByGroup(user.getId(),idGroup);
+		List<TestSession> alreadyDoneExams = learnerManagementService.getAlreadyDoneExamGradeByGroup(user.getId(),idGroup);
 		List<Grade> alreadyDoneExamsGrade = learnerManagementService.getAlreadyDoneGradeByGroup(user.getId(),idGroup);
 		ModelAndView mav = new ModelAndView("learner/index_group");
 		Group group = learnerManagementService.getGroup(idGroup);
@@ -594,7 +595,7 @@ public class LearnerExamController {
 		ModelAndView mav = new ModelAndView();
 		
 		// Get question to grade
-		ExamQuestion question = null;
+		ItemSession question = null;
 		int questionIndex, nextQuestionIndex;
 		try {
 			questionIndex = Integer.valueOf(request.getParameter("questionNumber")) - 1;
@@ -613,15 +614,15 @@ public class LearnerExamController {
 		// Checking if the question is correctly answered
 		boolean correct = true;
 		if(question.getType()==0){
-			Iterator<ExamAnswer> iterator = question.getAnswers().iterator();
+			Iterator<ItemSessionResponse> iterator = question.getAnswers().iterator();
 			while (iterator.hasNext()) {
-				ExamAnswer answer = iterator.next();
+				ItemSessionResponse answer = iterator.next();
 				if ((answer.getMarked() && answer.getSolution() == 0) || (!answer.getMarked() && answer.getSolution() != 0))
 					correct = false;
 			}
 		}else{
 			if(question.getAnswers()!=null && question.getAnswers().size()==1){
-				ExamAnswer answer = question.getAnswers().get(0);
+				ItemSessionResponse answer = question.getAnswers().get(0);
 				String learnerAnswer = question.getLearnerFillAnswer();
 				if(learnerAnswer!=null && answer.getText()!=null && answer.getText().toLowerCase().trim().equalsIgnoreCase(learnerAnswer.toLowerCase().trim())){
 					correct=true;
@@ -714,7 +715,7 @@ public class LearnerExamController {
 		
 		// 1.- Search for the question to be updated
 		// Questions
-		ListIterator<ExamQuestion> iterQuestions = null;
+		ListIterator<ItemSession> iterQuestions = null;
 		try {
 			iterQuestions = currentExam.getQuestions().listIterator();
 		} catch (NullPointerException e) {
@@ -725,8 +726,8 @@ public class LearnerExamController {
 			return true;
 		}
 		boolean qFound = false;				// Guadian
-		ExamQuestion question = null;		// Particular question
-		ExamAnswer answer = null;			// Particular answer
+		ItemSession question = null;		// Particular question
+		ItemSessionResponse answer = null;			// Particular answer
 		
 		
 		while (iterQuestions.hasNext() && !qFound) {
@@ -741,7 +742,7 @@ public class LearnerExamController {
 				return false;
 			}
 		    // Answers
-			ListIterator<ExamAnswer> iterAnswers = question.getAnswers().listIterator();
+			ListIterator<ItemSessionResponse> iterAnswers = question.getAnswers().listIterator();
 			
 			// Guardian
 			boolean aFound = false;
@@ -758,7 +759,7 @@ public class LearnerExamController {
 			   answer.setMarked(marked);
   		       // Update database info
 			   try {
-				   rows = learnerManagementService.updateExamAnswer(currentExam.getId(),Long.valueOf(iduser),Long.valueOf(idquestion),Long.valueOf(idanswer),marked);
+				   rows = learnerManagementService.updateItemSessionResponse(currentExam.getId(),Long.valueOf(iduser),Long.valueOf(idquestion),Long.valueOf(idanswer),marked);
 			   } catch (Exception e) {
 				   examLog.info("Excepción al marcar respuesta: "+e.toString());
 			   }
@@ -777,7 +778,7 @@ public class LearnerExamController {
 			return true;
 		}else if(rows == 0){
 			learnerManagementService.addNewExamAnswer2LogExams(currentExam,Long.valueOf(iduser),Long.valueOf(idquestion),System.currentTimeMillis());
-			learnerManagementService.updateExamAnswer(currentExam.getId(),Long.valueOf(iduser),Long.valueOf(idquestion),Long.valueOf(idanswer),marked);
+			learnerManagementService.updateItemSessionResponse(currentExam.getId(),Long.valueOf(iduser),Long.valueOf(idquestion),Long.valueOf(idanswer),marked);
 			return true;
 		}else{
 			return false;
@@ -813,9 +814,9 @@ public class LearnerExamController {
 	public boolean updateConfidenceLevel(boolean checked, long userId, long questionId){
 		try{
 			long examId = currentExam.getId();
-			for(ExamQuestion question : currentExam.getQuestions()){
+			for(ItemSession question : currentExam.getQuestions()){
 				if(question.getId() == questionId){
-					question.setMarked(checked);
+					question.setExamineeWasConfident(checked);
 				}
 			}
 			
@@ -848,7 +849,7 @@ public class LearnerExamController {
 		Double gr = 0.0, maxGr = 0.0;
 		if (currentExam != null) {
 			//learnerManagementService.checkExam(currentExam,user.getId());
-			gr = learnerManagementService.gradeExam(user.getId(),currentExam);
+			gr = learnerManagementService.gradeTestSession(user.getId(),currentExam);
 			maxGr = new Double(currentExam.getMaxGrade());
 			examLog.info("Examen CORREGIDO. Alumno: "+ user.getUserName()+"("+ user.getId()+") - Calificación: "+gr);
 			setCurrentGrade(gr);
@@ -874,7 +875,7 @@ public class LearnerExamController {
 		
 		// Adición del usuario
 		mav.addObject("user",user);
-		ConfigExam exam = new ConfigExam();
+		TestSessionTemplate exam = new TestSessionTemplate();
 		//Aqui salta una excepcion siempre que se intenta hacer algun examen que no se ha validado bien
 		try{
 			exam.setId(currentExam.getId());
@@ -915,7 +916,7 @@ public class LearnerExamController {
 	public void reviewExam2PDF(HttpServletRequest request,HttpServletResponse response) {
 		try {
 			if(currentExam==null)
-				currentExam = (Exam)request.getSession().getAttribute("examPreview");
+				currentExam = (TestSession)request.getSession().getAttribute("examPreview");
 			ByteArrayOutputStream pdfByte = learnerManagementService.parse2PDF(currentExam);
 			response.setHeader("Content-disposition", "attachment; filename=\""+currentExam.getTitle()+currentExam.getGroup().getCourse().getName()+currentExam.getId()+".pdf\""); 
 			response.setContentType("application/pdf");
@@ -946,11 +947,11 @@ public class LearnerExamController {
 		User user = (User) request.getSession().getAttribute(Constants.USER);
 		
 		// Based on an exam id, obtains from the database the data of the exam to be reviewed		
-		Exam ex = learnerManagementService.getAlreadyDoneExam(user, Long.valueOf(request.getParameter("idexam")));
-		List<Exam> examenes = learnerManagementService.getAllExams(ex.getId());
+		TestSession ex = learnerManagementService.getAlreadyDoneExam(user, Long.valueOf(request.getParameter("idexam")));
+		List<TestSession> examenes = learnerManagementService.getAllExams(ex.getId());
 		double sumaNotas = 0;
 		for(int i=0;i<examenes.size();i++){
-			Exam examen = examenes.get(i);
+			TestSession examen = examenes.get(i);
 			sumaNotas += examen.getExamGrade();
 		}
 		double media = sumaNotas/examenes.size();
@@ -979,9 +980,9 @@ public class LearnerExamController {
 	 *  @param idExam
 	 *  @return exam
 	 * */
-	public Exam getExam(String idExam){
+	public TestSession getExam(String idExam){
 		Long idEx = Long.parseLong(idExam);
-		Exam exam =learnerManagementService.getPreviewExam(idEx);
+		TestSession exam =learnerManagementService.createTestSessionPreview(idEx);
 		return exam;
 	}
 
@@ -1023,8 +1024,8 @@ public class LearnerExamController {
 	public boolean updateFillAnswer(Long idExam, Long idUser, Long idQuestion, Long idAnswer, String textAnswer){
 		try{
 			if(currentExam!=null){
-				List<ExamQuestion> questions = currentExam.getQuestions();
-				for(ExamQuestion question : questions){
+				List<ItemSession> questions = currentExam.getQuestions();
+				for(ItemSession question : questions){
 					if(question.getId().equals(idQuestion)){
 						if(textAnswer.trim().equalsIgnoreCase("")){
 							question.setLearnerFillAnswer("");

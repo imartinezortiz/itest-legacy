@@ -4,10 +4,11 @@ import java.util.List;
 
 import com.cesfelipesegundo.itis.model.AnsweredQuestionData;
 import com.cesfelipesegundo.itis.model.CalifData;
-import com.cesfelipesegundo.itis.model.ConfigExam;
-import com.cesfelipesegundo.itis.model.Exam;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.QuestionStats;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.test.business.entity.TestSession;
+import es.itest.engine.test.business.entity.TestSessionTemplate;
 
 public interface StatsDAO extends DAO {
 	
@@ -27,7 +28,7 @@ public interface StatsDAO extends DAO {
 	 * @return list of questionData with information about the questions appeared in all exams of the group
 	 */
 	
-	List<AnsweredQuestionData> getAnsweredQuestionsData(ConfigExam exam);
+	List<AnsweredQuestionData> getAnsweredQuestionsData(TestSessionTemplate exam);
 	
 	/**
 	 * Returns a list of califsData with information about the califs obtained in all exams of the group
@@ -58,6 +59,6 @@ public interface StatsDAO extends DAO {
 	 * @param currentExam 
 	 * */
 	void fillQuestionStatsByExam(List<QuestionStats> questionStats,
-			ConfigExam currentExam);
+			TestSessionTemplate currentExam);
 		
 }

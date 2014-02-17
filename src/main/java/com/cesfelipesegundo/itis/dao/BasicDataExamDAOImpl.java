@@ -8,9 +8,10 @@ import java.util.List;
 import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 
 import com.cesfelipesegundo.itis.dao.api.BasicDataExamDAO;
-import com.cesfelipesegundo.itis.model.BasicDataExam;
 import com.cesfelipesegundo.itis.model.ExamGlobalInfo;
 import com.cesfelipesegundo.itis.model.Grade;
+
+import es.itest.engine.test.business.entity.TestDetails;
 
 public class BasicDataExamDAOImpl extends SqlMapClientDaoSupport implements BasicDataExamDAO {
 	/**
@@ -21,13 +22,13 @@ public class BasicDataExamDAOImpl extends SqlMapClientDaoSupport implements Basi
 		super();
 	}
 	
-	public List<BasicDataExam> getPendingExams(Long id) {
-		List<BasicDataExam> list = super.getSqlMapClientTemplate().queryForList("BasicDataExam.getPendingExams", id);
+	public List<TestDetails> getPendingExams(Long id) {
+		List<TestDetails> list = super.getSqlMapClientTemplate().queryForList("BasicDataExam.getPendingExams", id);
 		return list;
 	}
 	
-	public List<BasicDataExam> getExamsForRevision(Long id) {
-		List<BasicDataExam> list = super.getSqlMapClientTemplate().queryForList("BasicDataExam.getExamsForRevision", id);
+	public List<TestDetails> getExamsForRevision(Long id) {
+		List<TestDetails> list = super.getSqlMapClientTemplate().queryForList("BasicDataExam.getExamsForRevision", id);
 		return list;
 	}
 	
@@ -79,11 +80,11 @@ public class BasicDataExamDAOImpl extends SqlMapClientDaoSupport implements Basi
 		return rows;
 	}
 	
-	public List<BasicDataExam> getNextExams(long userId, long idGroup) {
+	public List<TestDetails> getNextExams(long userId, long idGroup) {
 		HashMap<String,Long> parameters = new HashMap<String,Long>();
 		parameters.put("userId", userId);
 		parameters.put("idGroup", idGroup);
-		List<BasicDataExam> nextExams = (List<BasicDataExam>)super.getSqlMapClientTemplate().queryForList("BasicDataExam.getNextExamsByUser",parameters);
+		List<TestDetails> nextExams = (List<TestDetails>)super.getSqlMapClientTemplate().queryForList("BasicDataExam.getNextExamsByUser",parameters);
 		return nextExams;
 	}
 	

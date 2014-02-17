@@ -1,4 +1,4 @@
-package com.cesfelipesegundo.itis.model;
+package es.itest.engine.test.business.entity;
 
 import java.util.Date;
 import java.util.List;
@@ -9,13 +9,13 @@ import java.util.List;
  * @author chema
  *
  */
-public class TemplateExam extends BasicDataExam {
+public class Test extends TestDetails {
 
 	private int visibility;				// Visibility for the questions uses to make the exam
 	private int questionDistribution;	// Distribution of the questions: continuous or by questions 
 	private int duration;				// Duration
 	private double maxGrade;				// Maximun grade for the exam
-	private List<TemplateExamSubject> subjects;	// Lista de temas
+	private List<TestSubject> subjects;	// Lista de temas
 	private boolean activeReview;
 	private Date startDate;
 	private Date endDate;
@@ -100,11 +100,11 @@ public class TemplateExam extends BasicDataExam {
 		this.minQuestionGrade = minQuestionGrade;
 	}
 
-	public List<TemplateExamSubject> getSubjects() {
+	public List<TestSubject> getSubjects() {
 		return subjects;
 	}
 
-	public void setSubjects(List<TemplateExamSubject> subjects) {
+	public void setSubjects(List<TestSubject> subjects) {
 		this.subjects = subjects;
 	}
 

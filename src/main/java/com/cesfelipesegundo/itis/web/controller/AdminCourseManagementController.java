@@ -17,11 +17,12 @@ import com.cesfelipesegundo.itis.biz.api.AdminManagementService;
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
 import com.cesfelipesegundo.itis.model.Course;
 import com.cesfelipesegundo.itis.model.CourseStats;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.web.GroupWithTutors;
 import com.cesfelipesegundo.itis.web.comparators.GroupWithTutorsCompareGroups;
 import com.cesfelipesegundo.itis.web.comparators.GroupWithTutorsCompareInstitutions;
 import com.cesfelipesegundo.itis.web.comparators.GroupWithTutorsCompareYears;
+
+import es.itest.engine.course.business.entity.Group;
 
 /**
  * Delegate class. It manages the main operations related to an course

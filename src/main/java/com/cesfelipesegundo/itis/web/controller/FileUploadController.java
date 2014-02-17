@@ -3,9 +3,9 @@ package com.cesfelipesegundo.itis.web.controller;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.*;
 
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.ImportUser;
 import com.cesfelipesegundo.itis.model.ReadFile;
 import com.cesfelipesegundo.itis.model.User;
@@ -13,9 +13,13 @@ import com.cesfelipesegundo.itis.model.comparators.UserUserNameComparator;
 import com.cesfelipesegundo.itis.web.Constants;
 import com.cesfelipesegundo.itis.web.FileUploadBean;
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
+
+import es.itest.engine.course.business.entity.Group;
+
 import org.springframework.validation.BindException;
 import org.springframework.web.multipart.support.ByteArrayMultipartFileEditor;
 import org.springframework.web.bind.ServletRequestDataBinder;
+
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 

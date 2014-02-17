@@ -2,6 +2,8 @@ package com.cesfelipesegundo.itis.model;
 
 import java.util.Comparator;
 
+import es.itest.engine.test.business.entity.MediaElem;
+
 /**
  * To implement the sorting of media elems using the collection methods
  * @author chema

@@ -18,7 +18,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
 import com.cesfelipesegundo.itis.biz.api.AdminManagementService;
 import com.cesfelipesegundo.itis.model.Course;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.Institution;
 import com.cesfelipesegundo.itis.model.InstitutionStudies;
 import com.cesfelipesegundo.itis.model.User;
@@ -33,6 +32,8 @@ import com.cesfelipesegundo.itis.model.comparators.UserSurnameComparator;
 import com.cesfelipesegundo.itis.model.comparators.UserUserNameComparator;
 import com.cesfelipesegundo.itis.web.BreadCrumb;
 import com.cesfelipesegundo.itis.web.Constants;
+
+import es.itest.engine.course.business.entity.Group;
 
 /**
  * Delegate class. It manages the main operations related to an institution

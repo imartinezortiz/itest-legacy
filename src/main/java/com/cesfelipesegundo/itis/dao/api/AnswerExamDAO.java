@@ -1,8 +1,9 @@
 package com.cesfelipesegundo.itis.dao.api;
 
 import com.cesfelipesegundo.itis.model.AnswerExam;
-import com.cesfelipesegundo.itis.model.ExamAnswer;
-import com.cesfelipesegundo.itis.model.TemplateExamAnswer;
+
+import es.itest.engine.test.business.entity.ItemResponse;
+import es.itest.engine.test.business.entity.ItemSessionResponse;
 
 public interface AnswerExamDAO extends DAO {
 	
@@ -51,7 +52,7 @@ public interface AnswerExamDAO extends DAO {
 	 * 
 	 * @param templateAnswer
 	 */
-	void updateUsedInExam(TemplateExamAnswer templateAnswer);
+	void updateUsedInExam(ItemResponse templateAnswer);
 
 	/**
 	 * Updates the confidence level for a question exam
@@ -64,7 +65,7 @@ public interface AnswerExamDAO extends DAO {
 	int updateConfidenceLevel(long examId, long userId, long questionId,
 			boolean checked,int questionType);
 	
-	int updateExamAnswer(Long idexam, Long iduser, Long idquestion, ExamAnswer eAnswer);
+	int updateExamAnswer(Long idexam, Long iduser, Long idquestion, ItemSessionResponse eAnswer);
 
 	void addNewExamFillAnswer(Long idExam, Long idUser, Long idQuestion,
 			Long idAnswer, String textAnswer, long currentTimeMillis);

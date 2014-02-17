@@ -13,10 +13,11 @@ import org.springframework.web.context.ServletContextAware;
 
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
 import com.cesfelipesegundo.itis.model.DetailsTheme;
-import com.cesfelipesegundo.itis.model.Group;
-import com.cesfelipesegundo.itis.model.Subject;
 import com.cesfelipesegundo.itis.model.comparators.SubjectOrderComparator;
 import com.cesfelipesegundo.itis.web.Constants;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.course.business.entity.Subject;
 
 
 /**

@@ -10,9 +10,10 @@ import org.springframework.web.servlet.mvc.Controller;
 
 import com.cesfelipesegundo.itis.biz.TutorManagementServiceImpl;
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.User;
 import com.cesfelipesegundo.itis.web.Constants;
+
+import es.itest.engine.course.business.entity.Group;
 
 public class TutorGroupImportController implements Controller {
 	

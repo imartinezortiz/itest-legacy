@@ -14,10 +14,8 @@ import org.springframework.web.context.ServletContextAware;
 
 import com.cesfelipesegundo.itis.biz.api.AdminManagementService;
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
-import com.cesfelipesegundo.itis.model.ConfigExam;
 import com.cesfelipesegundo.itis.model.Course;
 import com.cesfelipesegundo.itis.model.ExamTest;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.GroupDetails;
 import com.cesfelipesegundo.itis.model.Institution;
 import com.cesfelipesegundo.itis.model.InstitutionStats;
@@ -25,6 +23,9 @@ import com.cesfelipesegundo.itis.model.User;
 import com.cesfelipesegundo.itis.model.comparators.GroupNameComparator;
 import com.cesfelipesegundo.itis.model.comparators.UserNameComparator;
 import com.cesfelipesegundo.itis.web.Constants;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.test.business.entity.TestSessionTemplate;
 
 public class AdminGroupManagementController  implements ServletContextAware {
 	
@@ -308,7 +309,7 @@ public class AdminGroupManagementController  implements ServletContextAware {
 		return null;
 	}
 	
-	public List<ConfigExam> getExamsByGroup(String groupId){
+	public List<TestSessionTemplate> getExamsByGroup(String groupId){
 		long idGroup;
 		try{
 			idGroup = Long.parseLong(groupId);
@@ -317,7 +318,7 @@ public class AdminGroupManagementController  implements ServletContextAware {
 		}
 		if(idGroup!=-1){
 			Group group = tutorManagementService.getGroup(idGroup);
-			List<ConfigExam> exams = tutorManagementService.getGroupConfigExams(group, "title");
+			List<TestSessionTemplate> exams = tutorManagementService.getGroupConfigExams(group, "title");
 			return exams;
 		}
 		return null;

@@ -11,7 +11,8 @@ import com.cesfelipesegundo.itis.dao.api.InstitutionDAO;
 import com.cesfelipesegundo.itis.model.Institution;
 import com.cesfelipesegundo.itis.model.InstitutionStats;
 import com.cesfelipesegundo.itis.model.InstitutionStudies;
-import com.cesfelipesegundo.itis.model.Subject;
+
+import es.itest.engine.course.business.entity.Subject;
 
 
 

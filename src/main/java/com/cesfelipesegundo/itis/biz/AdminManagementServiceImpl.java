@@ -17,18 +17,18 @@ import com.cesfelipesegundo.itis.dao.api.TemplateExamDAO;
 import com.cesfelipesegundo.itis.dao.api.UserDAO;
 import com.cesfelipesegundo.itis.model.Course;
 import com.cesfelipesegundo.itis.model.CourseStats;
-import com.cesfelipesegundo.itis.model.Exam;
 import com.cesfelipesegundo.itis.model.ExamGlobalInfo;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.GroupDetails;
 import com.cesfelipesegundo.itis.model.Institution;
 import com.cesfelipesegundo.itis.model.InstitutionStats;
 import com.cesfelipesegundo.itis.model.InstitutionStudies;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
 import com.cesfelipesegundo.itis.model.User;
-
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
 import com.mysql.jdbc.exceptions.MySQLTransactionRollbackException;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.test.business.entity.Item;
+import es.itest.engine.test.business.entity.TestSession;
 
 
 
@@ -255,16 +255,16 @@ public class AdminManagementServiceImpl extends BaseService implements
 	public void deleteGroup(Group group) {
 		
 		// Delete the questions of the group
-		List<TemplateExamQuestion> questionList = groupDAO.getQuestions(group);
+		List<Item> questionList = groupDAO.getQuestions(group);
 		
 		if (questionList != null)
 		{
 		
-			Iterator<TemplateExamQuestion> iterQuestionList = questionList.iterator();
+			Iterator<Item> iterQuestionList = questionList.iterator();
 			while (iterQuestionList.hasNext())
 			{
 			
-				TemplateExamQuestion question = iterQuestionList.next();
+				Item question = iterQuestionList.next();
 				tutorManagementService.deleteQuestion(question);				
 				
 			} // while iterQuestionList		
@@ -438,15 +438,15 @@ public class AdminManagementServiceImpl extends BaseService implements
 		return tutorManagementService.getGroup(idGroup);
 	}
 	
-	public Exam getAlreadyDoneExam(User user, long idexam){
+	public TestSession getAlreadyDoneExam(User user, long idexam){
 		return learnerManagementService.getAlreadyDoneExam(user, idexam);
 	}
 
-	public Exam getNewExam(User user, long idExam, String remoteAddr) {
-		return learnerManagementService.getNewExam(user, idExam, remoteAddr);
+	public TestSession getNewExam(User user, long idExam, String remoteAddr) {
+		return learnerManagementService.createTestSession(user, idExam, remoteAddr);
 	}
 
-	public void checkExam(Exam ex,long iduser) throws MySQLTransactionRollbackException, Exception {
+	public void checkExam(TestSession ex,long iduser) throws MySQLTransactionRollbackException, Exception {
 		learnerManagementService.checkExam(ex, iduser);
 	}
 

@@ -5,14 +5,15 @@ import java.util.Map;
 
 import com.cesfelipesegundo.itis.model.Course;
 import com.cesfelipesegundo.itis.model.CourseStats;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.Institution;
-import com.cesfelipesegundo.itis.model.Subject;
-import com.cesfelipesegundo.itis.model.TemplateExamSubject;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.course.business.entity.Subject;
+import es.itest.engine.test.business.entity.TestSubject;
 
 public interface CourseDAO {
 
-	List<TemplateExamSubject> getSubjects(Group group);
+	List<TestSubject> getSubjects(Group group);
 
 	Course getCourse(Long id);
 	

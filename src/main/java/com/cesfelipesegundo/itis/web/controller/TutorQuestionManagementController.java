@@ -19,17 +19,18 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.cesfelipesegundo.itis.biz.api.LearnerManagementService;
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
-import com.cesfelipesegundo.itis.model.ExamForReview;
-import com.cesfelipesegundo.itis.model.Group;
-import com.cesfelipesegundo.itis.model.MediaElem;
 import com.cesfelipesegundo.itis.model.Query;
-import com.cesfelipesegundo.itis.model.Subject;
-import com.cesfelipesegundo.itis.model.TemplateExamAnswer;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
-import com.cesfelipesegundo.itis.model.TemplateExamSubject;
 import com.cesfelipesegundo.itis.model.User;
 import com.cesfelipesegundo.itis.web.Constants;
 import com.lowagie.text.DocumentException;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.course.business.entity.Subject;
+import es.itest.engine.test.business.entity.Item;
+import es.itest.engine.test.business.entity.ItemResponse;
+import es.itest.engine.test.business.entity.MediaElem;
+import es.itest.engine.test.business.entity.TestSessionForReview;
+import es.itest.engine.test.business.entity.TestSubject;
 
 /**
  * It manages the main operations related to the new or edited question and
@@ -54,12 +55,12 @@ public class TutorQuestionManagementController implements ServletContextAware {
     /**
      * Question being managed (added or edited) by the tutor
      */
-    private TemplateExamQuestion currentQuestion;
+    private Item currentQuestion;
 
     /**
      * Answer being managed (added or edited) by the tutor
      */
-    private TemplateExamAnswer currentAnswer;
+    private ItemResponse currentAnswer;
     
     /**
      * Group being managed
@@ -70,12 +71,12 @@ public class TutorQuestionManagementController implements ServletContextAware {
    
     /* ******** Getters and setters ******** */
 
-	public TemplateExamQuestion getCurrentQuestion() {
+	public Item getCurrentQuestion() {
 		return currentQuestion;
 	}
 
 
-	public void setCurrentQuestion(TemplateExamQuestion currentQuestion) {
+	public void setCurrentQuestion(Item currentQuestion) {
 		this.currentQuestion = currentQuestion;
 	}
 
@@ -100,12 +101,12 @@ public class TutorQuestionManagementController implements ServletContextAware {
 		this.learnerManagementService = learnerManagementService;
 	}
 
-	public TemplateExamAnswer getCurrentAnswer() {
+	public ItemResponse getCurrentAnswer() {
 		return currentAnswer;
 	}
 
 
-	public void setCurrentAnswer(TemplateExamAnswer currentAnswer) {
+	public void setCurrentAnswer(ItemResponse currentAnswer) {
 		this.currentAnswer = currentAnswer;
 	}
 	
@@ -133,7 +134,7 @@ public class TutorQuestionManagementController implements ServletContextAware {
 	public Long saveQuestion (String idgroup, String idtheme, String title, String difficulty, String visibility, String enunc, String comment,int questionType) {
 		boolean error = false;
 		if (currentQuestion == null) {
-			currentQuestion = new TemplateExamQuestion();
+			currentQuestion = new Item();
 			log.debug("Se ha intentado salvar una pregunta sin estar establecida en la sesión");
 		}
 		//check if the current group is null
@@ -179,7 +180,7 @@ public class TutorQuestionManagementController implements ServletContextAware {
 		currentQuestion.setType(questionType);
 		
 		// Answers: create object only if there was no list
-		if (currentQuestion.getAnswers() == null) currentQuestion.setAnswers(new ArrayList<TemplateExamAnswer>());
+		if (currentQuestion.getAnswers() == null) currentQuestion.setAnswers(new ArrayList<ItemResponse>());
 		
 		/* 
 		 * If the question is new, the service must insert all the data into the DB.
@@ -203,9 +204,9 @@ public class TutorQuestionManagementController implements ServletContextAware {
 	 * Gets the list of answers for the current question
 	 * @return List of answers from the current question, including mmedia info
 	 */
-	public  List<TemplateExamAnswer> getCurrentQuestionAnswers () {
+	public  List<ItemResponse> getCurrentQuestionAnswers () {
 		if (currentQuestion.getAnswers()  == null) {
-			return new ArrayList<TemplateExamAnswer>();
+			return new ArrayList<ItemResponse>();
 		} else {
 			return currentQuestion.getAnswers();
 		}
@@ -218,7 +219,7 @@ public class TutorQuestionManagementController implements ServletContextAware {
 	 */
 	public void newAnswer () {
 		
-		setCurrentAnswer(new TemplateExamAnswer());
+		setCurrentAnswer(new ItemResponse());
 		
 		return;
 		
@@ -230,14 +231,14 @@ public class TutorQuestionManagementController implements ServletContextAware {
 	 * Saves the answer to the database. Implements the "save" action of the answer.
 	 * @return List of answers to be re-displayed
 	 */
-	public List<TemplateExamAnswer> saveAnswer (String texto, String solution, String isnewanswer) {
+	public List<ItemResponse> saveAnswer (String texto, String solution, String isnewanswer) {
 		
 		if (currentQuestion == null) {
-			currentQuestion = new TemplateExamQuestion();
+			currentQuestion = new Item();
 			log.debug("Se ha intentado salvar una respuesta sin estar establecida la pregunta en la sesión");
 		}
 		if (currentAnswer == null) {
-			currentAnswer = new TemplateExamAnswer();
+			currentAnswer = new ItemResponse();
 			log.debug("Se ha intentado salvar una respuesta sin estar establecida en la sesión");
 		}
 		
@@ -298,13 +299,13 @@ public class TutorQuestionManagementController implements ServletContextAware {
 		tutorManagementService.saveAnswer(currentAnswer);
 			
 		// The answer can only be saved when the question was saved before
-		List<TemplateExamAnswer> answers = currentQuestion.getAnswers();
+		List<ItemResponse> answers = currentQuestion.getAnswers();
 		
 		// It is important to update the values of the correct answers...
 		if (updateSolutionValues && answers!=null) {
-			Iterator<TemplateExamAnswer> iterAnsw = answers.iterator();
+			Iterator<ItemResponse> iterAnsw = answers.iterator();
 			int pendSols = currentQuestion.getNumCorrectAnswers();
-			TemplateExamAnswer answ = null;
+			ItemResponse answ = null;
 			
 			while (iterAnsw.hasNext() && (pendSols > 0)) {
 				answ = iterAnsw.next();
@@ -334,17 +335,17 @@ public class TutorQuestionManagementController implements ServletContextAware {
 	 * Deletes also the mmedia files associated to the answer.
 	 * @return List of answers to be re-displayed
 	 */
-	public List<TemplateExamAnswer> deleteAnswer (String idresp) {
+	public List<ItemResponse> deleteAnswer (String idresp) {
 
 		// Aux variable to update the value of the remaining solutions:
 		boolean updateSolutionValues = false;
 		
 		// The answer can only be deleted when the question was saved before
-		List<TemplateExamAnswer> answers = currentQuestion.getAnswers();
+		List<ItemResponse> answers = currentQuestion.getAnswers();
 
         // Find the answer to be deleted:
-		Iterator<TemplateExamAnswer> iterAnsw = answers.iterator();
-		TemplateExamAnswer answ = null;
+		Iterator<ItemResponse> iterAnsw = answers.iterator();
+		ItemResponse answ = null;
 		boolean aFound = false;
 		int pendSols = 0;
 		
@@ -390,7 +391,7 @@ public class TutorQuestionManagementController implements ServletContextAware {
 				if (pendSols > 0) {
 					// Integer division to correct the solution values
 					int solutionValue = 100/currentQuestion.getNumCorrectAnswers();
-					TemplateExamAnswer answAux = null;
+					ItemResponse answAux = null;
 					// Reset the iterator in order to begin from the first answer
 					iterAnsw = answers.iterator();
 					while (iterAnsw.hasNext() && (pendSols > 0)) {
@@ -416,11 +417,11 @@ public class TutorQuestionManagementController implements ServletContextAware {
 	 * Loads the answer from the list and changes the currentAnswer.
 	 * @return actual (selected) currentAnswer
 	 */
-	public TemplateExamAnswer editAnswer (String idresp) {
+	public ItemResponse editAnswer (String idresp) {
 		
         // Find the answer to be edited:
-		Iterator<TemplateExamAnswer> iterAnsw = currentQuestion.getAnswers().iterator();
-		TemplateExamAnswer answ = null;
+		Iterator<ItemResponse> iterAnsw = currentQuestion.getAnswers().iterator();
+		ItemResponse answ = null;
 		boolean aFound = false;
 		
 		while (iterAnsw.hasNext() && (!aFound)) {
@@ -433,7 +434,7 @@ public class TutorQuestionManagementController implements ServletContextAware {
 		if (!aFound) {
 			// Answer not found
 			log.debug("- Respuesta "+idresp+" NO encontrada");
-			setCurrentAnswer(new TemplateExamAnswer());
+			setCurrentAnswer(new ItemResponse());
 		} else {
 			setCurrentAnswer(answ);
 		}
@@ -1052,10 +1053,10 @@ public class TutorQuestionManagementController implements ServletContextAware {
 		ModelAndView mav = new ModelAndView("tutor/question_preview");
 		
 		// If the parameter is filled, then that question is previewed (used in "import question interface")
-		TemplateExamQuestion question;
+		Item question;
 		if (request.getParameter("qId") != null) {
 			Long idq = Long.valueOf(request.getParameter("qId"));
-			question = new TemplateExamQuestion();
+			question = new Item();
 			question.setId(idq);
 			question = tutorManagementService.getQuestionFromId(question);
 		} else {
@@ -1078,7 +1079,7 @@ public class TutorQuestionManagementController implements ServletContextAware {
 	public void generateQuestionPDF (HttpServletRequest request, HttpServletResponse response) {
 		
 		String idString = request.getParameter("idQuestion");
-		TemplateExamQuestion question = new TemplateExamQuestion();
+		Item question = new Item();
 		long idLong = -1;
 		try{
 			idLong =Long.parseLong(idString);
@@ -1125,11 +1126,11 @@ public class TutorQuestionManagementController implements ServletContextAware {
 		ModelAndView mav = new ModelAndView("tutor/new_question");
 		// copiar la pregunta
 		
-		TemplateExamQuestion question = tutorManagementService.copyQuestion(currentQuestion,true);
+		Item question = tutorManagementService.copyQuestion(currentQuestion,true);
 		log.info("Duplicada pregunta: "+currentQuestion.getId()+" a la nueva pregunta: "+question.getId());
 		
 		// List of themes for the course of this group 
-		List<TemplateExamSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
+		List<TestSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
 		// Addtion of the themes:
 		mav.addObject("themes",thlist);
 		setCurrentQuestion(question);//actualizamos el currenQuestion para que en la vista jsp tire de �l con los datos actualizados.
@@ -1168,7 +1169,7 @@ public class TutorQuestionManagementController implements ServletContextAware {
 			long idQuestion;
 			try{
 				idQuestion = Long.parseLong(selectedIdQuestion);
-				currentQuestion = new TemplateExamQuestion();
+				currentQuestion = new Item();
 				currentQuestion.setId(idQuestion);
 				currentQuestion = tutorManagementService.getQuestionFromId(currentQuestion);
 			}catch(Exception e){
@@ -1191,19 +1192,19 @@ public class TutorQuestionManagementController implements ServletContextAware {
 		}
 		
 		// copiar la pregunta
-		TemplateExamQuestion question = null;
+		Item question = null;
 		/*
 		 * If there are some error we create a new question else we copy the selectedQuestion
 		 * */
 		if(error){
-			question = new TemplateExamQuestion();
+			question = new Item();
 		}else{
 			question = tutorManagementService.copyQuestion(currentQuestion,true);
 			log.info("Duplicada pregunta: "+currentQuestion.getId()+" a la nueva pregunta: "+question.getId());
 		}
 		
 		// List of themes for the course of this group 
-		List<TemplateExamSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
+		List<TestSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
 		// Addtion of the themes:
 		mav.addObject("themes",thlist);
 		setCurrentQuestion(question);//actualizamos el currenQuestion para que en la vista jsp tire de él con los datos actualizados.
@@ -1233,7 +1234,7 @@ public class TutorQuestionManagementController implements ServletContextAware {
 	 * Review exams
 	 * @return List<ExamForReview>
 	 */
-	public List<ExamForReview> reviewExamsByQuestion() {
+	public List<TestSessionForReview> reviewExamsByQuestion() {
 		log.debug("Corrigiendo examenes en los que ha aparecido la pregunta con ID "+getCurrentQuestion().getId());
 		/*List<ExamForReview> infoCorregidos*/return learnerManagementService.examReviewByQuestion(getCurrentQuestion());
 		
@@ -1248,7 +1249,7 @@ public class TutorQuestionManagementController implements ServletContextAware {
 	public boolean isInExam(String id){
 		Query queryQuestions = new Query();
 		queryQuestions.setGroup(currentGroup.getId());
-		List<TemplateExamQuestion> tqlist = tutorManagementService.find(queryQuestions);
+		List<Item> tqlist = tutorManagementService.find(queryQuestions);
 		Long idQuestion = null;
 		try{
 		idQuestion = Long.parseLong(id);
@@ -1267,7 +1268,7 @@ public class TutorQuestionManagementController implements ServletContextAware {
 	
 	public int removeAnswersFromQuestion(int questionType){
 		if(currentQuestion!=null){
-			List<TemplateExamAnswer> answers = currentQuestion.getAnswers();
+			List<ItemResponse> answers = currentQuestion.getAnswers();
 			if(answers!=null){
 				for(int i=answers.size()-1;i>=0;i--){
 					tutorManagementService.deleteAnswer(answers.get(i));
@@ -1291,7 +1292,7 @@ public class TutorQuestionManagementController implements ServletContextAware {
 	
 	public int saveFillAnswer(String answerText, boolean isNewAnswer){
 		if(currentQuestion!=null && currentQuestion.getType()==1){
-			currentAnswer = new TemplateExamAnswer();
+			currentAnswer = new ItemResponse();
 			currentAnswer.setText(answerText);
 			currentAnswer.setQuestion(currentQuestion);
 			currentAnswer.setSolution(Constants.YES);
@@ -1299,8 +1300,8 @@ public class TutorQuestionManagementController implements ServletContextAware {
 			currentAnswer.setMmedia(null);
 			currentAnswer.setValue(100);
 			currentAnswer.setUsedInExam(false);
-			List<TemplateExamAnswer> answers = currentQuestion.getAnswers();
-			TemplateExamAnswer answer = null;
+			List<ItemResponse> answers = currentQuestion.getAnswers();
+			ItemResponse answer = null;
 			//Eliminamos todas las respuestas para que al a�adir la nueva solo haya una respuesta.
 			if(answers.size()>0){
 				for(int i=answers.size()-1;i>=0;i--){

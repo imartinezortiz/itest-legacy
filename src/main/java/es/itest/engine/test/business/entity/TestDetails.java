@@ -1,11 +1,13 @@
-package com.cesfelipesegundo.itis.model;
+package es.itest.engine.test.business.entity;
+
+import es.itest.engine.course.business.entity.Group;
 
 /**
  * Clase para modelar los datos básicos de un examen. Utilizado para mostrar listas de exámenes.
  * @author chema
  *
  */
-public class BasicDataExam {
+public class TestDetails {
 
 	private Long id;			// Id del examen
 	private String title;

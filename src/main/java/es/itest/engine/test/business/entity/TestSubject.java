@@ -1,4 +1,4 @@
-package com.cesfelipesegundo.itis.model;
+package es.itest.engine.test.business.entity;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import java.util.List;
  * @author Alberto
  *
  */
-public class TemplateExamSubject {
+public class TestSubject {
 
 	private Long id;
 	private String subject;	// Nombre del tema
@@ -26,7 +26,7 @@ public class TemplateExamSubject {
 	public void setQuestionsType(int questionsType) {
 		this.questionsType = questionsType;
 	}
-	private List<TemplateExamQuestion> questions;	// Lista de preguntas
+	private List<Item> questions;	// Lista de preguntas
 	
 	public int getAnswersxQuestionNumber() {
 		return answersxQuestionNumber;
@@ -47,10 +47,10 @@ public class TemplateExamSubject {
 		this.minDifficulty = minDifficulty;
 	}
 	
-	public List<TemplateExamQuestion> getQuestions() {
+	public List<Item> getQuestions() {
 		return questions;
 	}
-	public void setQuestions(List<TemplateExamQuestion> questions) {
+	public void setQuestions(List<Item> questions) {
 		this.questions = questions;
 	}
 	public String getSubject() {

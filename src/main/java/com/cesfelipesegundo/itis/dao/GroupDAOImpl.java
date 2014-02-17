@@ -9,14 +9,15 @@ import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 
 import com.cesfelipesegundo.itis.dao.api.GroupDAO;
 import com.cesfelipesegundo.itis.model.Course;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.GroupDetails;
 import com.cesfelipesegundo.itis.model.Institution;
-import com.cesfelipesegundo.itis.model.MediaElem;
-import com.cesfelipesegundo.itis.model.TemplateExamAnswer;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
 import com.cesfelipesegundo.itis.model.User;
 import com.cesfelipesegundo.itis.web.Constants;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.test.business.entity.Item;
+import es.itest.engine.test.business.entity.ItemResponse;
+import es.itest.engine.test.business.entity.MediaElem;
 
 public class GroupDAOImpl extends SqlMapClientDaoSupport implements GroupDAO {
 	/**
@@ -50,23 +51,23 @@ public class GroupDAOImpl extends SqlMapClientDaoSupport implements GroupDAO {
 		return group;
 	}
 
-	public List<TemplateExamQuestion> getQuestions(Group group) {
+	public List<Item> getQuestions(Group group) {
 		// Lista de preguntas del grupo correspondiente
-		List<TemplateExamQuestion> questions = super.getSqlMapClientTemplate().queryForList("TemplateExam.getTemplateExamQuestionByGroupId", group.getId());
+		List<Item> questions = super.getSqlMapClientTemplate().queryForList("TemplateExam.getTemplateExamQuestionByGroupId", group.getId());
 
 		// Además, a cada question hay que añadirle:
-		for(TemplateExamQuestion question : questions) {
+		for(Item question : questions) {
 			
 			// Lista de los elementos multimedia
 			List<MediaElem> questionMedia = super.getSqlMapClientTemplate().queryForList("TemplateExam.getQuestionMedia", question.getId());
 			question.setMmedia(questionMedia);
 			
 			// Lista de respuestas a esta pregunta
-			List<TemplateExamAnswer> answers = super.getSqlMapClientTemplate().queryForList("TemplateExam.getTemplateExamAnswer", question.getId());
+			List<ItemResponse> answers = super.getSqlMapClientTemplate().queryForList("TemplateExam.getTemplateExamAnswer", question.getId());
 			question.setAnswers(answers);
 			
 			// Y finalmente a cada respuesta hay que añadirle
-			for(TemplateExamAnswer answer : answers) {
+			for(ItemResponse answer : answers) {
 				// Lista de elementos multimedia
 				List<MediaElem> answerMedia = super.getSqlMapClientTemplate().queryForList("TemplateExam.getAnswerMedia", answer.getId());
 				answer.setMmedia(answerMedia);

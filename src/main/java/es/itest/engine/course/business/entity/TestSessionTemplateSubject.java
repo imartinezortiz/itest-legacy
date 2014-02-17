@@ -1,4 +1,6 @@
-package com.cesfelipesegundo.itis.model;
+package es.itest.engine.course.business.entity;
+
+import es.itest.engine.test.business.entity.TestSessionTemplate;
 
 /**
  * Class for the configuration of a theme that belongs to a exam configuration
@@ -6,10 +8,10 @@ package com.cesfelipesegundo.itis.model;
  * @author Alberto, Chema
  *
  */
-public class ConfigExamSubject {
+public class TestSessionTemplateSubject {
 
 	private Long id;
-	private ConfigExam cexam;	// Exam configuration related 
+	private TestSessionTemplate cexam;	// Exam configuration related 
 	private Subject subject;	// Related subject
 	private int questionsNumber;
 	private int answersxQuestionNumber;
@@ -53,10 +55,10 @@ public class ConfigExamSubject {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public ConfigExam getCexam() {
+	public TestSessionTemplate getCexam() {
 		return cexam;
 	}
-	public void setCexam(ConfigExam cexam) {
+	public void setCexam(TestSessionTemplate cexam) {
 		this.cexam = cexam;
 	}
 	public void setSubject(Subject subject) {

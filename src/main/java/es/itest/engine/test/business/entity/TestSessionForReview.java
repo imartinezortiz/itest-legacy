@@ -1,11 +1,11 @@
-package com.cesfelipesegundo.itis.model;
+package es.itest.engine.test.business.entity;
 
 /** Clase para modelar la relacion entre un alumno y un examen realizado por el
  * Unicamente contendra el ID del alumno y el ID de un examen realizado por el mismo
  * @author Gonzalo Alonso Gonzalez
  *
  */
-public class ExamForReview {
+public class TestSessionForReview {
 	private Long idExam;
 	private Long idLearner;
 	private Double preGrade;

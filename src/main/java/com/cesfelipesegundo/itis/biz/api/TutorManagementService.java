@@ -2,27 +2,28 @@ package com.cesfelipesegundo.itis.biz.api;
 
 import java.util.List;
 
-import com.cesfelipesegundo.itis.model.ConfigExam;
-import com.cesfelipesegundo.itis.model.ConfigExamSubject;
 import com.cesfelipesegundo.itis.model.CustomExamUser;
-import com.cesfelipesegundo.itis.model.Exam;
 import com.cesfelipesegundo.itis.model.ExamGlobalInfo;
 import com.cesfelipesegundo.itis.model.ExamStats;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.Institution;
 import com.cesfelipesegundo.itis.model.LearnerStats;
-import com.cesfelipesegundo.itis.model.MediaElem;
 import com.cesfelipesegundo.itis.model.Message;
 import com.cesfelipesegundo.itis.model.Query;
 import com.cesfelipesegundo.itis.model.QueryGrade;
 import com.cesfelipesegundo.itis.model.QuestionStats;
-import com.cesfelipesegundo.itis.model.ExamForReview;
-import com.cesfelipesegundo.itis.model.Subject;
-import com.cesfelipesegundo.itis.model.TemplateExamAnswer;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
-import com.cesfelipesegundo.itis.model.TemplateExamSubject;
-import com.cesfelipesegundo.itis.model.TemplateGrade;
 import com.cesfelipesegundo.itis.model.User;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.course.business.entity.Subject;
+import es.itest.engine.course.business.entity.TestSessionTemplateSubject;
+import es.itest.engine.test.business.entity.Item;
+import es.itest.engine.test.business.entity.ItemResponse;
+import es.itest.engine.test.business.entity.MediaElem;
+import es.itest.engine.test.business.entity.TestSession;
+import es.itest.engine.test.business.entity.TestSessionForReview;
+import es.itest.engine.test.business.entity.TestSessionGrade;
+import es.itest.engine.test.business.entity.TestSessionTemplate;
+import es.itest.engine.test.business.entity.TestSubject;
 
 /**
  * Interfaz para gestión de profesores
@@ -61,7 +62,7 @@ public interface TutorManagementService {
 	 * @return It returns a list of themes linked to the group whose id is
 	 *         passed as parameter
 	 */
-	List<TemplateExamSubject> getCourseSubjects(Group g);
+	List<TestSubject> getCourseSubjects(Group g);
 
 	/**
 	 * It returns a list of themes linked to the group passed as parameter
@@ -92,7 +93,7 @@ public interface TutorManagementService {
 	 * 
 	 * @param question
 	 */
-	void saveQuestion(TemplateExamQuestion question);
+	void saveQuestion(Item question);
 
 	/**
 	 * Saves the answer information into the database.
@@ -102,13 +103,13 @@ public interface TutorManagementService {
 	 * 
 	 * @param answer
 	 */
-	void saveAnswer(TemplateExamAnswer answer);
+	void saveAnswer(ItemResponse answer);
 
 	/**
 	 * Deletes an answer from the database
 	 * @param answ
 	 */
-	void deleteAnswer(TemplateExamAnswer answer);
+	void deleteAnswer(ItemResponse answer);
 	
 	/**
 	 * Gets from the database the list of questions related to this group
@@ -116,7 +117,7 @@ public interface TutorManagementService {
 	 * @param currentGroup
 	 * @return list of TemplateExamQuestion: questions, answers, mmedia, ...
 	 */
-	List<TemplateExamQuestion> getGroupQuestions(Group currentGroup);
+	List<Item> getGroupQuestions(Group currentGroup);
 	
 	/**
 	 * Saves the mediaElem into the question into the database.
@@ -128,7 +129,7 @@ public interface TutorManagementService {
 	 * @param mediaElem
 	 */
 
-	void saveMediaElemToQuestion(TemplateExamQuestion question, MediaElem mediaElem);
+	void saveMediaElemToQuestion(Item question, MediaElem mediaElem);
 	
 	/**
 	 * Saves the mediaElem into the comment into the database.
@@ -140,7 +141,7 @@ public interface TutorManagementService {
 	 * @param mediaElem
 	 */
 
-	void saveMediaElemToComment(TemplateExamQuestion question, MediaElem mediaElem);
+	void saveMediaElemToComment(Item question, MediaElem mediaElem);
 	
 	
 	/**
@@ -153,7 +154,7 @@ public interface TutorManagementService {
 	 * @param mediaElem
 	 */
 	
-	void saveMediaElemToAnswer(TemplateExamAnswer answer, MediaElem mediaElem);
+	void saveMediaElemToAnswer(ItemResponse answer, MediaElem mediaElem);
 	
 	/**
 	 * Delete a mediaElem from a question
@@ -162,7 +163,7 @@ public interface TutorManagementService {
 	 * @param mediaElem
 	 */
 	
-	void deleteMediaElemFromQuestion(TemplateExamQuestion question, MediaElem mediaElem);
+	void deleteMediaElemFromQuestion(Item question, MediaElem mediaElem);
 	
 	/**
 	 * Delete a comment mediaElem from a question
@@ -171,7 +172,7 @@ public interface TutorManagementService {
 	 * @param mediaElem
 	 */
 	
-	void deleteMediaElemFromComment(TemplateExamQuestion question, MediaElem mediaElem);
+	void deleteMediaElemFromComment(Item question, MediaElem mediaElem);
 
 	/**
 	 * Delete a mediaElem from an answer
@@ -180,7 +181,7 @@ public interface TutorManagementService {
 	 * @param mediaElem
 	 */
 	
-	void deleteMediaElemFromAnswer(TemplateExamAnswer answer, MediaElem mediaElem);
+	void deleteMediaElemFromAnswer(ItemResponse answer, MediaElem mediaElem);
 	
 	/**
 	 * Find questions in the questions' pool using a criteria.
@@ -188,7 +189,7 @@ public interface TutorManagementService {
 	 * @param query
 	 * @return
 	 */
-	List<TemplateExamQuestion> find(Query query);
+	List<Item> find(Query query);
 	
 	/**
 	 * 
@@ -196,7 +197,7 @@ public interface TutorManagementService {
 	 * 
 	 * @param question
 	 */
-	void deleteQuestion(TemplateExamQuestion question);
+	void deleteQuestion(Item question);
 	
 	/** Duplica (en profundidad) la pregunta pasada por parametro.
 	 * En profundidad quiere decir que:
@@ -206,14 +207,14 @@ public interface TutorManagementService {
 	 * @param copy : Indica si el final del titulo hay que añadirle "copia" o no
 	 * @return La pregunta resultado de la duplicacion.
 	 */
-	TemplateExamQuestion copyQuestion(TemplateExamQuestion question,boolean copy);
+	Item copyQuestion(Item question,boolean copy);
 
 	/**
 	 * Fills all the object attributes from the DB just using the id of the question
 	 * @param question
 	 * @return
 	 */
-	TemplateExamQuestion getQuestionFromId(TemplateExamQuestion question);
+	Item getQuestionFromId(Item question);
 	
 
 	/**
@@ -222,7 +223,7 @@ public interface TutorManagementService {
 	 * 
 	 * @return Returns the list of exam configurations associated to a group, sorted by the field "orderby"
 	 */
-	List<ConfigExam> getGroupConfigExams(Group group, String orderby);
+	List<TestSessionTemplate> getGroupConfigExams(Group group, String orderby);
 	
 	
 	/**
@@ -231,7 +232,7 @@ public interface TutorManagementService {
 	 * 
 	 * @param exam
 	 */
-	void deleteConfigExam(ConfigExam exam);
+	void deleteConfigExam(TestSessionTemplate exam);
 	
 	/**
 	 * 
@@ -239,7 +240,7 @@ public interface TutorManagementService {
 	 * 
 	 * @param exam
 	 */	
-	void updateExamReview(ConfigExam exam);
+	void updateExamReview(TestSessionTemplate exam);
 	
 	/**
 	 * Saves the exam configuration into the database
@@ -247,7 +248,7 @@ public interface TutorManagementService {
 	 * @param exam
 	 * @return id of the exam saved if update
 	 */
-	void saveExam(ConfigExam exam);
+	void saveExam(TestSessionTemplate exam);
 	
 	/**
 	 * Saves the subject into the exam into the database.
@@ -259,7 +260,7 @@ public interface TutorManagementService {
 	 * @param subject
 	 */
 	
-	void saveSubjectToExam(ConfigExam exam, ConfigExamSubject subject);
+	void saveSubjectToExam(TestSessionTemplate exam, TestSessionTemplateSubject subject);
 	
 	/**
 	 * Delete a subject from an exam
@@ -268,14 +269,14 @@ public interface TutorManagementService {
 	 * @param subject
 	 */
 	
-	void deleteSubjectFromExam(ConfigExam exam, ConfigExamSubject subject, long idGroup);
+	void deleteSubjectFromExam(TestSessionTemplate exam, TestSessionTemplateSubject subject, long idGroup);
 
 	/**
 	 * Fills all the object attributes from the DB just using the id of the exam configuration
 	 * @param exam configuration (just id filled)
 	 * @return exam configuration (filled)
 	 */
-	ConfigExam getConfigExamFromId(ConfigExam exfromdb);
+	TestSessionTemplate getConfigExamFromId(TestSessionTemplate exfromdb);
 
 	/**
 	 * Fills all the object attributes from the DB related to exams, learners and grades related
@@ -283,7 +284,7 @@ public interface TutorManagementService {
 	 * @param QueryGrade
 	 * @return list of student grades with the exam configuration and the related student info that comply with the query
 	 */
-	public List<TemplateGrade> find(QueryGrade query);
+	public List<TestSessionGrade> find(QueryGrade query);
 
 	/**
 	 * Returns the list of users (students) related to the current group sorted by surname
@@ -331,7 +332,7 @@ public interface TutorManagementService {
 	 * @return list of question stats related to the current exam, sorted by subject and text
 	 */
 	
-	List<QuestionStats> getQuestionStatsByExam(ConfigExam currentExam);
+	List<QuestionStats> getQuestionStatsByExam(TestSessionTemplate currentExam);
 	
 	/**
 	 * Validate an exam configuration
@@ -339,7 +340,7 @@ public interface TutorManagementService {
 	 * @param exam
 	 * @return
 	 */
-	List<Message> validate(ConfigExam exam);
+	List<Message> validate(TestSessionTemplate exam);
 
 	/**
 	 * Saves the subject into the database.
@@ -384,7 +385,7 @@ public interface TutorManagementService {
 	 * @param idConfigExam exam configuration id
 	 * @return Exam object with all information about questions, answers, etc.
 	 */
-	Exam getStudentExam(Long idStd, Long idConfigExam);
+	TestSession getStudentExam(Long idStd, Long idConfigExam);
 
 	
 	/**
@@ -456,7 +457,7 @@ public interface TutorManagementService {
 	 * 
 	 * @return false if there was a problem copying files
 	 */
-	boolean importQuestions(Group group, Subject sbj, List<TemplateExamQuestion> preImportedQuestionList, String sourcePath);
+	boolean importQuestions(Group group, Subject sbj, List<Item> preImportedQuestionList, String sourcePath);
 
 	
 	
@@ -509,7 +510,7 @@ public interface TutorManagementService {
 	 * @param examSource ConfigExam to copy from
 	 * @return Exam copy
 	 */
-	public ConfigExam configExamCopy (ConfigExam examSource);
+	public TestSessionTemplate configExamCopy (TestSessionTemplate examSource);
 	
 	/** Obtain number of questions for a subject, group and difficulty given
 	 * 
@@ -557,7 +558,7 @@ public interface TutorManagementService {
 	 * @param question
 	 * @return
 	 * */
-	public List<Long> getExamIds(TemplateExamQuestion question);
+	public List<Long> getExamIds(Item question);
 
 	/**
 	 * Return the number of all question for this theme

@@ -8,9 +8,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
-import com.cesfelipesegundo.itis.model.ConfigExam;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.comparators.ConfigExamComparator;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.test.business.entity.TestSessionTemplate;
 
 /**
  * It manages the operations related to LIST of exam configurations of the managed group
@@ -29,7 +30,7 @@ public class TutorExamListManagementController {
     /**
      * Exam configurations LIST being managed by the tutor
      */
-    private List<ConfigExam> currentExamList;
+    private List<TestSessionTemplate> currentExamList;
    
     /* ******** Getters and setters ******** */
 
@@ -43,13 +44,13 @@ public class TutorExamListManagementController {
 		this.tutorManagementService = tutorManagementService;
 	}
 
-	public List<ConfigExam> getCurrentExamList() {
+	public List<TestSessionTemplate> getCurrentExamList() {
 		return currentExamList;
 	}
 
 
 	public void setCurrentExamList(
-			List<ConfigExam> currentExamList) {
+			List<TestSessionTemplate> currentExamList) {
 		this.currentExamList = currentExamList;
 	}
 	
@@ -61,11 +62,11 @@ public class TutorExamListManagementController {
 	 * Implements the "delete" action of the exam configurations list.
 	 * @return List of exam configurations, needed for the callback function to repaint the list
 	 */
-	public List<ConfigExam> deleteConfigExam (String idexam) {
+	public List<TestSessionTemplate> deleteConfigExam (String idexam) {
 		
         // Find the exam configuration to be deleted:
-		Iterator<ConfigExam> iterE = currentExamList.iterator();
-		ConfigExam exam = null;
+		Iterator<TestSessionTemplate> iterE = currentExamList.iterator();
+		TestSessionTemplate exam = null;
 		boolean aFound = false;
 		
 		while (iterE.hasNext() && (!aFound)) {
@@ -97,7 +98,7 @@ public class TutorExamListManagementController {
 	 * Deletes an exam configuration list and all the related info from the database.
 	 * @return List of exam configurations, needed for the callback function to repaint the list
 	 */
-	public List<ConfigExam> deleteConfigExams (String[] exams) {
+	public List<TestSessionTemplate> deleteConfigExams (String[] exams) {
 		for (int i = 0; i < exams.length; i++)
 			deleteConfigExam(exams[i]);
 		return currentExamList;		
@@ -108,10 +109,10 @@ public class TutorExamListManagementController {
 	 * Changes the value of the revision of the exam: true or not, depending on the value
 	 * @return List of exam configurations, needed for the callback function to repaint the list
 	 */
-	public List<ConfigExam> changeReviewExam (String idconfigexam, String value) {
+	public List<TestSessionTemplate> changeReviewExam (String idconfigexam, String value) {
 		  // Find the exam configuration to be updated:
-		Iterator<ConfigExam> iter = currentExamList.iterator();
-		ConfigExam ce = null;
+		Iterator<TestSessionTemplate> iter = currentExamList.iterator();
+		TestSessionTemplate ce = null;
 		boolean aFound = false;
 		
 		while (iter.hasNext() && (!aFound)) {
@@ -145,7 +146,7 @@ public class TutorExamListManagementController {
 	 * Applies for sorting exam configurations
 	 * @return List of exam configurations sorted by "orderby", needed for the callback function to repaint the list
 	 */
-	public List<ConfigExam> sort (String idgroup,String orderby, boolean reverse) {
+	public List<TestSessionTemplate> sort (String idgroup,String orderby, boolean reverse) {
 		/* 
 		 * We have to obtain from the database the list of exam configurations related to this group, and then we order
 		 * the data using the parameter. 
@@ -153,7 +154,7 @@ public class TutorExamListManagementController {
 		Group cGroup = new Group();
 		cGroup.setId(Long.valueOf(idgroup));
 		// Get the list, ordered by the selected field.
-		List<ConfigExam> tempCElist = tutorManagementService.getGroupConfigExams(cGroup,orderby);
+		List<TestSessionTemplate> tempCElist = tutorManagementService.getGroupConfigExams(cGroup,orderby);
 		Collections.sort(tempCElist, new ConfigExamComparator(orderby));
 		if(reverse){
 			Collections.reverse(tempCElist);
@@ -167,9 +168,9 @@ public class TutorExamListManagementController {
 	} // sort
 	
 	public void setExamVisible(long examId, int value){
-		ConfigExam exfromdb = new ConfigExam();
+		TestSessionTemplate exfromdb = new TestSessionTemplate();
 		exfromdb.setId(examId);
-		ConfigExam configExam = tutorManagementService.getConfigExamFromId(exfromdb);
+		TestSessionTemplate configExam = tutorManagementService.getConfigExamFromId(exfromdb);
 		configExam.setVisibility(value);
 		tutorManagementService.saveExam(configExam);
 	}

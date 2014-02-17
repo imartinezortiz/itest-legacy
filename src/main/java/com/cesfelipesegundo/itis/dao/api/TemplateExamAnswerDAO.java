@@ -1,8 +1,8 @@
 package com.cesfelipesegundo.itis.dao.api;
 
-import com.cesfelipesegundo.itis.model.MediaElem;
-import com.cesfelipesegundo.itis.model.TemplateExamAnswer;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
+import es.itest.engine.test.business.entity.Item;
+import es.itest.engine.test.business.entity.ItemResponse;
+import es.itest.engine.test.business.entity.MediaElem;
 
 public interface TemplateExamAnswerDAO {
 
@@ -11,7 +11,7 @@ public interface TemplateExamAnswerDAO {
 	 * 
 	 * @param answer
 	 */
-	void update(TemplateExamAnswer answer);
+	void update(ItemResponse answer);
 
 	/**
 	 * Inserts <code>answer</code> in the database.
@@ -20,7 +20,7 @@ public interface TemplateExamAnswerDAO {
 	 * 
 	 * @param answer
 	 */
-	void save(TemplateExamAnswer answer);
+	void save(ItemResponse answer);
 	
 	/**
 	 * Delete <code>answer</code> from the database.
@@ -28,7 +28,7 @@ public interface TemplateExamAnswerDAO {
 	 * @param answer
 	 */
 	
-	void delete(TemplateExamAnswer answer);
+	void delete(ItemResponse answer);
 	
 	
 	/**
@@ -38,7 +38,7 @@ public interface TemplateExamAnswerDAO {
 	 * @param mediaElem
 	 */
 	
-	void update(TemplateExamAnswer answer, MediaElem mediaElem);
+	void update(ItemResponse answer, MediaElem mediaElem);
 	
 	/**
 	 * Inserts mediaElem into answer into the database
@@ -49,7 +49,7 @@ public interface TemplateExamAnswerDAO {
 	 * @param mediaElem
 	 */
 	
-	void save(TemplateExamAnswer answer, MediaElem mediaElem);
+	void save(ItemResponse answer, MediaElem mediaElem);
 	
 	
 	/**
@@ -59,6 +59,6 @@ public interface TemplateExamAnswerDAO {
 	 * @param mediaElem
 	 */
 	
-	public void delete(TemplateExamAnswer answer, MediaElem mediaElem);
+	public void delete(ItemResponse answer, MediaElem mediaElem);
 
 }

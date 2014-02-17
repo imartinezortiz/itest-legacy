@@ -1,6 +1,6 @@
 package com.cesfelipesegundo.itis.dao.api;
 
-import com.cesfelipesegundo.itis.model.TemplateExam;
+import es.itest.engine.test.business.entity.Test;
 
 public interface TemplateExamDAO extends DAO {
 		
@@ -11,7 +11,7 @@ public interface TemplateExamDAO extends DAO {
 	 * @return Plantilla de examen con toda la información asociada a un posible examen
 	 */
 		
-	TemplateExam getTemplateExam(Long id);
+	Test getTest(Long id);
 
 	
 }

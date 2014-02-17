@@ -1,7 +1,9 @@
 package com.cesfelipesegundo.itis.model;
 
+import es.itest.engine.test.business.entity.TestSession;
+
 public class ExamTest {
-	private Exam exam;
+	private TestSession exam;
 	private User user;
 	private long time;
 	private boolean failed;
@@ -18,10 +20,10 @@ public class ExamTest {
 	public void setFailed(boolean failed) {
 		this.failed = failed;
 	}
-	public Exam getExam() {
+	public TestSession getExam() {
 		return exam;
 	}
-	public void setExam(Exam exam) {
+	public void setExam(TestSession exam) {
 		this.exam = exam;
 	}
 	public User getUser() {

@@ -2,9 +2,10 @@ package com.cesfelipesegundo.itis.dao.api;
 
 import java.util.List;
 
-import com.cesfelipesegundo.itis.model.MediaElem;
 import com.cesfelipesegundo.itis.model.Query;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
+
+import es.itest.engine.test.business.entity.Item;
+import es.itest.engine.test.business.entity.MediaElem;
 
 public interface TemplateExamQuestionDAO {
 
@@ -13,7 +14,7 @@ public interface TemplateExamQuestionDAO {
 	 * 
 	 * @param question
 	 */
-	void update(TemplateExamQuestion question);
+	void update(Item question);
 
 	/**
 	 * Inserts <code>question</code> into the database
@@ -22,7 +23,7 @@ public interface TemplateExamQuestionDAO {
 	 * 
 	 * @param question
 	 */
-	void save(TemplateExamQuestion question);
+	void save(Item question);
 	
 	/**
 	 * Updates <code>mediaElem</code> from the question in the database.
@@ -31,7 +32,7 @@ public interface TemplateExamQuestionDAO {
 	 * @param mediaElem
 	 */
 	
-	void update(TemplateExamQuestion question, MediaElem mediaElem, boolean isQuestion);
+	void update(Item question, MediaElem mediaElem, boolean isQuestion);
 	
 	/**
 	 * Inserts mediaElem into question into the database
@@ -42,7 +43,7 @@ public interface TemplateExamQuestionDAO {
 	 * @param mediaElem
 	 */
 	
-	void save(TemplateExamQuestion question, MediaElem mediaElem, boolean isQuestion);
+	void save(Item question, MediaElem mediaElem, boolean isQuestion);
 	
 	/**
 	 * Delete a mediaElem from a question from the database
@@ -51,7 +52,7 @@ public interface TemplateExamQuestionDAO {
 	 * @param mediaElem
 	 */
 	
-	void delete(TemplateExamQuestion question, MediaElem mediaElem, boolean isQuestion);
+	void delete(Item question, MediaElem mediaElem, boolean isQuestion);
 
 	/**
 	 * 
@@ -60,20 +61,20 @@ public interface TemplateExamQuestionDAO {
 	 * @param query
 	 * @return
 	 */
-	List<TemplateExamQuestion> find(Query query);
+	List<Item> find(Query query);
 
 	/**
 	 * Delete <code>question</code> from the database
 	 * @param question
 	 */
-	void delete(TemplateExamQuestion question);
+	void delete(Item question);
 	
 	/**
 	 * Fills all the object attributes from the DB just using the id of the question
 	 * @param question
 	 * @return
 	 */
-	TemplateExamQuestion getQuestionFromId(TemplateExamQuestion question);
+	Item getQuestionFromId(Item question);
 	
 	
 	/**
@@ -81,7 +82,7 @@ public interface TemplateExamQuestionDAO {
 	 * 
 	 * @param question
 	 */
-	void fillMediaElem(TemplateExamQuestion question);
+	void fillMediaElem(Item question);
 
 	/**
 	 * 
@@ -89,14 +90,14 @@ public interface TemplateExamQuestionDAO {
 	 * 
 	 * @param templateQuestion
 	 */
-	void updateUsedInExam(TemplateExamQuestion templateQuestion);
+	void updateUsedInExam(Item templateQuestion);
 
 	/**
 	 * Fills the answers of a question (including mmedia of answers)
 	 * Used to show the number of answers in the question list.
 	 * @param question
 	 */
-	void fillAnswers(TemplateExamQuestion templateQuestion);
+	void fillAnswers(Item templateQuestion);
 
 	/**
 	 * Checks and updates questions that not are used in exam

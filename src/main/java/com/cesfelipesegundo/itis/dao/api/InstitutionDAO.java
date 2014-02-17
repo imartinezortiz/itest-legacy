@@ -3,12 +3,13 @@ package com.cesfelipesegundo.itis.dao.api;
 import java.util.List;
 import java.util.Map;
 
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.Institution;
 import com.cesfelipesegundo.itis.model.InstitutionStats;
 import com.cesfelipesegundo.itis.model.InstitutionStudies;
-import com.cesfelipesegundo.itis.model.Subject;
 import com.cesfelipesegundo.itis.model.User;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.course.business.entity.Subject;
 
 /**
  * Interfaz DAO para el modelo <code>Institution</code>.

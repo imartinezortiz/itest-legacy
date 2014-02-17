@@ -4,13 +4,14 @@ import java.util.Date;
 import java.util.List;
 
 import com.cesfelipesegundo.itis.model.CourseStats;
-import com.cesfelipesegundo.itis.model.Exam;
 import com.cesfelipesegundo.itis.model.ExamGlobalInfo;
-import com.cesfelipesegundo.itis.model.ExamQuestion;
-import com.cesfelipesegundo.itis.model.ExamForReview;
 import com.cesfelipesegundo.itis.model.Grade;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
 import com.cesfelipesegundo.itis.model.User;
+
+import es.itest.engine.test.business.entity.Item;
+import es.itest.engine.test.business.entity.ItemSession;
+import es.itest.engine.test.business.entity.TestSession;
+import es.itest.engine.test.business.entity.TestSessionForReview;
 
 public interface ExamDAO extends DAO {
 		
@@ -25,7 +26,7 @@ public interface ExamDAO extends DAO {
 	 * @return exam performed by the user
 	 */
 		
-	public Exam getAlreadyDoneExam(User user, Long id);
+	public TestSession getAlreadyDoneExam(User user, Long id);
 	
 	/**
 	 * Method to obtain the data of an already done exam: questions, answers,
@@ -67,14 +68,14 @@ public interface ExamDAO extends DAO {
 	 * @return Returns the next question if there is one or <code>null</code> if
 	 * there is no more question to take.
 	 */
-	public ExamQuestion getNextQuestion(User user, Long idExam, Long lastQuestionId);
+	public ItemSession getNextQuestion(User user, Long idExam, Long lastQuestionId);
 	
 	/** Obtain a list of exams which included the question id given by parameter
 	 * 
 	 * @param idQuestion Question to filter by
 	 * @return List of exams which included that question
 	 */
-	public List<ExamForReview> getExamsByQuestion(Long idQuestion);
+	public List<TestSessionForReview> getExamsByQuestion(Long idQuestion);
 	
 	
 	/** Obtain a list of exams
@@ -82,7 +83,7 @@ public interface ExamDAO extends DAO {
 	 * @param idExam Exam to filter by
 	 * @return List of exams which included that question
 	 */
-	public List<ExamForReview> getExamsByIdExam(Long idExam);
+	public List<TestSessionForReview> getExamsByIdExam(Long idExam);
 	
 	/**
 	 * Obtain a list of the next exams ordered by date
@@ -104,7 +105,7 @@ public interface ExamDAO extends DAO {
 	 * @param idalumn 
 	 * @return exam 
 	 * */
-	public Exam getExamById(Long id, Long idalumn);
+	public TestSession getExamById(Long id, Long idalumn);
 	
 	
 	/**
@@ -113,7 +114,7 @@ public interface ExamDAO extends DAO {
 	 * @idgroup Group's id
 	 * @return the exam list of the user to this group
 	 * */
-	public List<Exam> getAlreadyDoneExamGradeByGroup(long iduser, long idgroup);
+	public List<TestSession> getAlreadyDoneExamGradeByGroup(long iduser, long idgroup);
 
 	
 	/**
@@ -121,7 +122,7 @@ public interface ExamDAO extends DAO {
 	 * @param question
 	 * @return
 	 * */
-	public List<Long> getExamIds(TemplateExamQuestion question);
+	public List<Long> getExamIds(Item question);
 
 	/**
 	 * Return the list width global info from exams filtered by idInstitution, idCourse and year
@@ -145,7 +146,7 @@ public interface ExamDAO extends DAO {
 	 * @param idexam
 	 * @return the list of exams
 	 */
-	public List<Exam> getAllExams(Long idexam);
+	public List<TestSession> getAllExams(Long idexam);
 
 	public List<ExamGlobalInfo> getActiveExamsFiltered(String Centro,
 			String Asignatura, Date startDate, Date endDate);

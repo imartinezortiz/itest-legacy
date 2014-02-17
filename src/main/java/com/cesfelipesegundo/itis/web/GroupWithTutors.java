@@ -6,7 +6,8 @@ import java.util.List;
 import com.cesfelipesegundo.itis.model.Course;
 import com.cesfelipesegundo.itis.model.Institution;
 import com.cesfelipesegundo.itis.model.User;
-import com.cesfelipesegundo.itis.model.Group;
+
+import es.itest.engine.course.business.entity.Group;
 
 /**
  * Clase que representa un grupo de una asignatura

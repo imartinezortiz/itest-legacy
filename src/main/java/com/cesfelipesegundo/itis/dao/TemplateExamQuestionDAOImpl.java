@@ -8,10 +8,11 @@ import java.util.Map;
 import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 
 import com.cesfelipesegundo.itis.dao.api.TemplateExamQuestionDAO;
-import com.cesfelipesegundo.itis.model.MediaElem;
 import com.cesfelipesegundo.itis.model.Query;
-import com.cesfelipesegundo.itis.model.TemplateExamAnswer;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
+
+import es.itest.engine.test.business.entity.Item;
+import es.itest.engine.test.business.entity.ItemResponse;
+import es.itest.engine.test.business.entity.MediaElem;
 
 public class TemplateExamQuestionDAOImpl extends SqlMapClientDaoSupport implements TemplateExamQuestionDAO {
 	/**
@@ -22,7 +23,7 @@ public class TemplateExamQuestionDAOImpl extends SqlMapClientDaoSupport implemen
 		super();
 	}
 	
-	public void update(TemplateExamQuestion question) {
+	public void update(Item question) {
 		/*int rows =*/ getSqlMapClientTemplate().update("TemplateExam.updateTemplateExamQuestion", question);		
 	}
 	
@@ -31,7 +32,7 @@ public class TemplateExamQuestionDAOImpl extends SqlMapClientDaoSupport implemen
 	 * @param question : Objeto a guardar en la bbdd
 	 * @see GroupDAOImpl
 	 */
-	public void save(TemplateExamQuestion question) {
+	public void save(Item question) {
 		/*Object newKey =*/ /*super.getSqlMapClientTemplate().insert("TemplateExam.addNewTemplateExamQuestion", question);*/
 		
 		if (question.getId() == null){
@@ -42,7 +43,7 @@ public class TemplateExamQuestionDAOImpl extends SqlMapClientDaoSupport implemen
 		
 	}
 
-	public void update(TemplateExamQuestion question, MediaElem mediaElem, boolean isQuestion){
+	public void update(Item question, MediaElem mediaElem, boolean isQuestion){
 		if(isQuestion){
 			HashMap<String,Object> map = new HashMap<String,Object>();
 			map.put("idextrap", mediaElem.getId());
@@ -70,7 +71,7 @@ public class TemplateExamQuestionDAOImpl extends SqlMapClientDaoSupport implemen
 		}
 	}
 		
-	public void save(TemplateExamQuestion question, MediaElem mediaElem, boolean isQuestion){
+	public void save(Item question, MediaElem mediaElem, boolean isQuestion){
 		if(mediaElem.getId()!=null) this.update(question, mediaElem, isQuestion);
 		else {
 			if(isQuestion){
@@ -101,7 +102,7 @@ public class TemplateExamQuestionDAOImpl extends SqlMapClientDaoSupport implemen
 		}		
 	}
 	
-	public void delete(TemplateExamQuestion question, MediaElem mediaElem,boolean isQuestion){
+	public void delete(Item question, MediaElem mediaElem,boolean isQuestion){
 		if(isQuestion){
 			/*int rows =*/ super.getSqlMapClientTemplate().delete("TemplateExam.deleteQuestionMedia", mediaElem.getId());
 		}else{
@@ -109,7 +110,7 @@ public class TemplateExamQuestionDAOImpl extends SqlMapClientDaoSupport implemen
 		}
 	}
 
-	public List<TemplateExamQuestion> find(Query query) {
+	public List<Item> find(Query query) {
 		// Relleno el mapa que hará de parámetro de consulta
 		Map<String,Object> map = new HashMap<String,Object>();
 		
@@ -146,10 +147,10 @@ public class TemplateExamQuestionDAOImpl extends SqlMapClientDaoSupport implemen
 		if ((query.getMaxResultCount() != null) && (query.getMaxResultCount()>0)) 
 			map.put("maxResultCount", Integer.valueOf(query.getMaxResultCount()));
 		
-		List<TemplateExamQuestion> questions = super.getSqlMapClientTemplate().queryForList("TemplateExam.findTemplateExamQuestion", map);
+		List<Item> questions = super.getSqlMapClientTemplate().queryForList("TemplateExam.findTemplateExamQuestion", map);
 		
 		// Obtencion de multimedia:
-		for(TemplateExamQuestion question : questions) {
+		for(Item question : questions) {
 			// Lista de los elementos multimedia
 			List<MediaElem> questionMedia = super.getSqlMapClientTemplate().queryForList("TemplateExam.getQuestionMedia", question.getId());
 			question.setMmedia(questionMedia);
@@ -160,13 +161,13 @@ public class TemplateExamQuestionDAOImpl extends SqlMapClientDaoSupport implemen
 		return questions;
 	}
 
-	public void delete(TemplateExamQuestion question) {
+	public void delete(Item question) {
 		/*int rows =*/ super.getSqlMapClientTemplate().delete("TemplateExam.deleteTemplateExamQuestion", question.getId());		
 	}
 	
-	public TemplateExamQuestion getQuestionFromId(TemplateExamQuestion question){
+	public Item getQuestionFromId(Item question){
 		// Cojo el question por ID
-		question = (TemplateExamQuestion) super.getSqlMapClientTemplate().queryForObject("TemplateExam.getTemplateExamQuestionById", question.getId());
+		question = (Item) super.getSqlMapClientTemplate().queryForObject("TemplateExam.getTemplateExamQuestionById", question.getId());
 		
 		// Lista de los elementos multimedia
 		this.fillMediaElem(question);
@@ -177,7 +178,7 @@ public class TemplateExamQuestionDAOImpl extends SqlMapClientDaoSupport implemen
 		return question;		
 	}
 
-	public void fillMediaElem(TemplateExamQuestion question) {
+	public void fillMediaElem(Item question) {
 		// Lista de los elementos multimedia
 		List<MediaElem> questionMedia = super.getSqlMapClientTemplate().queryForList("TemplateExam.getQuestionMedia", question.getId());
 		question.setMmedia(questionMedia);	
@@ -185,16 +186,16 @@ public class TemplateExamQuestionDAOImpl extends SqlMapClientDaoSupport implemen
 		question.setMmediaComment(commentMedia);	
 	}
 
-	public void updateUsedInExam(TemplateExamQuestion question) {
+	public void updateUsedInExam(Item question) {
 		/*int rows =*/ super.getSqlMapClientTemplate().update("TemplateExam.updateTemplateExamQuestionUsedInExam", question);		
 	}
 
-	public void fillAnswers(TemplateExamQuestion templateQuestion) {
-		List<TemplateExamAnswer> answers = super.getSqlMapClientTemplate().queryForList("TemplateExam.getTemplateExamAnswer", templateQuestion.getId());
+	public void fillAnswers(Item templateQuestion) {
+		List<ItemResponse> answers = super.getSqlMapClientTemplate().queryForList("TemplateExam.getTemplateExamAnswer", templateQuestion.getId());
 		templateQuestion.setAnswers(answers);
 
 		// Y finalmente a cada respuesta hay que añadirle
-		for(TemplateExamAnswer answer : answers) {
+		for(ItemResponse answer : answers) {
 			// Lista de elementos multimedia
 			List<MediaElem> answerMedia = super.getSqlMapClientTemplate().queryForList("TemplateExam.getAnswerMedia", answer.getId());
 			answer.setMmedia(answerMedia);

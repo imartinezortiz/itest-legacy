@@ -2,7 +2,8 @@ package com.cesfelipesegundo.itis.model.comparators;
 
 import java.util.Comparator;
 import java.util.Date;
-import com.cesfelipesegundo.itis.model.ConfigExam;
+
+import es.itest.engine.test.business.entity.TestSessionTemplate;
 
 public class ConfigExamComparator extends UTF8Adapter implements Comparator{
 
@@ -14,10 +15,10 @@ public class ConfigExamComparator extends UTF8Adapter implements Comparator{
 	
 	public int compare(Object arg0, Object arg1) {
 		if(orderBy.equalsIgnoreCase("sdate")){
-			Date date1 = ((ConfigExam)arg0).getStartDate();
-			Date date2 = ((ConfigExam)arg1).getStartDate();
-			int visibility1 = ((ConfigExam)arg0).getVisibility();
-			int visibility2 = ((ConfigExam)arg1).getVisibility();
+			Date date1 = ((TestSessionTemplate)arg0).getStartDate();
+			Date date2 = ((TestSessionTemplate)arg1).getStartDate();
+			int visibility1 = ((TestSessionTemplate)arg0).getVisibility();
+			int visibility2 = ((TestSessionTemplate)arg1).getVisibility();
 			if(visibility1==visibility2){
 				if(visibility1==1){
 					return date1.compareTo(date2);
@@ -33,10 +34,10 @@ public class ConfigExamComparator extends UTF8Adapter implements Comparator{
 			}
 		}
 		if(orderBy.equalsIgnoreCase("revsdate")){
-			Date date1 = ((ConfigExam)arg0).getStartDateRevision();
-			Date date2 = ((ConfigExam)arg1).getStartDateRevision();
-			boolean active1 = ((ConfigExam)arg0).isActiveReview();
-			boolean active2 = ((ConfigExam)arg1).isActiveReview();
+			Date date1 = ((TestSessionTemplate)arg0).getStartDateRevision();
+			Date date2 = ((TestSessionTemplate)arg1).getStartDateRevision();
+			boolean active1 = ((TestSessionTemplate)arg0).isActiveReview();
+			boolean active2 = ((TestSessionTemplate)arg1).isActiveReview();
 			if(active1==active2){
 				if(active1==true){
 					return date1.compareTo(date2);

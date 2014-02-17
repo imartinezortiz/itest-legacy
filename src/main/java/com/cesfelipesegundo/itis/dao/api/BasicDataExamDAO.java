@@ -1,8 +1,10 @@
 package com.cesfelipesegundo.itis.dao.api;
 
 import java.util.List;
-import com.cesfelipesegundo.itis.model.BasicDataExam;
+
 import com.cesfelipesegundo.itis.model.ExamGlobalInfo;
+
+import es.itest.engine.test.business.entity.TestDetails;
 
 public interface BasicDataExamDAO extends DAO {
 	
@@ -13,7 +15,7 @@ public interface BasicDataExamDAO extends DAO {
 	 * @param id del alumno
 	 * @return Lista de exámenes disponibles para ser realizados por el alumno, ordenados por nombre de asignatura. 
 	 */
-	List<BasicDataExam> getPendingExams(Long id);
+	List<TestDetails> getPendingExams(Long id);
 	
 	/**
 	 * Devuelve una lista con los datos de los exámenes que el alumno ha realizado hasta la fecha actual, si están en su periodo de
@@ -21,7 +23,7 @@ public interface BasicDataExamDAO extends DAO {
 	 * @param id del alumno
 	 * @return Lista de exámenes en periodo de revisión ya realizados por el alumno, ordenados por nombre de asignatura.
 	 */
-	List<BasicDataExam> getExamsForRevision(Long id);
+	List<TestDetails> getExamsForRevision(Long id);
 
 	/**
 	 * // Add a new calif with the starting date of the examn 
@@ -57,5 +59,5 @@ public interface BasicDataExamDAO extends DAO {
 	 * 
 	 * @return List of the next exams
 	 * */
-	public List<BasicDataExam> getNextExams(long userId, long idGroup);
+	public List<TestDetails> getNextExams(long userId, long idGroup);
 }

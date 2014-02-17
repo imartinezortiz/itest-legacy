@@ -23,27 +23,28 @@ import org.springframework.web.servlet.ModelAndView;
 import com.cesfelipesegundo.itis.biz.api.LearnerManagementService;
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
 import com.cesfelipesegundo.itis.model.CustomExamUser;
-import com.cesfelipesegundo.itis.model.Exam;
-import com.cesfelipesegundo.itis.model.ExamAnswer;
-import com.cesfelipesegundo.itis.model.ExamQuestion;
 import com.cesfelipesegundo.itis.model.ExamStats;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.LearnerStats;
 import com.cesfelipesegundo.itis.model.Message;
 import com.cesfelipesegundo.itis.model.Query;
-import com.cesfelipesegundo.itis.model.ConfigExam;
 import com.cesfelipesegundo.itis.model.QueryGrade;
 import com.cesfelipesegundo.itis.model.QuestionStats;
-import com.cesfelipesegundo.itis.model.Subject;
-import com.cesfelipesegundo.itis.model.TemplateExamAnswer;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
-import com.cesfelipesegundo.itis.model.TemplateExamSubject;
-import com.cesfelipesegundo.itis.model.TemplateGrade;
 import com.cesfelipesegundo.itis.model.User;
 import com.cesfelipesegundo.itis.web.BreadCrumb;
 import com.cesfelipesegundo.itis.web.Constants;
 import com.cesfelipesegundo.itis.model.comparators.*;
 import com.lowagie.text.DocumentException;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.course.business.entity.Subject;
+import es.itest.engine.test.business.entity.Item;
+import es.itest.engine.test.business.entity.ItemResponse;
+import es.itest.engine.test.business.entity.ItemSession;
+import es.itest.engine.test.business.entity.ItemSessionResponse;
+import es.itest.engine.test.business.entity.TestSession;
+import es.itest.engine.test.business.entity.TestSessionGrade;
+import es.itest.engine.test.business.entity.TestSessionTemplate;
+import es.itest.engine.test.business.entity.TestSubject;
 
 /**
  * Delegate class. It manages the main operations related to a group, and to the questions related
@@ -292,12 +293,12 @@ public class TutorGroupManagementController {
 				currentGroup = tutorManagementService.getGroup(idGroup);
 		}
 		// We have to obtain from the database the list of themes for the course of this group 
-		List<TemplateExamSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
+		List<TestSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
 
 		// The currentQuestion is new:
-		tutorQuestionManagementController.setCurrentQuestion(new TemplateExamQuestion());
+		tutorQuestionManagementController.setCurrentQuestion(new Item());
 		// And the currentAnswer also is new
-		tutorQuestionManagementController.setCurrentAnswer(new TemplateExamAnswer());
+		tutorQuestionManagementController.setCurrentAnswer(new ItemResponse());
 		// Set the group
 		tutorQuestionManagementController.setCurrentGroup(currentGroup);
 		
@@ -327,7 +328,7 @@ public class TutorGroupManagementController {
 		// The same view as the new question one, but with the currentQuestion precharged 
 		
 		// We have to obtain the question from the id:
-		TemplateExamQuestion qfromdb = new TemplateExamQuestion(); 
+		Item qfromdb = new Item(); 
 		if (request.getParameter("idquestion") != null) {
 			qfromdb.setId(Long.valueOf(request.getParameter("idquestion")));
 			qfromdb = tutorManagementService.getQuestionFromId(qfromdb);
@@ -338,12 +339,12 @@ public class TutorGroupManagementController {
 		
 		// The rest of the elements for the view have to be added:
 		// List of themes for the course of this group 
-		List<TemplateExamSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
+		List<TestSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
 
 		// CurrentQuestion:
 		tutorQuestionManagementController.setCurrentQuestion(qfromdb);
 		// The currentAnswer is new
-		tutorQuestionManagementController.setCurrentAnswer(new TemplateExamAnswer());
+		tutorQuestionManagementController.setCurrentAnswer(new ItemResponse());
 		// Set the group
 		tutorQuestionManagementController.setCurrentGroup(currentGroup);
 		
@@ -357,7 +358,7 @@ public class TutorGroupManagementController {
 		//Adición del usuario para mostrar nombre y apellidos. Está en la sesión
 		User user = (User) request.getSession().getAttribute(Constants.USER);
 		mav.addObject("user",user);
-		TemplateExamQuestion question = tutorQuestionManagementController.getCurrentQuestion();
+		Item question = tutorQuestionManagementController.getCurrentQuestion();
 		if(question!= null && question.getType()==1){
 			if(question.getAnswers()!=null && question.getAnswers().size()==1){
 				mav.addObject("fillAnswer", question.getAnswers().get(0));
@@ -385,10 +386,10 @@ public class TutorGroupManagementController {
 		queryQuestions.setGroup(currentGroup.getId());
 		queryQuestions.setMaxResultCount(100);
 		tutorManagementService.updateQuestionNotUsedInExam(currentGroup.getId());
-		List<TemplateExamQuestion> tqlist = tutorManagementService.find(queryQuestions);
+		List<Item> tqlist = tutorManagementService.find(queryQuestions);
 		
 		// We have to obtain from the database the list of themes for the course of this group 
-		List<TemplateExamSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
+		List<TestSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
 
 		// Setting the question list into the question list controller
 		tutorQuestionListManagementController.setCurrentQuestionList(tqlist);
@@ -415,11 +416,11 @@ public class TutorGroupManagementController {
 	public ModelAndView newExam (HttpServletRequest request, HttpServletResponse response) {
 
 		// We have to obtain from the database the list of themes for the course of this group 
-		List<TemplateExamSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
+		List<TestSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
 
 		// Creación del ModelAndView. 
 		ModelAndView mav = new ModelAndView("tutor/new_exam");
-		ConfigExam ex = new ConfigExam();
+		TestSessionTemplate ex = new TestSessionTemplate();
 		ex.setGroup(currentGroup);
 		// New currentTutorConfigExam
 		tutorExamManagementController.setCurrentTutorExam(ex);
@@ -450,7 +451,7 @@ public class TutorGroupManagementController {
 		// The same view as the new exam one, but with the currentTutorExam precharged 
 		
 		// We have to obtain the exam configuration from the id:
-		ConfigExam exfromdb = new ConfigExam(); 
+		TestSessionTemplate exfromdb = new TestSessionTemplate(); 
 		if (request.getParameter("idconfigexam") != null) {
 			exfromdb.setId(Long.valueOf(request.getParameter("idconfigexam")));
 			exfromdb = tutorManagementService.getConfigExamFromId(exfromdb);
@@ -461,7 +462,7 @@ public class TutorGroupManagementController {
 		
 		// The rest of the elements for the view have to be added:
 		// List of themes for the course of this group 
-		List<TemplateExamSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
+		List<TestSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
 		List<User> usersNotInCustomExam = tutorManagementService.getUsersNotInCustomExam(exfromdb.getId(),currentGroup.getId());
 		List<CustomExamUser> usersInCustomExam = tutorManagementService.getUsersInCustomExam(exfromdb.getId());
 		// Set the current exam configuration:
@@ -506,9 +507,9 @@ public class TutorGroupManagementController {
 		ModelAndView mav = new ModelAndView("tutor/exams_list");
 
 		// We have to obtain from the database the list of exams related to this group, sorted by theme (default order):
-		List<ConfigExam> telist = tutorManagementService.getGroupConfigExams(currentGroup,"title");
+		List<TestSessionTemplate> telist = tutorManagementService.getGroupConfigExams(currentGroup,"title");
 		// We have to obtain from the database the list of themes for the course of this group 
-		List<TemplateExamSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
+		List<TestSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
 
 		// Setting the exam list into the exam list controller
 		tutorExamListManagementController.setCurrentExamList(telist);
@@ -539,7 +540,7 @@ public class TutorGroupManagementController {
 		ModelAndView mav = new ModelAndView("tutor/exam_error_list");
 
 		// We have to obtain the current exam configuration
-		ConfigExam currentConfigExam = tutorExamManagementController.getCurrentTutorExam();
+		TestSessionTemplate currentConfigExam = tutorExamManagementController.getCurrentTutorExam();
 		List<Message> msglist = new ArrayList<Message>();
 		
 		if (currentConfigExam != null) {
@@ -569,11 +570,11 @@ public class TutorGroupManagementController {
 		QueryGrade query = new QueryGrade();
 		query.setMaxResultCount(100);
 		query.setGroup(currentGroup.getId());
-		List<TemplateGrade> grlist = tutorManagementService.find(query);
+		List<TestSessionGrade> grlist = tutorManagementService.find(query);
 		// We have to obtain from the database the list of students related to this group, sorted by surname:
 		List<User> stlist = tutorManagementService.getStudents(currentGroup);
 		// We have to obtain from the database the list of exams related to this group, sorted by title
-		List<ConfigExam> celist = tutorManagementService.getGroupConfigExams(currentGroup, "title");		
+		List<TestSessionTemplate> celist = tutorManagementService.getGroupConfigExams(currentGroup, "title");		
 		tutorGradeListManagementController.setCurrentGradeList(grlist);
 		// Addition of the group object:
 		mav.addObject("group",currentGroup);
@@ -866,7 +867,7 @@ public class TutorGroupManagementController {
 		// Creación del ModelAndView. 
 		ModelAndView mav = new ModelAndView("tutor/questions_stats");
 		// Getting the exam
-		ConfigExam exam = new ConfigExam();
+		TestSessionTemplate exam = new TestSessionTemplate();
 		String examid = request.getParameter("examid");
 		exam.setId(new Long(examid));
 		exam = tutorManagementService.getConfigExamFromId(exam);
@@ -952,7 +953,7 @@ public class TutorGroupManagementController {
 		ModelAndView mav = new ModelAndView("tutor/exam_error_list");
 
 		// We have to obtain the current exam configuration
-		ConfigExam currentConfigExam = tutorExamManagementController.getCurrentTutorExam();
+		TestSessionTemplate currentConfigExam = tutorExamManagementController.getCurrentTutorExam();
  		// The exam is validate before generating a preview 
 		List<Message> msglist = new ArrayList<Message>();
 		
@@ -963,7 +964,7 @@ public class TutorGroupManagementController {
 			if (msglist.isEmpty()) {
 				mav.setViewName("tutor/exam_preview");
 				//Exam preview = tutorManagementService.getExamPreview(currentConfigExam);
-				Exam preview = learnerManagementService.getPreviewExam(currentConfigExam.getId()); 
+				TestSession preview = learnerManagementService.createTestSessionPreview(currentConfigExam.getId()); 
 				// Adding the exam
 				mav.addObject("exam",preview);
 				// Store the exam in the session
@@ -992,19 +993,19 @@ public class TutorGroupManagementController {
 		// Creación del ModelAndView. 
 		ModelAndView mav = new ModelAndView("tutor/grade_preview");
 		
-		Exam exam = (Exam) request.getSession().getAttribute("examPreview");
+		TestSession exam = (TestSession) request.getSession().getAttribute("examPreview");
 		// iterating on questions
-		ListIterator<ExamQuestion> iterQuestions = exam.getQuestions().listIterator();
+		ListIterator<ItemSession> iterQuestions = exam.getQuestions().listIterator();
 		while (iterQuestions.hasNext()) {
-			ExamQuestion question = iterQuestions.next();
+			ItemSession question = iterQuestions.next();
 			String check = request.getParameter("confidenceQuestion"+question.getId());
 			if (check!=null) {
-				question.setMarked(true);
+				question.setExamineeWasConfident(true);
 			}
 			// iterating on answers
-			ListIterator<ExamAnswer> iterAnswers = question.getAnswers().listIterator();
+			ListIterator<ItemSessionResponse> iterAnswers = question.getAnswers().listIterator();
 			while (iterAnswers.hasNext()) {
-				ExamAnswer answer = iterAnswers.next();
+				ItemSessionResponse answer = iterAnswers.next();
 				String marked = request.getParameter("check"+answer.getId());
 				if (marked!=null) {
 					answer.setMarked(true);
@@ -1017,7 +1018,7 @@ public class TutorGroupManagementController {
 		}
 		
 		// Adición de la calificación:
-		Double grade = learnerManagementService.gradePreviewedExam(exam);
+		Double grade = learnerManagementService.gradeTestSessionPreview(exam);
 		mav.addObject("grade",grade);
 		mav.addObject("maxgrade",exam.getMaxGrade());
 		
@@ -1053,7 +1054,7 @@ public class TutorGroupManagementController {
 		}
 		if ((idStd != null) && (idConfigExam != null)) {
 			// Obtention of the exam from the database.
-			Exam ex = tutorManagementService.getStudentExam(idStd,idConfigExam);
+			TestSession ex = tutorManagementService.getStudentExam(idStd,idConfigExam);
 			if(regrade){
 				double grade = learnerManagementService.reGradeExam(idStd, ex);
 				ex.setExamGrade(grade);
@@ -1179,17 +1180,17 @@ public class TutorGroupManagementController {
 		queryQuestions.setExcludeGroup(currentGroup.getId());
 		queryQuestions.setUserId(user.getId());
 		
-		List<TemplateExamQuestion> tqlist = tutorManagementService.find(queryQuestions);
+		List<Item> tqlist = tutorManagementService.find(queryQuestions);
 		
 		// Setting the question list into the question list controller
 		tutorQuestionListManagementController.setCurrentQuestionList(tqlist);
 		
 		// The preimported question list has to be initialized:
-		tutorQuestionListManagementController.setPreImportedQuestionList(new ArrayList<TemplateExamQuestion>());
+		tutorQuestionListManagementController.setPreImportedQuestionList(new ArrayList<Item>());
 			
 		// We have to obtain from the database the list of themes for the course of this group
 		// The theme is used to decided where to import the questions.
-		List<TemplateExamSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
+		List<TestSubject> thlist = tutorManagementService.getCourseSubjects(currentGroup);
 		
 		// We also need to know the groups teached by the user:
 		List<Group> mygroups = tutorManagementService.getTeachedGroups(user.getId());
@@ -1221,7 +1222,7 @@ public class TutorGroupManagementController {
 	}
 
 	public void reviewExam2PDF(HttpServletRequest request,HttpServletResponse response) {
-		Exam currentExam = (Exam)request.getSession().getAttribute("examPreview");
+		TestSession currentExam = (TestSession)request.getSession().getAttribute("examPreview");
 		try {
 			String archivo = currentExam.getTitle()+"_"+currentExam.getGroup().getCourse().getName()+"_"+currentExam.getId()+".pdf";
 			log.info("generando el archivo "+archivo);

@@ -2,11 +2,11 @@ package com.cesfelipesegundo.itis.model.comparators;
 
 import java.util.Comparator;
 
-import com.cesfelipesegundo.itis.model.ConfigExamSubject;
+import es.itest.engine.course.business.entity.TestSessionTemplateSubject;
 
-public class ConfigExamSubjectComparator implements Comparator<ConfigExamSubject> {
+public class ConfigExamSubjectComparator implements Comparator<TestSessionTemplateSubject> {
 
-	public int compare (ConfigExamSubject o1, ConfigExamSubject o2) {
+	public int compare (TestSessionTemplateSubject o1, TestSessionTemplateSubject o2) {
 		int order1 = o1.getSubject().getOrder();
 		int order2 = o2.getSubject().getOrder();
 		if (order1 == order2) {

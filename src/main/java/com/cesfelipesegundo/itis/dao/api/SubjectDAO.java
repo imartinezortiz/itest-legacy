@@ -2,9 +2,9 @@ package com.cesfelipesegundo.itis.dao.api;
 
 import java.util.List;
 
-import com.cesfelipesegundo.itis.model.Group;
-import com.cesfelipesegundo.itis.model.Subject;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.course.business.entity.Subject;
+import es.itest.engine.test.business.entity.Item;
 
 /**
  * Interfaz DAO para el modelo <code>Subject</code>.
@@ -63,7 +63,7 @@ public interface SubjectDAO extends DAO {
 	 * @param groupId
 	 * @return
 	 */
-	public List<TemplateExamQuestion> getQuestionsBySubjectAndGroupId(Long subjectId,Long groupId);
+	public List<Item> getQuestionsBySubjectAndGroupId(Long subjectId,Long groupId);
 
 	/** Obtain number of questions for subject, group and difficulty given
 	 * 

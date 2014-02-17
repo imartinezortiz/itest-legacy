@@ -7,17 +7,18 @@ import java.util.Map;
 import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 
 import com.cesfelipesegundo.itis.dao.api.TemplateGradeDAO;
-import com.cesfelipesegundo.itis.model.ConfigExam;
-import com.cesfelipesegundo.itis.model.ConfigExamSubject;
-import com.cesfelipesegundo.itis.model.Exam;
 import com.cesfelipesegundo.itis.model.Grade;
 import com.cesfelipesegundo.itis.model.QueryGrade;
-import com.cesfelipesegundo.itis.model.TemplateGrade;
 import com.cesfelipesegundo.itis.model.User;
+
+import es.itest.engine.course.business.entity.TestSessionTemplateSubject;
+import es.itest.engine.test.business.entity.TestSession;
+import es.itest.engine.test.business.entity.TestSessionGrade;
+import es.itest.engine.test.business.entity.TestSessionTemplate;
 
 public class TemplateGradeDAOImpl extends SqlMapClientDaoSupport implements TemplateGradeDAO {
 
-	public List<TemplateGrade> find(QueryGrade query) {
+	public List<TestSessionGrade> find(QueryGrade query) {
 		
 		// This map will be the criteria for the SQL
 		Map<String,Object> map = new HashMap<String,Object>();
@@ -51,16 +52,16 @@ public class TemplateGradeDAOImpl extends SqlMapClientDaoSupport implements Temp
 		if ((query.getMaxResultCount() != null) && (query.getMaxResultCount()>0)) 
 			map.put("maxResultCount", Integer.valueOf(query.getMaxResultCount()));
 		
-		List<TemplateGrade> grades = super.getSqlMapClientTemplate().queryForList("Grade.selectTemplateGradesByCriteria", map);
+		List<TestSessionGrade> grades = super.getSqlMapClientTemplate().queryForList("Grade.selectTemplateGradesByCriteria", map);
 		
 		// Fill the User and ConfigExam objects
-		for(TemplateGrade grade : grades) {
+		for(TestSessionGrade grade : grades) {
 			User user = (User)super.getSqlMapClientTemplate().queryForObject("User.getUserById", grade.getLearner().getId());
 			grade.setLearner(user);
 			
-			ConfigExam configExam = (ConfigExam)super.getSqlMapClientTemplate().queryForObject("ConfigExam.selectConfigExam", grade.getExam().getId());
+			TestSessionTemplate configExam = (TestSessionTemplate)super.getSqlMapClientTemplate().queryForObject("ConfigExam.selectConfigExam", grade.getExam().getId());
 			// Subjects associated to the theme:
-			List<ConfigExamSubject> subjects = super.getSqlMapClientTemplate().queryForList("ConfigExam.selectConfigExamSubjectsByExamId", configExam.getId());
+			List<TestSessionTemplateSubject> subjects = super.getSqlMapClientTemplate().queryForList("ConfigExam.selectConfigExamSubjectsByExamId", configExam.getId());
 			configExam.setSubjects(subjects);
 			grade.setExam(configExam);
 		}
@@ -74,7 +75,7 @@ public class TemplateGradeDAOImpl extends SqlMapClientDaoSupport implements Temp
 		map.put("idExam", idExam);
 		map.put("finalGrade", finalGrade);
 		
-		List<TemplateGrade> list = super.getSqlMapClientTemplate().queryForList("Grade.checkGrade",map);
+		List<TestSessionGrade> list = super.getSqlMapClientTemplate().queryForList("Grade.checkGrade",map);
 		return list != null;
 	}
 

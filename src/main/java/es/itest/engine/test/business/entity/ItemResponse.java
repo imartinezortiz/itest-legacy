@@ -1,50 +1,60 @@
-package com.cesfelipesegundo.itis.model;
+package es.itest.engine.test.business.entity;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.Embeddable;
+import javax.persistence.Transient;
+
+import com.cesfelipesegundo.itis.model.MediaElemComparator;
+
 /**
- * Representa cada una de las respuestas que van a ser mostradas en cada pregunta de un examen para un alumno
- * @author chema
- *
+ * Represents an {@link Item} response.
  */
-public class TemplateExamAnswer {
+@Embeddable
+public class ItemResponse {
 	
 	private Long id;					// Id de la respuesta
+	
 	private String text;				// Texto de la respuesta
+	
 	private List<MediaElem> mmedia;		// Lista de elementos multimedia ordenador por su campo de orden
-	private Boolean marked;		// Al iniciar el examen ninguna respuesta está marcada 
 
-	private int active;
-	private int solution;
-	private int value;
-	private TemplateExamQuestion question;
+	private boolean active;
+
+	private boolean solution;
 	
-	private Boolean usedInExam;
+	/**
+	 * Weight of the response in the grade
+	 */
+	@Transient
+	private BigDecimal value;
 	
-	public TemplateExamAnswer(){
-		usedInExam = null;
-		marked = false;
+	private Item question;
+	
+	private boolean usedInExam;
+	
+	public ItemResponse(){
+	  value = BigDecimal.ZERO;
 	}
 	
-	public int getActive() {
+	public boolean isActive() {
 		return active;
 	}
-	public void setActive(int active) {
+
+	public void setActive(boolean active) {
 		this.active = active;
 	}
-	public int getSolution() {
+
+	public boolean isSolution() {
 		return solution;
 	}
-	public void setSolution(int solution) {
+
+	public void setSolution(boolean solution) {
 		this.solution = solution;
 	}
-	public Boolean getMarked() {
-		return marked;
-	}
-	public void setMarked(Boolean marked) {
-		this.marked = marked;
-	}
+
 	public Long getId() {
 		return id;
 	}
@@ -65,16 +75,16 @@ public class TemplateExamAnswer {
 	public void setText(String text) {
 		this.text = text;
 	}
-	public int getValue() {
+	public BigDecimal getValue() {
 		return value;
 	}
-	public void setValue(int value) {
+	public void setValue(BigDecimal value) {
 		this.value = value;
 	}
-	public void setQuestion(TemplateExamQuestion question) {
+	public void setQuestion(Item question) {
 		this.question = question;
 	}
-	public TemplateExamQuestion getQuestion(){
+	public Item getQuestion(){
 		return this.question;
 	}
 

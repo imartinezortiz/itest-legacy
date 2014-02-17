@@ -4,9 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.cesfelipesegundo.itis.model.CustomExamUser;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.Institution;
 import com.cesfelipesegundo.itis.model.User;
+
+import es.itest.engine.course.business.entity.Group;
 
 /**
  * DAO que gestiona los usuarios

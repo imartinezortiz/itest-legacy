@@ -1,4 +1,4 @@
-package com.cesfelipesegundo.itis.model;
+package es.itest.engine.course.business.entity;
 
 /**
  * Class that models the themes related to a course and its questions
@@ -13,7 +13,7 @@ public class Subject {
 	// The following attribute is not stored into the database
 	private Short usedInExam;		// Flag to avoid deleting themes used in exam
 	// Group
-	private Group group;			// Group related to this subject
+//	private Group group;			// Group related to this subject
 	// Questions of this subject
 	private Long numQuestions;		
 	

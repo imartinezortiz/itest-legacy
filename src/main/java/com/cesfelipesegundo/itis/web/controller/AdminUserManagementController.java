@@ -17,7 +17,6 @@ import com.cesfelipesegundo.itis.biz.api.AdminManagementService;
 import com.cesfelipesegundo.itis.biz.api.LearnerManagementService;
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
 import com.cesfelipesegundo.itis.biz.api.UserManagementService;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.Institution;
 import com.cesfelipesegundo.itis.model.User;
 import com.cesfelipesegundo.itis.web.Constants;
@@ -26,6 +25,8 @@ import com.cesfelipesegundo.itis.model.comparators.GroupCourseComparator;
 import com.cesfelipesegundo.itis.model.comparators.GroupInstitutionNameComparator;
 import com.cesfelipesegundo.itis.model.comparators.GroupNameComparator;
 import com.cesfelipesegundo.itis.model.comparators.GroupYearComparator;
+
+import es.itest.engine.course.business.entity.Group;
 
 public class AdminUserManagementController  implements ServletContextAware {
 	

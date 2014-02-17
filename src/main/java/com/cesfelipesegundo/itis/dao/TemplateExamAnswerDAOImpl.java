@@ -8,8 +8,9 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 
 import com.cesfelipesegundo.itis.dao.api.TemplateExamAnswerDAO;
-import com.cesfelipesegundo.itis.model.MediaElem;
-import com.cesfelipesegundo.itis.model.TemplateExamAnswer;
+
+import es.itest.engine.test.business.entity.ItemResponse;
+import es.itest.engine.test.business.entity.MediaElem;
 
 public class TemplateExamAnswerDAOImpl extends SqlMapClientDaoSupport implements TemplateExamAnswerDAO {
 	private static final Log log = LogFactory.getLog(TemplateExamAnswerDAOImpl.class);
@@ -21,11 +22,11 @@ public class TemplateExamAnswerDAOImpl extends SqlMapClientDaoSupport implements
 		super();
 	}
 	
-	public void update(TemplateExamAnswer answer) {
+	public void update(ItemResponse answer) {
 		/*int rows =*/ getSqlMapClientTemplate().update("TemplateExam.updateTemplateExamAnswer", answer);		
 	}
 	
-	public void save(TemplateExamAnswer answer) {
+	public void save(ItemResponse answer) {
 		/*Object newKey = super.getSqlMapClientTemplate().insert("TemplateExam.addNewTemplateExamAnswer", answer);*/
 		if (answer.getId()==null) {
 			try{
@@ -57,11 +58,11 @@ public class TemplateExamAnswerDAOImpl extends SqlMapClientDaoSupport implements
 		else update(answer);
 	}
 	
-	public void delete(TemplateExamAnswer answer) {
+	public void delete(ItemResponse answer) {
 		/*int rows =*/ super.getSqlMapClientTemplate().delete("TemplateExam.deleteTemplateExamAnswer", answer.getId());
 	}
 	
-	public void update(TemplateExamAnswer answer, MediaElem mediaElem){
+	public void update(ItemResponse answer, MediaElem mediaElem){
 		HashMap<String,Object> map = new HashMap<String,Object>();
 		map.put("idextrar", mediaElem.getId());
 		map.put("resp", answer.getId());
@@ -74,7 +75,7 @@ public class TemplateExamAnswerDAOImpl extends SqlMapClientDaoSupport implements
 		/*int rows =*/ super.getSqlMapClientTemplate().update("TemplateExam.updateAnswerMedia", map);
 	}
 		
-	public void save(TemplateExamAnswer answer, MediaElem mediaElem){
+	public void save(ItemResponse answer, MediaElem mediaElem){
 		if(mediaElem.getId()!=null) this.update(answer, mediaElem);
 		else {
 			HashMap<String,Object> map = new HashMap<String,Object>();
@@ -91,7 +92,7 @@ public class TemplateExamAnswerDAOImpl extends SqlMapClientDaoSupport implements
 	}
 	
 	
-	public void delete(TemplateExamAnswer answer, MediaElem mediaElem){
+	public void delete(ItemResponse answer, MediaElem mediaElem){
 		/*int rows =*/ super.getSqlMapClientTemplate().delete("TemplateExam.deleteAnswerMedia", mediaElem.getId());
 	}
 	

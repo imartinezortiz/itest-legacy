@@ -12,16 +12,17 @@ import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 
 import com.cesfelipesegundo.itis.dao.api.ExamDAO;
 import com.cesfelipesegundo.itis.model.CourseStats;
-import com.cesfelipesegundo.itis.model.Exam;
-import com.cesfelipesegundo.itis.model.ExamAnswer;
 import com.cesfelipesegundo.itis.model.ExamGlobalInfo;
-import com.cesfelipesegundo.itis.model.ExamQuestion;
 import com.cesfelipesegundo.itis.model.Grade;
-import com.cesfelipesegundo.itis.model.MediaElem;
-import com.cesfelipesegundo.itis.model.ExamForReview;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
 import com.cesfelipesegundo.itis.model.User;
 import com.cesfelipesegundo.itis.model.comparators.ExamGlobalInfoIdComparator;
+
+import es.itest.engine.test.business.entity.Item;
+import es.itest.engine.test.business.entity.ItemSession;
+import es.itest.engine.test.business.entity.ItemSessionResponse;
+import es.itest.engine.test.business.entity.MediaElem;
+import es.itest.engine.test.business.entity.TestSession;
+import es.itest.engine.test.business.entity.TestSessionForReview;
 
 public class ExamDAOImpl extends SqlMapClientDaoSupport implements ExamDAO {
 	/**
@@ -32,24 +33,24 @@ public class ExamDAOImpl extends SqlMapClientDaoSupport implements ExamDAO {
 		super();
 	}
 	
-	public Exam getAlreadyDoneExam(User user, Long id) {
+	public TestSession getAlreadyDoneExam(User user, Long id) {
 		
 		// En primer lugar cojo la información básica del examen
 		// Sin la lista de preguntas.
 		HashMap<String,Long> parameters = new HashMap<String,Long>();
 		parameters.put("idUser", user.getId());
 		parameters.put("idExam", id);
-		Exam exam = (Exam)super.getSqlMapClientTemplate().queryForObject("Exam.getExam", parameters);
+		TestSession exam = (TestSession)super.getSqlMapClientTemplate().queryForObject("Exam.getExam", parameters);
 		
 		// Retrieve questions only if exam was already done
 		if (exam != null) {
 		
 			// Lista de preguntas del examen correspondienete hecho por user
-			List<ExamQuestion> questions = super.getSqlMapClientTemplate().queryForList("Exam.getExamQuestion", parameters);
+			List<ItemSession> questions = super.getSqlMapClientTemplate().queryForList("Exam.getExamQuestion", parameters);
 			
 	
 			// A cada question hay que añadirle:
-			for(ExamQuestion question : questions) {
+			for(ItemSession question : questions) {
 				
 				// Lista de los elementos multimedia
 				List<MediaElem> questionMedia = super.getSqlMapClientTemplate().queryForList("Exam.getQuestionMedia", question.getId());
@@ -59,19 +60,19 @@ public class ExamDAOImpl extends SqlMapClientDaoSupport implements ExamDAO {
 					
 				// Lista de respuestas a esta pregunta
 				parameters.put("idQuestion", question.getId());
-				List<ExamAnswer> answers = super.getSqlMapClientTemplate().queryForList("Exam.getExamAnswer", parameters);
+				List<ItemSessionResponse> answers = super.getSqlMapClientTemplate().queryForList("Exam.getExamAnswer", parameters);
 				question.setAnswers(answers);
 					
 				// Y finalmente a cada respuesta hay que añadirle
-				for(ExamAnswer answer : answers) {
+				for(ItemSessionResponse answer : answers) {
 					// Lista de elementos multimedia
 					List<MediaElem> answerMedia = super.getSqlMapClientTemplate().queryForList("Exam.getAnswerMedia", answer.getId());
 					answer.setMmedia(answerMedia);
 				}
 			} // for
 			
-			List<ExamQuestion> fillQuestions = super.getSqlMapClientTemplate().queryForList("Exam.getExamFillQuestion", parameters);
-			for(ExamQuestion question : fillQuestions){
+			List<ItemSession> fillQuestions = super.getSqlMapClientTemplate().queryForList("Exam.getExamFillQuestion", parameters);
+			for(ItemSession question : fillQuestions){
 				List<MediaElem> questionMedia = super.getSqlMapClientTemplate().queryForList("Exam.getQuestionMedia", question.getId());
 				question.setMmedia(questionMedia);
 				List<MediaElem> questionMediaComment = super.getSqlMapClientTemplate().queryForList("Exam.getCommentMedia", question.getId());
@@ -79,7 +80,7 @@ public class ExamDAOImpl extends SqlMapClientDaoSupport implements ExamDAO {
 				
 				// Lista de respuestas a esta pregunta
 				parameters.put("idQuestion", question.getId());
-				List<ExamAnswer> answers = super.getSqlMapClientTemplate().queryForList("Exam.getExamFillAnswer", parameters);
+				List<ItemSessionResponse> answers = super.getSqlMapClientTemplate().queryForList("Exam.getExamFillAnswer", parameters);
 				question.setAnswers(answers);
 				
 			}
@@ -92,15 +93,15 @@ public class ExamDAOImpl extends SqlMapClientDaoSupport implements ExamDAO {
 		return exam;
 	}
 	
-	public ExamQuestion getNextQuestion(User user, Long idExam, Long lastQuestionId){
-		ExamQuestion question = null;
+	public ItemSession getNextQuestion(User user, Long idExam, Long lastQuestionId){
+		ItemSession question = null;
 
 		HashMap<String,Long> parameters = new HashMap<String,Long>();
 		parameters.put("idUser", user.getId());
 		parameters.put("idExam", idExam);
 		parameters.put("lastId", lastQuestionId);
 		
-		question = (ExamQuestion) super.getSqlMapClientTemplate().queryForObject("Exam.getNextQuestion", parameters);
+		question = (ItemSession) super.getSqlMapClientTemplate().queryForObject("Exam.getNextQuestion", parameters);
 
 		// Lista de los elementos multimedia
 		List<MediaElem> questionMedia = super.getSqlMapClientTemplate().queryForList("Exam.getQuestionMedia", question.getId());
@@ -109,11 +110,11 @@ public class ExamDAOImpl extends SqlMapClientDaoSupport implements ExamDAO {
 		question.setMmediaComment(questionMediaComment);
 		// Lista de respuestas a esta pregunta
 		parameters.put("idQuestion", question.getId());
-		List<ExamAnswer> answers = super.getSqlMapClientTemplate().queryForList("Exam.getExamAnswer", parameters);
+		List<ItemSessionResponse> answers = super.getSqlMapClientTemplate().queryForList("Exam.getExamAnswer", parameters);
 		question.setAnswers(answers);
 			
 		// Y finalmente a cada respuesta hay que añadirle
-		for(ExamAnswer answer : answers) {
+		for(ItemSessionResponse answer : answers) {
 			// Lista de elementos multimedia
 			List<MediaElem> answerMedia = super.getSqlMapClientTemplate().queryForList("Exam.getAnswerMedia", answer.getId());
 			answer.setMmedia(answerMedia);
@@ -140,11 +141,11 @@ public class ExamDAOImpl extends SqlMapClientDaoSupport implements ExamDAO {
 		getSqlMapClientTemplate().delete("Exam.deleteFillQuestionFromExam",parameters);
 	}
 	
-	public List<ExamForReview> getExamsByQuestion(Long idQuestion){
+	public List<TestSessionForReview> getExamsByQuestion(Long idQuestion){
 		return super.getSqlMapClientTemplate().queryForList("Exam.getExamsByQuestion", idQuestion);
 	}
 	
-	public List<ExamForReview> getExamsByIdExam(Long idExam){
+	public List<TestSessionForReview> getExamsByIdExam(Long idExam){
 		return super.getSqlMapClientTemplate().queryForList("Exam.getExamsByIdExam", idExam);
 	}
 
@@ -189,13 +190,13 @@ public class ExamDAOImpl extends SqlMapClientDaoSupport implements ExamDAO {
 		return (Grade) super.getSqlMapClientTemplate().queryForObject("Grade.selectGrade", parameters);
 	}
 
-	public Exam getExamById(Long idexam, Long iduser) {
+	public TestSession getExamById(Long idexam, Long iduser) {
 		HashMap<String,Long> parameters = new HashMap<String,Long>();
 		parameters.put("idExam", idexam);
 		parameters.put("idUser", iduser);
-		Exam exam = (Exam)super.getSqlMapClientTemplate().queryForObject("Exam.getExam", parameters);
-		List<ExamQuestion> questions = super.getSqlMapClientTemplate().queryForList("Exam.getExamQuestion", parameters);
-		for(ExamQuestion question : questions) {
+		TestSession exam = (TestSession)super.getSqlMapClientTemplate().queryForObject("Exam.getExam", parameters);
+		List<ItemSession> questions = super.getSqlMapClientTemplate().queryForList("Exam.getExamQuestion", parameters);
+		for(ItemSession question : questions) {
 			
 			// Lista de los elementos multimedia
 			List<MediaElem> questionMedia = super.getSqlMapClientTemplate().queryForList("Exam.getQuestionMedia", question.getId());
@@ -205,18 +206,18 @@ public class ExamDAOImpl extends SqlMapClientDaoSupport implements ExamDAO {
 				
 			// Lista de respuestas a esta pregunta
 			parameters.put("idQuestion", question.getId());
-			List<ExamAnswer> answers = super.getSqlMapClientTemplate().queryForList("Exam.getExamAnswer", parameters);
+			List<ItemSessionResponse> answers = super.getSqlMapClientTemplate().queryForList("Exam.getExamAnswer", parameters);
 			question.setAnswers(answers);
 				
 			// Y finalmente a cada respuesta hay que añadirle
-			for(ExamAnswer answer : answers) {
+			for(ItemSessionResponse answer : answers) {
 				// Lista de elementos multimedia
 				List<MediaElem> answerMedia = super.getSqlMapClientTemplate().queryForList("Exam.getAnswerMedia", answer.getId());
 				answer.setMmedia(answerMedia);
 			}
 		} // for
-		List<ExamQuestion> fillQuestions = super.getSqlMapClientTemplate().queryForList("Exam.getExamFillQuestion", parameters);
-		for(ExamQuestion question : fillQuestions){
+		List<ItemSession> fillQuestions = super.getSqlMapClientTemplate().queryForList("Exam.getExamFillQuestion", parameters);
+		for(ItemSession question : fillQuestions){
 			List<MediaElem> questionMedia = super.getSqlMapClientTemplate().queryForList("Exam.getQuestionMedia", question.getId());
 			question.setMmedia(questionMedia);
 			List<MediaElem> questionMediaComment = super.getSqlMapClientTemplate().queryForList("Exam.getCommentMedia", question.getId());
@@ -224,7 +225,7 @@ public class ExamDAOImpl extends SqlMapClientDaoSupport implements ExamDAO {
 			
 			// Lista de respuestas a esta pregunta
 			parameters.put("idQuestion", question.getId());
-			List<ExamAnswer> answers = super.getSqlMapClientTemplate().queryForList("Exam.getExamFillAnswer", parameters);
+			List<ItemSessionResponse> answers = super.getSqlMapClientTemplate().queryForList("Exam.getExamFillAnswer", parameters);
 			question.setAnswers(answers);
 			
 		}
@@ -234,15 +235,15 @@ public class ExamDAOImpl extends SqlMapClientDaoSupport implements ExamDAO {
 	}
 
 	
-	public List<Exam> getAlreadyDoneExamGradeByGroup(long iduser, long idgroup){
+	public List<TestSession> getAlreadyDoneExamGradeByGroup(long iduser, long idgroup){
 		Map<String,Object> map = new HashMap<String,Object>();
 		
 		map.put("user", iduser);
 		map.put("group", idgroup);
-		return (List<Exam>) super.getSqlMapClientTemplate().queryForList("Exam.selectExamByGroupAndUser",map);
+		return (List<TestSession>) super.getSqlMapClientTemplate().queryForList("Exam.selectExamByGroupAndUser",map);
 	}
 
-	public List<Long> getExamIds(TemplateExamQuestion question) {
+	public List<Long> getExamIds(Item question) {
 		return (List<Long>) super.getSqlMapClientTemplate().queryForList("Exam.getExamIds",question.getId());
 	}
 
@@ -297,8 +298,8 @@ public class ExamDAOImpl extends SqlMapClientDaoSupport implements ExamDAO {
 		return stats;
 	}
 
-	public List<Exam> getAllExams(Long idexam) {
-		return (((List<Exam>) super.getSqlMapClientTemplate().queryForList("Exam.getAllExamsForId",idexam)));
+	public List<TestSession> getAllExams(Long idexam) {
+		return (((List<TestSession>) super.getSqlMapClientTemplate().queryForList("Exam.getAllExamsForId",idexam)));
 	}
 
 	public List<ExamGlobalInfo> getActiveExamsFiltered(String centro,

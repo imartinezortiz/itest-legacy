@@ -10,9 +10,10 @@ import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 import com.cesfelipesegundo.itis.dao.api.UserDAO;
 import com.cesfelipesegundo.itis.model.CustomExamUser;
 import com.cesfelipesegundo.itis.model.ExamGlobalInfo;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.Institution;
 import com.cesfelipesegundo.itis.model.User;
+
+import es.itest.engine.course.business.entity.Group;
 
 /**
  * Clase que implementa la interfaz <code>UserDAO</code> desarrollada por Iván.

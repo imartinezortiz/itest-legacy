@@ -8,11 +8,12 @@ import java.util.Date;
 
 import com.cesfelipesegundo.itis.biz.api.LearnerManagementService;
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
-import com.cesfelipesegundo.itis.model.Exam;
 import com.cesfelipesegundo.itis.model.Grade;
 import com.cesfelipesegundo.itis.model.QueryGrade;
-import com.cesfelipesegundo.itis.model.TemplateGrade;
 import com.cesfelipesegundo.itis.model.comparators.TemplateGradeComparator;
+
+import es.itest.engine.test.business.entity.TestSession;
+import es.itest.engine.test.business.entity.TestSessionGrade;
 
 /**
  * It manages the operations related to LIST of grades of the managed group
@@ -31,7 +32,7 @@ public class TutorGradeListManagementController {
 	 */
     private LearnerManagementService learnerManagementService;
     
-    private List<TemplateGrade> currentGradeList;
+    private List<TestSessionGrade> currentGradeList;
    
     /* ******** Getters and setters ******** */
 
@@ -40,11 +41,11 @@ public class TutorGradeListManagementController {
 		return tutorManagementService;
 	}
 
-	public List<TemplateGrade> getCurrentGradeList() {
+	public List<TestSessionGrade> getCurrentGradeList() {
 		return currentGradeList;
 	}
 
-	public void setCurrentGradeList(List<TemplateGrade> currentGradeList) {
+	public void setCurrentGradeList(List<TestSessionGrade> currentGradeList) {
 		this.currentGradeList = currentGradeList;
 	}
 
@@ -71,7 +72,7 @@ public class TutorGradeListManagementController {
 	 * @return List of grades that comply with the filter, needed for the callback function to repaint the list
 	 */
 	
-	public List<TemplateGrade> filterAndSearch (String idgroup, String idstudent, String idexam, String grade,
+	public List<TestSessionGrade> filterAndSearch (String idgroup, String idstudent, String idexam, String grade,
 			 									String startDate, String endDate, String dur, String orderby, String typeOrder,boolean limit) {
 		/* 
 		 * We have to obtain from the database the list of questions related to this group, using the
@@ -150,7 +151,7 @@ public class TutorGradeListManagementController {
 		
 	} // filterAndSearch
 
-	public List<TemplateGrade> orderCurrentGradeList(String typeOrder, String orderby){
+	public List<TestSessionGrade> orderCurrentGradeList(String typeOrder, String orderby){
 		Collections.sort(currentGradeList, new TemplateGradeComparator(orderby));
 		if(typeOrder.equalsIgnoreCase("DESC"))
 			Collections.reverse(currentGradeList);
@@ -162,7 +163,7 @@ public class TutorGradeListManagementController {
 	 * @return List of grades needed for the callback function to repaint the list
 	 **/
 	
-	public List<TemplateGrade> deleteStudentExam (String idgroup, String idstudent, String idexam) {
+	public List<TestSessionGrade> deleteStudentExam (String idgroup, String idstudent, String idexam) {
 
 		// Getting input data:
 		Long idgrp = null;
@@ -178,7 +179,7 @@ public class TutorGradeListManagementController {
 			tutorManagementService.updateQuestionNotUsedInExam(idgrp);
 		}
 		for(int i=0;i<currentGradeList.size();i++){
-			TemplateGrade gr = currentGradeList.get(i);
+			TestSessionGrade gr = currentGradeList.get(i);
 			if(gr.getLearner().getId().equals(idstd) && gr.getExam().getId().equals(idex)){
 				currentGradeList.remove(gr);
 				break;
@@ -187,8 +188,8 @@ public class TutorGradeListManagementController {
 		return currentGradeList;
 	} // deleteStudentExam
 	
-	public List<TemplateGrade> gradeExam(String idgroup, Long idUser, Long idExam){
-		Exam exam = learnerManagementService.getExam(idExam, idUser);
+	public List<TestSessionGrade> gradeExam(String idgroup, Long idUser, Long idExam){
+		TestSession exam = learnerManagementService.getTestSession(idExam, idUser);
 		Grade grade = learnerManagementService.getGradeByIdExam(idExam, idUser);
 		if(grade!=null){
 			exam.setStartingDate(grade.getBegin().getTime());
@@ -197,7 +198,7 @@ public class TutorGradeListManagementController {
 			exam.setStartingDate(System.currentTimeMillis()- (exam.getDuration()*60000));
 		}
 		
-		grade.setGrade(learnerManagementService.gradeExam(idUser, exam));
+		grade.setGrade(learnerManagementService.gradeTestSession(idUser, exam));
 		grade.setEnd(learnerManagementService.getGradeByIdExam(idExam, idUser).getEnd());
 		for(int i=0;i<currentGradeList.size();i++){
 			if(currentGradeList.get(i).getExam().getId().equals(idExam) && currentGradeList.get(i).getLearner().getId().equals(idUser)){

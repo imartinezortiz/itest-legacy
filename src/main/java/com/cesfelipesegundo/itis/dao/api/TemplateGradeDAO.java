@@ -2,10 +2,11 @@ package com.cesfelipesegundo.itis.dao.api;
 
 import java.util.List;
 
-import com.cesfelipesegundo.itis.model.ConfigExam;
 import com.cesfelipesegundo.itis.model.Grade;
 import com.cesfelipesegundo.itis.model.QueryGrade;
-import com.cesfelipesegundo.itis.model.TemplateGrade;
+
+import es.itest.engine.test.business.entity.TestSessionGrade;
+import es.itest.engine.test.business.entity.TestSessionTemplate;
 
 public interface TemplateGradeDAO {
 
@@ -16,7 +17,7 @@ public interface TemplateGradeDAO {
 	 * @param query
 	 * @return
 	 */
-	List<TemplateGrade> find(QueryGrade query);
+	List<TestSessionGrade> find(QueryGrade query);
 	
 	/** Checks grade persistence for an exam and learner given
 	 * 

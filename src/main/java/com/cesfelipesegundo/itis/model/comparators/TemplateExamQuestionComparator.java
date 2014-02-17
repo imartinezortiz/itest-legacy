@@ -1,7 +1,8 @@
 package com.cesfelipesegundo.itis.model.comparators;
 
 import java.util.Comparator;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
+
+import es.itest.engine.test.business.entity.Item;
 
 public class TemplateExamQuestionComparator extends UTF8Adapter implements Comparator{
 
@@ -12,8 +13,8 @@ public class TemplateExamQuestionComparator extends UTF8Adapter implements Compa
 	}
 	
 	public int compare(Object arg0, Object arg1) {
-		TemplateExamQuestion t1 = (TemplateExamQuestion) arg0;
-		TemplateExamQuestion t2 = (TemplateExamQuestion) arg1;
+		Item t1 = (Item) arg0;
+		Item t2 = (Item) arg1;
 		
 		if(orderBy.equalsIgnoreCase("id")){
 			if(t1.getId()==t2.getId()){

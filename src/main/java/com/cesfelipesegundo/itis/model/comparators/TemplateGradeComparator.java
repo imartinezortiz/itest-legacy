@@ -1,10 +1,11 @@
 package com.cesfelipesegundo.itis.model.comparators;
 
-import com.cesfelipesegundo.itis.model.ConfigExam;
-import com.cesfelipesegundo.itis.model.TemplateGrade;
+import es.itest.engine.test.business.entity.TestSessionGrade;
+import es.itest.engine.test.business.entity.TestSessionTemplate;
+
 import java.util.Comparator;
 
-public class TemplateGradeComparator extends UTF8Adapter implements Comparator<TemplateGrade>{
+public class TemplateGradeComparator extends UTF8Adapter implements Comparator<TestSessionGrade>{
 
 	private String orderBy;
 	
@@ -12,7 +13,7 @@ public class TemplateGradeComparator extends UTF8Adapter implements Comparator<T
 		orderBy = order;
 	}
 	
-	public int compare(TemplateGrade arg0, TemplateGrade arg1) {
+	public int compare(TestSessionGrade arg0, TestSessionGrade arg1) {
 		if(orderBy.equalsIgnoreCase("student")){
 			return orderByStudent(arg0,arg1);
 		}
@@ -40,13 +41,13 @@ public class TemplateGradeComparator extends UTF8Adapter implements Comparator<T
 		return 0;
 	}
 
-	private int orderByIp(TemplateGrade arg0, TemplateGrade arg1) {
+	private int orderByIp(TestSessionGrade arg0, TestSessionGrade arg1) {
 		String ip1 = arg0.getIp();
 		String ip2 = arg0.getIp();
 		return ip1.compareTo(ip2);
 	}
 
-	private int orderByDuration(TemplateGrade arg0, TemplateGrade arg1) {
+	private int orderByDuration(TestSessionGrade arg0, TestSessionGrade arg1) {
 		long date0 = arg0.getEnd().getTime();
 		long date1 = arg1.getEnd().getTime();
 		if(date0==date1 && date0==0){
@@ -61,31 +62,31 @@ public class TemplateGradeComparator extends UTF8Adapter implements Comparator<T
 		}
 	}
 
-	private int orderByMaxGrade(TemplateGrade arg0, TemplateGrade arg1) {
+	private int orderByMaxGrade(TestSessionGrade arg0, TestSessionGrade arg1) {
 		Double maxGrade0 = arg0.getExam().getMaxGrade();
 		Double maxGrade1 = arg1.getExam().getMaxGrade();
 		return maxGrade0.compareTo(maxGrade1);
 	}
 
-	private int orderByEndDate(TemplateGrade arg0, TemplateGrade arg1) {
+	private int orderByEndDate(TestSessionGrade arg0, TestSessionGrade arg1) {
 		return arg0.getEnd().compareTo(arg1.getEnd());
 	}
 
-	private int orderByStartDate(TemplateGrade arg0, TemplateGrade arg1) {
+	private int orderByStartDate(TestSessionGrade arg0, TestSessionGrade arg1) {
 		return arg0.getBegin().compareTo(arg1.getBegin());
 	}
 
-	private int orderByGrade(TemplateGrade arg0, TemplateGrade arg1) {
+	private int orderByGrade(TestSessionGrade arg0, TestSessionGrade arg1) {
 		return arg0.getGrade().compareTo(arg1.getGrade());
 	}
 
-	private int orderByExam(ConfigExam exam, ConfigExam exam2) {
+	private int orderByExam(TestSessionTemplate exam, TestSessionTemplate exam2) {
 		String name1 = exam.getTitle();
 		String name2 = exam2.getTitle();
 		return name1.compareTo(name2);
 	}
 
-	private int orderByStudent(TemplateGrade arg0, TemplateGrade arg1) {
+	private int orderByStudent(TestSessionGrade arg0, TestSessionGrade arg1) {
 		String userName1 = arg0.getLearner().getSurname()+arg0.getLearner().getName();
 		String userName2 = arg1.getLearner().getSurname()+arg1.getLearner().getName();
 		int result = userName1.compareTo(userName2);

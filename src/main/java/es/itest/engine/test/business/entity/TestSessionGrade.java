@@ -1,13 +1,15 @@
-package com.cesfelipesegundo.itis.model;
+package es.itest.engine.test.business.entity;
 
 import java.util.Date;
+
+import com.cesfelipesegundo.itis.model.User;
 
 /**
  * Class to model the student grades using objects instead of identifiers.
  * @author Chema
  *
  */
-public class TemplateGrade {
+public class TestSessionGrade {
 	/** Grade identifier */
     private Long id;
     
@@ -15,7 +17,7 @@ public class TemplateGrade {
     private User learner;
     
     /** Exam */
-    private ConfigExam exam;
+    private TestSessionTemplate exam;
     
     /** ip from where the exam was solved. */
     private String ip;
@@ -82,11 +84,11 @@ public class TemplateGrade {
 		this.time = time;
 	}
 
-	public ConfigExam getExam() {
+	public TestSessionTemplate getExam() {
 		return exam;
 	}
 
-	public void setExam(ConfigExam exam) {
+	public void setExam(TestSessionTemplate exam) {
 		this.exam = exam;
 	}
 

@@ -17,15 +17,16 @@ import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import com.cesfelipesegundo.itis.biz.api.AdminManagementService;
 import com.cesfelipesegundo.itis.biz.api.LearnerManagementService;
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
-import com.cesfelipesegundo.itis.model.ExamForReview;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.Institution;
 import com.cesfelipesegundo.itis.model.Query;
-import com.cesfelipesegundo.itis.model.Subject;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
 import com.cesfelipesegundo.itis.model.User;
 import com.cesfelipesegundo.itis.model.comparators.TemplateExamQuestionComparator;
 import com.cesfelipesegundo.itis.web.Constants;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.course.business.entity.Subject;
+import es.itest.engine.test.business.entity.Item;
+import es.itest.engine.test.business.entity.TestSessionForReview;
 
 /**
  * It manages the operations related to LIST of question of the managed group
@@ -54,12 +55,12 @@ public class TutorQuestionListManagementController extends MultiActionController
     /**
      * Question LIST being managed by the tutor
      */
-    private List<TemplateExamQuestion> currentQuestionList;
+    private List<Item> currentQuestionList;
 
     /**
      * Question LIST to maintain the questions to be imported
      */
-    private List<TemplateExamQuestion> preImportedQuestionList;
+    private List<Item> preImportedQuestionList;
     
     /* ******** Getters and setters ******** */
 
@@ -85,23 +86,23 @@ public class TutorQuestionListManagementController extends MultiActionController
 	}
 
 
-	public List<TemplateExamQuestion> getCurrentQuestionList() {
+	public List<Item> getCurrentQuestionList() {
 		return currentQuestionList;
 	}
 
 
 	public void setCurrentQuestionList(
-			List<TemplateExamQuestion> currentQuestionList) {
+			List<Item> currentQuestionList) {
 		this.currentQuestionList = currentQuestionList;
 	}
 	
-	public List<TemplateExamQuestion> getPreImportedQuestionList() {
+	public List<Item> getPreImportedQuestionList() {
 		return preImportedQuestionList;
 	}
 
 
 	public void setPreImportedQuestionList(
-			List<TemplateExamQuestion> preImportedQuestionList) {
+			List<Item> preImportedQuestionList) {
 		this.preImportedQuestionList = preImportedQuestionList;
 	}
 
@@ -141,11 +142,11 @@ public class TutorQuestionListManagementController extends MultiActionController
 	 * Implements the "delete" action of the question list.
 	 * @return List of questions, needed for the callback function to repaint the list
 	 */
-	public List<TemplateExamQuestion> deleteQuestion (String idquestion) {
+	public List<Item> deleteQuestion (String idquestion) {
 		
         // Find the question to be deleted:
-		Iterator<TemplateExamQuestion> iterQ = currentQuestionList.iterator();
-		TemplateExamQuestion question = null;
+		Iterator<Item> iterQ = currentQuestionList.iterator();
+		Item question = null;
 		boolean aFound = false;
 		
 		while (iterQ.hasNext() && (!aFound)) {
@@ -219,8 +220,8 @@ public class TutorQuestionListManagementController extends MultiActionController
 		Object[] respuesta = new Object[2];
 		respuesta[1]= 0;
         // Find the question to be deleted:
-		Iterator<TemplateExamQuestion> iterQ = currentQuestionList.iterator();
-		TemplateExamQuestion question = null;
+		Iterator<Item> iterQ = currentQuestionList.iterator();
+		Item question = null;
 		boolean aFound = false;
 		
 		while (iterQ.hasNext() && (!aFound)) {
@@ -247,7 +248,7 @@ public class TutorQuestionListManagementController extends MultiActionController
 			// Recoregimos los examenes alterados
 			int examsModify = 0;
 			for(int i=0;i<examids.size();i++){
-				List<ExamForReview> exams = learnerManagementService.examReviewByIdExam(examids.get(i));
+				List<TestSessionForReview> exams = learnerManagementService.examReviewByIdExam(examids.get(i));
 				examsModify += exams.size();
 			}
 						
@@ -266,7 +267,7 @@ public class TutorQuestionListManagementController extends MultiActionController
 	 * Deletes a list of questions and all the related info from the database.
 	 * @return List of questions, needed for the callback function to repaint the list
 	 */
-	public List<TemplateExamQuestion> deleteQuestions (String[] questions) {
+	public List<Item> deleteQuestions (String[] questions) {
 		for (int i = 0; i < questions.length; i++)
 			deleteQuestion(questions[i]);
 		return currentQuestionList;		
@@ -276,10 +277,10 @@ public class TutorQuestionListManagementController extends MultiActionController
 	 * Changes the activity of the question: active or not, depending on the value
 	 * @return List of questions, needed for the callback function to repaint the list
 	 */
-	public List<TemplateExamQuestion> changeActivityQuestion (String idquestion, String value) {
+	public List<Item> changeActivityQuestion (String idquestion, String value) {
 		  // Find the question to be updated:
-		Iterator<TemplateExamQuestion> iterQ = currentQuestionList.iterator();
-		TemplateExamQuestion question = null;
+		Iterator<Item> iterQ = currentQuestionList.iterator();
+		Item question = null;
 		boolean aFound = false;
 		
 		while (iterQ.hasNext() && (!aFound)) {
@@ -309,7 +310,7 @@ public class TutorQuestionListManagementController extends MultiActionController
 	 * Changes the activity of a list of questions: active or not, depending on the value
 	 * @return List of questions, needed for the callback function to repaint the list
 	 */
-	public List<TemplateExamQuestion> changeActivityQuestions (String[] questions, String value) {
+	public List<Item> changeActivityQuestions (String[] questions, String value) {
 		for (int i = 0; i < questions.length; i++)
 			changeActivityQuestion(questions[i],value);
 		return currentQuestionList;
@@ -319,10 +320,10 @@ public class TutorQuestionListManagementController extends MultiActionController
 	 * Changes the visibility of a list of questions to the value specified
 	 * @return List of questions, needed for the callback function to repaint the list
 	 */
-	public List<TemplateExamQuestion> changeVisibilityQuestions (String[] questions, String value) {
+	public List<Item> changeVisibilityQuestions (String[] questions, String value) {
 		for (int i = 0; i < questions.length; i++) {
-			Iterator<TemplateExamQuestion> iterQ = currentQuestionList.iterator();
-			TemplateExamQuestion question = null;
+			Iterator<Item> iterQ = currentQuestionList.iterator();
+			Item question = null;
 			boolean aFound = false;
 			
 			while (iterQ.hasNext() && (!aFound)) {
@@ -351,10 +352,10 @@ public class TutorQuestionListManagementController extends MultiActionController
 	 * Changes the difficulty of a list of questions to the value specified
 	 * @return List of questions, needed for the callback function to repaint the list
 	 */
-	public List<TemplateExamQuestion> changeDifficultyQuestions (String[] questions, String value) {
+	public List<Item> changeDifficultyQuestions (String[] questions, String value) {
 		for (int i = 0; i < questions.length; i++) {
-			Iterator<TemplateExamQuestion> iterQ = currentQuestionList.iterator();
-			TemplateExamQuestion question = null;
+			Iterator<Item> iterQ = currentQuestionList.iterator();
+			Item question = null;
 			boolean aFound = false;
 			
 			while (iterQ.hasNext() && (!aFound)) {
@@ -383,7 +384,7 @@ public class TutorQuestionListManagementController extends MultiActionController
 	 * Changes the subject of a list of questions to the value specified
 	 * @return List of questions, needed for the callback function to repaint the list
 	 */
-	public List<TemplateExamQuestion> changeSubjectQuestions (String[] questions, String value) {
+	public List<Item> changeSubjectQuestions (String[] questions, String value) {
 		Subject subject = tutorManagementService.getSubject(Long.valueOf(value));
 		if (subject == null) {
 			log.error("se ha intentado cambiar a un tema inexistente: "+value);
@@ -401,8 +402,8 @@ public class TutorQuestionListManagementController extends MultiActionController
 				 * o que no se ha hecho bien la conversion de String a Long
 				 * */
 				if(id!=-1){
-					Iterator<TemplateExamQuestion> iterQ = currentQuestionList.iterator();
-					TemplateExamQuestion question = null;
+					Iterator<Item> iterQ = currentQuestionList.iterator();
+					Item question = null;
 					boolean aFound = false;
 					
 					while (iterQ.hasNext() && (!aFound)) {
@@ -436,7 +437,7 @@ public class TutorQuestionListManagementController extends MultiActionController
 	 * 
 	 * @return List of questions that comply with the filter, needed for the callback function to repaint the list
 	 */
-	public List<TemplateExamQuestion> filterAndSearch (String idgroup, String idquestion, String idtheme,String text,String textTheme,String diff,String scope,String active,String orderby,String idInstitution,boolean reverse,boolean limit,int questionType) {
+	public List<Item> filterAndSearch (String idgroup, String idquestion, String idtheme,String text,String textTheme,String diff,String scope,String active,String orderby,String idInstitution,boolean reverse,boolean limit,int questionType) {
 		/* 
 		 * We have to obtain from the database the list of questions related to this group, using the
 		 * data from the parameters. 
@@ -462,7 +463,7 @@ public class TutorQuestionListManagementController extends MultiActionController
 			}
 			if(questionType!=-1)queryQuestions.setQuestionType(questionType);
 		}catch(Exception e){
-			return new Vector<TemplateExamQuestion>();
+			return new Vector<Item>();
 		}
 		
 		// Order:
@@ -493,7 +494,7 @@ public class TutorQuestionListManagementController extends MultiActionController
 		queryQuestions.setFirstResult(0);
 		if(limit)
 			queryQuestions.setMaxResultCount(100);
-		List<TemplateExamQuestion> qlist = tutorManagementService.find(queryQuestions);
+		List<Item> qlist = tutorManagementService.find(queryQuestions);
 		if(reverse){
 			Collections.reverse(qlist);
 		}
@@ -515,7 +516,7 @@ public class TutorQuestionListManagementController extends MultiActionController
 	 * 
 	 * @return List of questions, needed for the callback function to repaint the list
 	 */
-	public List<TemplateExamQuestion> importQuestions (String idgroup, String idtheme) {
+	public List<Item> importQuestions (String idgroup, String idtheme) {
 		
 		// Get the theme and group
 		if (!idtheme.equals(new String("")) && !idgroup.equals(new String(""))) {
@@ -560,7 +561,7 @@ public class TutorQuestionListManagementController extends MultiActionController
 		    // Adds the question to the preimported question list:
 			
 		    // Obtains all the data of the question:
-		    TemplateExamQuestion q = new TemplateExamQuestion();
+		    Item q = new Item();
 		    q.setId(Long.valueOf(idq));
 		    q = tutorManagementService.getQuestionFromId(q);
 		    // Adds the question to the list
@@ -573,8 +574,8 @@ public class TutorQuestionListManagementController extends MultiActionController
 		    // Removes the question from the preimported question list:
 			
 			// Find the question:
-			Iterator<TemplateExamQuestion> iterQ = preImportedQuestionList.iterator();
-			TemplateExamQuestion q = null;
+			Iterator<Item> iterQ = preImportedQuestionList.iterator();
+			Item q = null;
 			boolean aFound = false;
 			
 			while (iterQ.hasNext() && (!aFound)) {
@@ -652,7 +653,7 @@ public class TutorQuestionListManagementController extends MultiActionController
 		ModelAndView mav = new ModelAndView("tutor/question_preview");
 		
 		// The parameter must be filled in, then the question is previewed (used in "import question interface")
-		TemplateExamQuestion question = new TemplateExamQuestion();
+		Item question = new Item();
 		if (request.getParameter("qId") != null) {
 			Long idq = Long.valueOf(request.getParameter("qId"));
 			question.setId(idq);
@@ -671,7 +672,7 @@ public class TutorQuestionListManagementController extends MultiActionController
 		return mav;
 	}
 	
-	public List<TemplateExamQuestion> orderQuestionList(String orderby,boolean reverse){
+	public List<Item> orderQuestionList(String orderby,boolean reverse){
 		Collections.sort(currentQuestionList,new TemplateExamQuestionComparator(orderby));
 		if(reverse)
 			Collections.reverse(currentQuestionList);

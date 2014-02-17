@@ -2,7 +2,7 @@ package com.cesfelipesegundo.itis.model.comparators;
 
 import java.util.Comparator;
 
-import com.cesfelipesegundo.itis.model.Subject;
+import es.itest.engine.course.business.entity.Subject;
 
 /**
  * Implements the sorting, based on order, of subject elems using the collection methods

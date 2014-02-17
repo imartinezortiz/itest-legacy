@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 
+
+
+
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,11 +28,9 @@ import com.cesfelipesegundo.itis.biz.api.LearnerManagementService;
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
 import com.cesfelipesegundo.itis.model.Conection;
 import com.cesfelipesegundo.itis.model.CourseStats;
-import com.cesfelipesegundo.itis.model.Exam;
 import com.cesfelipesegundo.itis.model.ExamTest;
 import com.cesfelipesegundo.itis.model.ExamGlobalInfo;
 import com.cesfelipesegundo.itis.model.Grade;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.Institution;
 import com.cesfelipesegundo.itis.model.User;
 import com.cesfelipesegundo.itis.model.Course;
@@ -79,6 +81,9 @@ import com.cesfelipesegundo.itis.model.comparators.UserUserNameComparator;
 import com.cesfelipesegundo.itis.web.BreadCrumb;
 import com.cesfelipesegundo.itis.web.Constants;
 import com.cesfelipesegundo.itis.web.servlets.HomeServlet;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.test.business.entity.TestSession;
 
 public class AdminManagementController implements ServletContextAware{
 
@@ -606,12 +611,12 @@ public class AdminManagementController implements ServletContextAware{
 				ExamTest ex4 = new ExamTest();
 				if(userNumber<users.size())
 					auxUser = users.get(userNumber);
-				Exam ex = adminManagementService.getAlreadyDoneExam(auxUser, idExam);
+				TestSession ex = adminManagementService.getAlreadyDoneExam(auxUser, idExam);
 				if(ex==null){
 					try{
 						ex = adminManagementService.getNewExam(auxUser, idExam ,request.getRemoteAddr());
 						if(ex==null){
-							ex = new Exam();
+							ex = new TestSession();
 							ex.setId(idExam);
 							ex.setTitle("null");
 							ex.setQuestionsNumber(0);
@@ -675,7 +680,7 @@ public class AdminManagementController implements ServletContextAware{
 		
 		if ((idStd != null) && (idConfigExam != null)) {
 			// Obtention of the exam from the database.
-			Exam ex = tutorManagementService.getStudentExam(idStd,idConfigExam);
+			TestSession ex = tutorManagementService.getStudentExam(idStd,idConfigExam);
 			
 			if (ex == null) {
 				log.error("No existe examen "+request.getParameter("exam")+" o alumno "+request.getParameter("alu"));

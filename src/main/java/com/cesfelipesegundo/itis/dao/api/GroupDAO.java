@@ -4,11 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.cesfelipesegundo.itis.model.Course;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.GroupDetails;
 import com.cesfelipesegundo.itis.model.Institution;
-import com.cesfelipesegundo.itis.model.TemplateExamQuestion;
 import com.cesfelipesegundo.itis.model.User;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.test.business.entity.Item;
 
 /**
  * Interfaz DAO para el modelo <code>Group</code>.
@@ -56,7 +57,7 @@ public interface GroupDAO extends DAO {
 	 * 
 	 * @return Returns a list with the questions of the group
 	 */
-	public List<TemplateExamQuestion> getQuestions(Group group);
+	public List<Item> getQuestions(Group group);
 
 	/**
 	 * Returns the list of students of the <code>currentGroup Group</code>

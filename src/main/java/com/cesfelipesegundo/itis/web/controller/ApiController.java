@@ -23,11 +23,12 @@ import com.cesfelipesegundo.itis.biz.CommonManagementService;
 import com.cesfelipesegundo.itis.biz.MailSenderManagementServiceImpl;
 import com.cesfelipesegundo.itis.biz.api.LearnerManagementService;
 import com.cesfelipesegundo.itis.biz.api.TutorManagementService;
-import com.cesfelipesegundo.itis.model.Group;
 import com.cesfelipesegundo.itis.model.QueryGrade;
-import com.cesfelipesegundo.itis.model.TemplateGrade;
 import com.cesfelipesegundo.itis.model.User;
 import com.cesfelipesegundo.itis.web.Constants;
+
+import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.test.business.entity.TestSessionGrade;
 
 public class ApiController{
 	
@@ -209,7 +210,7 @@ public class ApiController{
 				}
 				return;
 			}
-        	List<TemplateGrade> gradeList = tutorManagementService.find(query);
+        	List<TestSessionGrade> gradeList = tutorManagementService.find(query);
         	/* Use array list in order to avoid String limit */
         	List<String> xml = new ArrayList<String>();
         	Integer xmlLength = 0;
@@ -219,7 +220,7 @@ public class ApiController{
         	xml.add(xmlElem);
         	xmlLength += xmlElem.length();
         		for(int i=0;i<gradeList.size();i++){
-        			TemplateGrade grade = gradeList.get(i);
+        			TestSessionGrade grade = gradeList.get(i);
         			xmlElem="<grade>\n";
         			xmlElem+="<examId>"+grade.getExam().getId()+"</examId>";
         			xmlElem+="<examTittle>"+grade.getExam().getTitle()+"</examTittle>";

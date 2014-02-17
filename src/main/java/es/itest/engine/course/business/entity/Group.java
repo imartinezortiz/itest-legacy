@@ -1,4 +1,7 @@
-package com.cesfelipesegundo.itis.model;
+package es.itest.engine.course.business.entity;
+
+import com.cesfelipesegundo.itis.model.Course;
+import com.cesfelipesegundo.itis.model.Institution;
 
 /**
  * Clase que representa un grupo de una asignatura
@@ -12,6 +15,9 @@ public class Group {
 	private Course course;	    // Asignatura a la que pertenece el grupo
 	private String year;		// Academic year
 	private Institution institution;
+	
+	privat List<Subject> subjects;
+	
 	/**
 	 * Type of student.
 	 */
