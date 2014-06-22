@@ -1,5 +1,7 @@
 package es.itest.engine.course.business.entity;
 
+import java.util.List;
+
 import com.cesfelipesegundo.itis.model.Course;
 import com.cesfelipesegundo.itis.model.Institution;
 
@@ -16,7 +18,7 @@ public class Group {
 	private String year;		// Academic year
 	private Institution institution;
 	
-	privat List<Subject> subjects;
+	private List<Subject> subjects;
 	
 	/**
 	 * Type of student.

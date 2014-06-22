@@ -356,13 +356,14 @@ public class TestManager {
       boolean updateDatabase) {
 
     TestSessionTemplate ce = testSessionTemplateDAO.getTestSessionTemplate(testId);
+    Test test = ce.createTest();
 
     try (DomainEventRegistrationRemover r1 =
         DomainEvents.ITEM_RESPONSE_USED.register(new UpdateItemResponseOnUseAction(updateDatabase));
         DomainEventRegistrationRemover r2 =
             DomainEvents.ITEM_USED.register(new UpdateItemOnUseAtion(updateDatabase))) {
 
-      TestSession exam = ce.createTestSession();
+      TestSession exam = test.createTestSession();
 
       // A new calif is added with the starting date of the examn
       if (updateDatabase) {

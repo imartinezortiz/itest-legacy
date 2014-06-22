@@ -19,7 +19,6 @@ public class Test extends TestDetails {
 	private boolean activeReview;
 	private Date startDate;
 	private Date endDate;
-	private String title;
 	
 	/** Sets partial correction by answers*/
 	private boolean partialCorrection;
@@ -162,14 +161,6 @@ public class Test extends TestDetails {
 
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
 	}
 	
 }

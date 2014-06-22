@@ -1,9 +1,14 @@
 package es.itest.engine.test.business.entity;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+
+@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
+@DiscriminatorValue(value="M")
 public class ItemSessionMultipleChoice extends ItemSession {
 
   private List<ItemSessionResponse> responses; // Lista de respuestas
@@ -20,7 +25,7 @@ public class ItemSessionMultipleChoice extends ItemSession {
     int numAnswers = 0;
     for (int i = 0; i < responses.size(); i++) {
       ItemSessionResponse ea = this.responses.get(i);
-      if (ea.getSolution() == 1) {
+      if (ea.getResponse().isSolution()) {
         numAnswers++;
       }
     }
@@ -31,193 +36,154 @@ public class ItemSessionMultipleChoice extends ItemSession {
     int marked = 0;
     for (int i = 0; i < responses.size(); i++) {
       ItemSessionResponse ea = responses.get(i);
-      if (ea.getMarked()) {
+      if (ea.isMarked()) {
         marked++;
       }
     }
     return marked;
   }
-  public BigDecimal grade() {
+  
+  public BigDecimal grade(GradingParameters params) {
 
-    double questionGrade = 0.0;
-    double numCorrectAnswers = getNumCorrectAnswers();
-    double numCorrectMarkedAnswers = 0.0;
-    double numIncorrectMarkedAnswers = 0.0;
-
-    // Correct and incorrect marked answers lists will be needed to calculate and save to DB each
-    // answer grade
-    List<ItemSessionResponse> correctMarkedAnswers = new ArrayList<ItemSessionResponse>();
-    List<ItemSessionResponse> incorrectMarkedAnswers = new ArrayList<ItemSessionResponse>();
+    BigDecimal questionGrade = BigDecimal.ZERO;
+    int numCorrectAnswers = item.getNumCorrectAnswers();
+    int numCorrectMarkedAnswers = 0;
+    int numIncorrectMarkedAnswers = 0;
+    
 
     // Get correct and incorrect answers marked
     for (ItemSessionResponse answer : getAnswers()) {
-      if (answer.getMarked())
-        if (answer.getValue() != 0) {
+      if (answer.isMarked())
+        if ( answer.getResponse().isSolution()) {
           numCorrectMarkedAnswers++;
-          if (updateDatabase)
-            correctMarkedAnswers.add(answer);
         } else {
           numIncorrectMarkedAnswers++;
-          if (updateDatabase)
-            incorrectMarkedAnswers.add(answer);
         }
     }
+    
+    /* 
+     * Regular grading
+     */
+    if (params.isPartialCorrection()) {
+      questionGrade = partialGrading(params, numCorrectAnswers, numCorrectMarkedAnswers, numIncorrectMarkedAnswers);
+    } else {
+      questionGrade = notPartialGrading(params, numCorrectAnswers, numCorrectMarkedAnswers, numIncorrectMarkedAnswers);
+    }
+    
+    /*
+     * Confidence level extra credit
+     */
+    
+    if (params.isConfidenceLevel()) {
+      questionGrade.add(calculateConfidendeLevelExtraCredit(params, numCorrectAnswers, numCorrectMarkedAnswers, numIncorrectMarkedAnswers));
+    }
+   
+    return questionGrade;
+  }
 
-    // Grade the question according to correct and incorrect answers and the evaluation method
-    // choosen
+  private BigDecimal calculateConfidendeLevelExtraCredit(GradingParameters params, int numCorrectAnswers, int numCorrectMarkedAnswers, int numIncorrectMarkedAnswers) {
 
+    BigDecimal extraCredit = BigDecimal.ZERO;
+    
+    BigDecimal maxGradePerQuestion = params.getMaxGradePerQuestion();
+    if (numCorrectAnswers == numCorrectMarkedAnswers && numIncorrectMarkedAnswers == 0) {
+      if (getExamineeWasConfident()) {
+        extraCredit = maxGradePerQuestion.multiply(params.getRewardConfidenceLevel());
+      }
+    } else {
+      if (getExamineeWasConfident()) {
+        BigDecimal penalty = maxGradePerQuestion.multiply(params.getPenConfidenceLevel());
+        extraCredit = penalty.negate();
+      }
+    }
+    return extraCredit;
+  }
+
+  private BigDecimal notPartialGrading(GradingParameters params, int numCorrectAnswers, int numCorrectMarkedAnswers, int numIncorrectMarkedAnswers) {
+
+    BigDecimal questionGrade = BigDecimal.ZERO;
+    
     // If the question has no correct answers
-    if (numCorrectAnswers == 0)
+    if (numCorrectAnswers == 0) {
       // Question will be correct if it has no answers marked
       if (numCorrectMarkedAnswers == 0 && numIncorrectMarkedAnswers == 0)
-        questionGrade = maxGradePerQuestion;
+        questionGrade = params.getMaxGradePerQuestion();
       else {
-        // Depending on evaluation method
-        if (currentExam.isPartialCorrection())
-          // At partial correction, question with no correct answers but answered will be graded at
-          // minQuestionGrade
-          questionGrade = maxGradePerQuestion * currentExam.getMinQuestionGrade();
-        else
-          // No partial correction grades question to penalty for questions failed
-          questionGrade = -(maxGradePerQuestion * currentExam.getPenQuestionFailed());
-
-        if (updateDatabase) {
-          // All answers marked were incorrect (question has not correct answers!!)
-          double answerGrade = questionGrade / numIncorrectMarkedAnswers;
-          for (ItemSessionResponse answer : incorrectMarkedAnswers)
-            answerExamDAO.updateExamAnswerGrade(currentExam.getId(), id, question.getId(),
-                answer.getId(), answerGrade);
-        }
+        // No partial correction grades question to penalty for questions failed
+        questionGrade = params.getMaxGradePerQuestion().multiply(params.getPenQuestionFailed()).negate();
       }
-    else {
+    } else {
+      BigDecimal maxGradePerQuestion = params.getMaxGradePerQuestion();
       // If the question was not answered
       if (numCorrectMarkedAnswers == 0 && numIncorrectMarkedAnswers == 0)
-        questionGrade = -(maxGradePerQuestion * currentExam.getPenQuestionNotAnswered());
+        questionGrade = maxGradePerQuestion.multiply(params.getPenQuestionNotAnswered()).negate();
+      // No database update needed (No answers marked!!!)
+      else {
+
+        // Else, the question will be qualified to maxGradePerQuestion if it was correctly answered,
+        // or it will be qualified to the penalty for question failed
+        if (numCorrectMarkedAnswers == numCorrectAnswers && numIncorrectMarkedAnswers == 0) {
+          questionGrade = maxGradePerQuestion;
+        } else {
+          questionGrade = maxGradePerQuestion.multiply(params.getPenQuestionFailed()).negate();
+        }
+      }
+    }
+    return questionGrade;
+  }
+
+  private BigDecimal partialGrading(GradingParameters params, int numCorrectAnswers, int numCorrectMarkedAnswers, int numIncorrectMarkedAnswers) {
+
+    BigDecimal questionGrade = BigDecimal.ZERO;
+
+    /*
+     * Question will be correct if it has no answers marked
+     */
+    if (numCorrectAnswers == 0) {
+      if (numCorrectMarkedAnswers == 0 && numIncorrectMarkedAnswers == 0) {
+        questionGrade = params.getMaxGradePerQuestion();
+      } else {
+        /*
+         *  At partial correction, question with no correct answers but answered will be graded at minQuestionGrade
+         */
+        questionGrade = params.getMaxGradePerQuestion().multiply(params.getMinQuestionGrade());
+      }
+    } else {
+      BigDecimal maxGradePerQuestion = params.getMaxGradePerQuestion();
+      // If the question was not answered
+      if (numCorrectMarkedAnswers == 0 && numIncorrectMarkedAnswers == 0)
+        questionGrade = maxGradePerQuestion.multiply(params.getPenQuestionNotAnswered()).negate();
       // No database update needed (No answers marked!!!)
       else {
         // If exam has been configured to a partial correction, each question will be qualified
         // attending to the number of correct and incorrect marked answers, with its corresponding
         // penalty
-        if (currentExam.isPartialCorrection()) {
-          // If the question was perfectly answered, its grade is maxGradePerQuestion (avoids
-          // rounding problems when the question is perfectly answered)
-          if (numCorrectMarkedAnswers == numCorrectAnswers && numIncorrectMarkedAnswers == 0) {
-            questionGrade = maxGradePerQuestion;
-            if (updateDatabase) {
-              // All answers are correct
-              double answerGrade = questionGrade / numCorrectMarkedAnswers;
-              for (ItemSessionResponse answer : correctMarkedAnswers)
-                answerExamDAO.updateExamAnswerGrade(currentExam.getId(), id, question.getId(),
-                    answer.getId(), answerGrade);
-            }
-          } else {
-            // Adds grade for each correct answer marked
-            questionGrade += (maxGradePerQuestion / numCorrectAnswers) * numCorrectMarkedAnswers;
-            // Subtracts penalty for incorrect answer marked, multiplied by the number of incorrect
-            // answers marked
-            questionGrade -=
-                (maxGradePerQuestion * currentExam.getPenAnswerFailed())
-                    * numIncorrectMarkedAnswers;
-            // If calculated grade for the question is less than minQuestionGrade configured by
-            // tutor for this exam, question grade will be minQuestionGrade
-            if (questionGrade < maxGradePerQuestion * currentExam.getMinQuestionGrade()) {
-              questionGrade = maxGradePerQuestion * currentExam.getMinQuestionGrade();
-              // La ponctution de la question est divicé de la même façon pour les reponds corrects
-              // et les incorrects
-              // Question grade will be divided to equal parts among correct and incorrect answers
-              if (updateDatabase) {
-                double answerGrade =
-                    questionGrade / (numCorrectMarkedAnswers + numIncorrectMarkedAnswers);
-                for (ItemSessionResponse answer : correctMarkedAnswers)
-                  answerExamDAO.updateExamAnswerGrade(currentExam.getId(), id, question.getId(),
-                      answer.getId(), answerGrade);
-                for (ItemSessionResponse answer : incorrectMarkedAnswers)
-                  answerExamDAO.updateExamAnswerGrade(currentExam.getId(), id, question.getId(),
-                      answer.getId(), answerGrade);
-              }
-            } else if (updateDatabase) {
-              // Correct answers will be graded to maxGradePerQuestion/numCorrectAnswers
-              double answerGrade = maxGradePerQuestion / numCorrectAnswers;
-              for (ItemSessionResponse answer : correctMarkedAnswers)
-                answerExamDAO.updateExamAnswerGrade(currentExam.getId(), id, question.getId(),
-                    answer.getId(), answerGrade);
-              // Incorrect answers will be graded to pre-configured penalty per answer failed
-              answerGrade = -(maxGradePerQuestion * currentExam.getPenAnswerFailed());
-              for (ItemSessionResponse answer : incorrectMarkedAnswers)
-                answerExamDAO.updateExamAnswerGrade(currentExam.getId(), id, question.getId(),
-                    answer.getId(), answerGrade);
 
-            }
-          }
-        }
-        // Else, the question will be qualified to maxGradePerQuestion if it was correctly answered,
-        // or it will be qualified to the penalty for question failed
-        else if (numCorrectMarkedAnswers == numCorrectAnswers && numIncorrectMarkedAnswers == 0) {
+        // If the question was perfectly answered, its grade is maxGradePerQuestion (avoids
+        // rounding problems when the question is perfectly answered)
+        if (numCorrectMarkedAnswers == numCorrectAnswers && numIncorrectMarkedAnswers == 0) {
           questionGrade = maxGradePerQuestion;
-          if (updateDatabase) {
-            // There are only correct answers. Question grade will be divided to equal parts among
-            // them
-            double answerGrade = questionGrade / numCorrectAnswers;
-            for (ItemSessionResponse answer : correctMarkedAnswers)
-              answerExamDAO.updateExamAnswerGrade(currentExam.getId(), id, question.getId(),
-                  answer.getId(), answerGrade);
-          }
         } else {
-          questionGrade = -(maxGradePerQuestion * currentExam.getPenQuestionFailed());
-          if (updateDatabase) {
-            // The question was failed
-            // Correct answers will be graded to 0.0
-            for (ItemSessionResponse answer : correctMarkedAnswers)
-              answerExamDAO.updateExamAnswerGrade(currentExam.getId(), id, question.getId(),
-                  answer.getId(), 0.0);
-            // Question failed penalty will be divided to equal parts among incorrect answers
-            double answerGrade = questionGrade / numIncorrectMarkedAnswers;
-            for (ItemSessionResponse answer : incorrectMarkedAnswers)
-              answerExamDAO.updateExamAnswerGrade(currentExam.getId(), id, question.getId(),
-                  answer.getId(), answerGrade);
-          }
-        }
-      }
-    }
-    if (currentExam.isConfidenceLevel()) {
-      if (numCorrectAnswers == numCorrectMarkedAnswers && numIncorrectMarkedAnswers == 0) {
-        if (question.getExamineeWasConfident()) {
-          questionGrade += maxGradePerQuestion * currentExam.getRewardConfidenceLevel();
-          if (updateDatabase) {
-            // All answers are correct
-            double answerGrade = questionGrade / numCorrectMarkedAnswers;
-            for (ItemSessionResponse answer : correctMarkedAnswers)
-              answerExamDAO.updateExamAnswerGrade(currentExam.getId(), id, question.getId(),
-                  answer.getId(), answerGrade);
-          }
-        }
-      } else {
-        if (question.getExamineeWasConfident()) {
-          questionGrade -= maxGradePerQuestion * currentExam.getPenConfidenceLevel();
-          if (updateDatabase) {
-            // The question was failed
-            // Correct answers will be graded to 0.0
-            for (ItemSessionResponse answer : correctMarkedAnswers)
-              answerExamDAO.updateExamAnswerGrade(currentExam.getId(), id, question.getId(),
-                  answer.getId(), 0.0);
-            // Question failed penalty will be divided to equal parts among incorrect answers
-            double answerGrade = questionGrade / numIncorrectMarkedAnswers;
-            for (ItemSessionResponse answer : incorrectMarkedAnswers)
-              answerExamDAO.updateExamAnswerGrade(currentExam.getId(), id, question.getId(),
-                  answer.getId(), answerGrade);
-          }
-        }
-      }
-    }
-    // Its possible that questionGrade equals -0 (For example, when penalty for question not
-    // answered is equal to 0)
-    // Web interface could show -0.0 grade for that question, and it wont be elegant.
-    // This code corrects that
-    if (questionGrade == -0.0)
-      return 0.0;
-    else
-      return questionGrade;
+          // Adds grade for each correct answer marked
+          questionGrade = (maxGradePerQuestion.divide(new BigDecimal(numCorrectAnswers))).multiply(new BigDecimal(numCorrectMarkedAnswers));
+                
+          BigDecimal penalty = 
+              maxGradePerQuestion.multiply(params.getPenAnswerFailed()).multiply(new BigDecimal(numIncorrectMarkedAnswers));
 
+          // Subtracts penalty for incorrect answer marked, multiplied by the number of incorrect
+          // answers marked
+          questionGrade = questionGrade.subtract(penalty);
+
+          // If calculated grade for the question is less than minQuestionGrade configured by
+          // tutor for this exam, question grade will be minQuestionGrade
+          BigDecimal minQuestionGrade = maxGradePerQuestion.multiply(params.getMinQuestionGrade());
+          if (questionGrade.compareTo(minQuestionGrade) < 0) {
+            questionGrade = minQuestionGrade;
+          }
+        }
+      }
+    }
+    return questionGrade;
   }
 
   @SuppressWarnings("unchecked")

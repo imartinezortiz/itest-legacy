@@ -1,27 +1,22 @@
 package es.itest.engine.test.business.entity;
 
-import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Transient;
-
-import com.cesfelipesegundo.itis.model.MediaElemComparator;
-
-import es.itest.engine.course.business.entity.Subject;
+import javax.validation.constraints.Size;
 
 /**
- * Represents a test question 
+ * Represents a test question
  */
 @Entity
-public class Item {
+public abstract class Item {
   /**
    * Difficulty constants
    */
   public enum DifficultyEnum {
-      LOW, MEDIUM, HIGH;
+    LOW, MEDIUM, HIGH;
   }
 
   /**
@@ -30,55 +25,64 @@ public class Item {
   public enum VisibilityEnum {
     GROUP, COURSE, PUBLIC;
   }
-  
-  public enum QuestionTypeEnum {
+
+  public enum ItemTypeEnum {
     MULTIPLE_CHOICE // 0 database vaue
     , FILL_IN_BLANKS // 1 database value;
-    }
+  }
+
+
+  private static final int ITEM_BODY_MAX_lENGTH = 4096;
+
+  private static final int COMMENT_MAX_LENGTH = 1024;
+  
+  private static final int ITEM_TITLE_MAX_LENGTH = 60;
   
   @Id
   private Long id;
-  
+
   /**
    * Title of the question
    */
+  @Size(max=ITEM_TITLE_MAX_LENGTH)
+  @Column(length=ITEM_TITLE_MAX_LENGTH)
   private String title;
-  
+
   private DifficultyEnum difficulty;
-  
+
   private VisibilityEnum visibility;
 
-  private QuestionTypeEnum type;
+  private ItemTypeEnum type;
 
   private boolean usedInExam;
-  
-  private String body;
-  
-  private List<MediaElem> mmedia;
-  
-  private List<ItemResponse> answers;
-  
-  @Transient
-  private int numCorrectAnswers;
 
-  @ManyToOne
-  private Subject subject; // Related theme
+  @Size(max=ITEM_BODY_MAX_lENGTH)
+  @Column(length=ITEM_BODY_MAX_lENGTH)
+  private String itemBody;
+
+  private List<MediaElem> mmedia;
+
+  private List<ItemResponse> answers;
+
+  private int numCorrectAnswers;
 
   private boolean active;
 
+  @Size(max=COMMENT_MAX_LENGTH)
+  @Column(length=COMMENT_MAX_LENGTH)
   private String comment;
-  
+
   private List<MediaElem> mmediaComment;
 
-  public Item(QuestionTypeEnum type) {
+  public Item(ItemTypeEnum type) {
     this.type = type;
   }
 
-  public QuestionTypeEnum getType() {
+  public ItemTypeEnum getType() {
     return type;
   }
 
-  public void setType(QuestionTypeEnum type) {
+  public void setType(ItemTypeEnum type) {
     this.type = type;
   }
 
@@ -131,9 +135,6 @@ public class Item {
   }
 
   public List<MediaElem> getMmedia() {
-    // Orders the list:
-    if (mmedia != null)
-      Collections.sort(mmedia, new MediaElemComparator());
     return mmedia;
   }
 
@@ -142,8 +143,6 @@ public class Item {
   }
 
   public List<MediaElem> getMmediaComment() {
-    if (mmediaComment != null)
-      Collections.sort(mmediaComment, new MediaElemComparator());
     return mmediaComment;
   }
 
@@ -152,19 +151,11 @@ public class Item {
   }
 
   public String getText() {
-    return body;
+    return itemBody;
   }
 
   public void setText(String text) {
-    this.body = text;
-  }
-
-  public Subject getSubject() {
-    return subject;
-  }
-
-  public void setSubject(Subject subject) {
-    this.subject = subject;
+    this.itemBody = text;
   }
 
   public int getNumCorrectAnswers() {
@@ -183,28 +174,12 @@ public class Item {
     this.usedInExam = usedInExam;
   }
 
-  // Return the text of the question splitted into paragraphs
-  public String[] getTextParagraphs() {
-    if (body != null)
-      return (body.trim()).split("\n");
-    else
-      return null;
-  }
-
   public String getTitle() {
     return title;
   }
 
   public void setTitle(String title) {
     this.title = title;
-  }
-
-  // Return the text of the question comment splitted into paragraphs
-  public String[] getCommentParagraphs() {
-    if (comment != null)
-      return (comment.trim()).split("\n");
-    else
-      return null;
   }
 
   public int getSize() {
@@ -220,4 +195,5 @@ public class Item {
     else
       return 0;
   }
+
 }

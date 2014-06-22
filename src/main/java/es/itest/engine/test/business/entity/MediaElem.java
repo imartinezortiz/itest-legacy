@@ -9,27 +9,31 @@ import javax.persistence.Embeddable;
  */
 @Embeddable
 public class MediaElem {
-  public enum MediaElemType {
+  public enum MediaElemTypeEnum {
     FLASH(1), IMAGE(2), SOUND(3), GEOGEBRA(4), JAVAAPPLET(5), SIBELIUS(6), YOUTUBE(7);
     
     private int value;
     
-    private MediaElemType(final int value) {
+    private MediaElemTypeEnum(final int value) {
       this.value = value;
     }
   };
+  
+  public enum GeogebraTypeEnum {
+    BASIC, ADVANCED;
+  }
   
   private String name;
   
   private String path; // Ruta al elemento
   
-  private MediaElemType type; // Tipo de elemento: Flash, Imagen, Sonido
+  private MediaElemTypeEnum type; // Tipo de elemento: Flash, Imagen, Sonido
   
   private String width; // Ancho del elemento - B.D. V3.5
   
   private String height; // Alto del elemento - B.D. V3.5
   
-  private int geogebraType;
+  private GeogebraTypeEnum geogebraType;
 
   public MediaElem() {
 
@@ -67,11 +71,11 @@ public class MediaElem {
     this.path = path;
   }
 
-  public MediaElemType getType() {
+  public MediaElemTypeEnum getType() {
     return type;
   }
 
-  public void setType(MediaElemType type) {
+  public void setType(MediaElemTypeEnum type) {
     this.type = type;
   }
 
@@ -127,11 +131,11 @@ public class MediaElem {
     return "";
   }
 
-  public int getGeogebraType() {
+  public GeogebraTypeEnum getGeogebraType() {
     return geogebraType;
   }
 
-  public void setGeogebraType(int geogebraType) {
+  public void setGeogebraType(GeogebraTypeEnum geogebraType) {
     this.geogebraType = geogebraType;
   }
 

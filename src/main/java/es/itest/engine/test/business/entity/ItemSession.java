@@ -1,7 +1,6 @@
 package es.itest.engine.test.business.entity;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -20,11 +19,11 @@ public abstract class ItemSession implements Adaptable {
   private Long id; // Id de la pregunta
 
   @ManyToOne
-  private Item item;
+  protected Item item;
 
-  private BigDecimal grade; // Obtained grade for the question
+  protected BigDecimal grade; // Obtained grade for the question
   
-  private boolean examineeWasConfident; // el nivel de confianza
+  protected boolean examineeWasConfident; // el nivel de confianza
 
   public Long getId() {
     return id;
@@ -37,11 +36,15 @@ public abstract class ItemSession implements Adaptable {
   public BigDecimal getQuestionGrade() {
     return grade;
   }
+  
+  public void setQuestionGrade(BigDecimal grade) {
+    this.grade = grade;
+  }
 
   // Return the text of the question splitted into paragraphs
   public String[] getTextParagraphs() {
     try {
-      return (text.trim()).split("\n");
+      return (item.getText().trim()).split("\n");
     } catch (Exception e) {
       return null;
     }
@@ -50,7 +53,7 @@ public abstract class ItemSession implements Adaptable {
   // Return the text of the question comment splitted into paragraphs
   public String[] getCommentParagraphs() {
     try {
-      return (comment.trim()).split("\n");
+      return (item.getComment().trim()).split("\n");
     } catch (Exception e) {
       return null;
     }
@@ -65,7 +68,10 @@ public abstract class ItemSession implements Adaptable {
   }
 
 
-  public abstract BigDecimal grade();
+  public abstract BigDecimal grade(GradingParameters params);
 
+  public Item getItem() {
+    return item;
+  }
 
 }

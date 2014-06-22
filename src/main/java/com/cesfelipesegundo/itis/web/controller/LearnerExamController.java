@@ -27,6 +27,7 @@ import com.cesfelipesegundo.itis.web.Constants;
 import com.lowagie.text.DocumentException;
 
 import es.itest.engine.course.business.entity.Group;
+import es.itest.engine.test.business.entity.Item.ItemTypeEnum;
 import es.itest.engine.test.business.entity.ItemSession;
 import es.itest.engine.test.business.entity.ItemSessionResponse;
 import es.itest.engine.test.business.entity.TestDetails;
@@ -613,7 +614,7 @@ public class LearnerExamController {
 		
 		// Checking if the question is correctly answered
 		boolean correct = true;
-		if(question.getType()==0){
+		if(question.getItem().getType()==ItemTypeEnum.MULTIPLE_CHOICE){
 			Iterator<ItemSessionResponse> iterator = question.getAnswers().iterator();
 			while (iterator.hasNext()) {
 				ItemSessionResponse answer = iterator.next();

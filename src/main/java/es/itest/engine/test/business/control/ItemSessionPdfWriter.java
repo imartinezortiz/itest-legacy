@@ -21,16 +21,17 @@ import com.lowagie.text.pdf.PdfWriter;
 import es.itest.engine.test.business.entity.Item;
 import es.itest.engine.test.business.entity.Item.ItemTypeEnum;
 import es.itest.engine.test.business.entity.ItemResponse;
+import es.itest.engine.test.business.entity.ItemSession;
 import es.itest.engine.test.business.entity.MediaElem;
 import es.itest.engine.test.business.entity.MediaElem.MediaElemTypeEnum;
 
-public class ItemPdfWriter extends AbstractPdfWriter {
+public class ItemSessionPdfWriter extends AbstractPdfWriter {
 
-	private Item item;
+	private ItemSession itemSession;
 	
-	public ItemPdfWriter(File rootPath, Item item) {
+	public ItemSessionPdfWriter(File rootPath, ItemSession itemSession) {
 		super(rootPath);
-		this.item = item;
+		this.itemSession = itemSession;
 	}
 	
 	public void write(OutputStream out) throws DocumentException, IOException {
@@ -38,12 +39,13 @@ public class ItemPdfWriter extends AbstractPdfWriter {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PdfWriter.getInstance(document, baos);
 		document.open();
+		Item item = itemSession.getItem();
 		if(item!=null){
 			document.addCreationDate();
 			document.addCreator("Herramienta de generacion automatizada para visualizar preguntas en PDF de iTest");
 			document.addKeywords("pregunta,"+item.getTitle()+","+item.getId()+".pdf");
 			document.addTitle("Pregunta: "+item.getId()+" Titulo: "+item.getTitle()+".pdf");
-			
+		
 			PdfPTable questionInfo = new PdfPTable(1);
 			questionInfo.getDefaultCell().setGrayFill(0.8f);
 			questionInfo.getDefaultCell().setBorderWidth(0.0f);
@@ -85,6 +87,22 @@ public class ItemPdfWriter extends AbstractPdfWriter {
 
 			for (ItemResponse answer : item.getAnswers()) {
 				if(item.getType() == ItemTypeEnum.MULTIPLE_CHOICE){
+					if (answer.isSolution() && answer.isMarked()) {
+						Paragraph correctAnswer = new Paragraph("\t\t\t\t\t\t[X]\t\t\t",FontFactory.getFont(FontFactory.HELVETICA,10.0f,Font.BOLD,Color.GREEN));
+						text = answer.getText();
+						body.add(rellenaParrafo(text,correctAnswer,false));
+						body.add(Chunk.NEWLINE);
+						body.add(Chunk.NEWLINE);
+						
+					}
+					if (! answer.isSolution() && answer.getMarked()) {
+						Paragraph incorrectAnswer = new Paragraph("\t\t\t\t\t\t[X]\t\t\t",FontFactory.getFont(FontFactory.HELVETICA,10.0f,Font.BOLD,Color.RED));
+						text = answer.getText();
+						body.add(rellenaParrafo(text,incorrectAnswer,false));
+						body.add(Chunk.NEWLINE);
+						body.add(Chunk.NEWLINE);
+						continue;
+					}
 					Paragraph noAnswer = new Paragraph("\t\t\t\t\t\t[   ]\t\t\t",FontFactory.getFont(FontFactory.HELVETICA,10.0f,Font.NORMAL,Color.BLACK));
 					text = answer.getText();
 					body.add(rellenaParrafo(text,noAnswer,false));

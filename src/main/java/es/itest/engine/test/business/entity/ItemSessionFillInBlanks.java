@@ -3,8 +3,14 @@ package es.itest.engine.test.business.entity;
 import java.math.BigDecimal;
 import java.util.List;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+
+@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
+@DiscriminatorValue(value="F")
 public class ItemSessionFillInBlanks extends ItemSession {
-  
+
   private String learnerFillAnswer;
 
 
@@ -15,63 +21,66 @@ public class ItemSessionFillInBlanks extends ItemSession {
   public void setLearnerFillAnswer(String learnerFillAnswer) {
     this.learnerFillAnswer = learnerFillAnswer;
   }
-	@Override
-	public BigDecimal grade() {
-		double questionGrade = 0.0;
-		boolean correct = true;
-		List<ItemSessionResponse> answers = getAnswers();
-		if(answers.size()==1){
-			ItemSessionResponse answer = answers.get(0);
-			String textLearnerAnswer = null;
-			if(question!=null && getLearnerFillAnswer()!=null){
-				textLearnerAnswer = getLearnerFillAnswer().toLowerCase();
-				questionGrade = calculateEntropy(answer,textLearnerAnswer,maxGradePerQuestion);
-			}
-			if(questionGrade != maxGradePerQuestion){
-				correct = false;
-			}
-			if(currentExam.isConfidenceLevel() && getExamineeWasConfident()){
-				if(questionGrade==0.0){
-					//Pregunta contestada incorrectamente
-					questionGrade-=(maxGradePerQuestion*currentExam.getPenConfidenceLevel());
-				}else{
-					//Pregunta contestada correctamente
-					questionGrade+=(maxGradePerQuestion*currentExam.getRewardConfidenceLevel());
-				}
-			}
-			if(!currentExam.isPartialCorrection() && !correct){
-				if(!textLearnerAnswer.trim().equalsIgnoreCase("")){
-					questionGrade-=(maxGradePerQuestion*currentExam.getPenQuestionFailed());
-				}else{
-					questionGrade-=(maxGradePerQuestion*currentExam.getPenQuestionNotAnswered());
-				}
-			}
-			if(updateDatabase){
-				answerExamDAO.updateExamAnswerGrade(currentExam.getId(), userId, question.getId(), answer.getId(), questionGrade);		
-			}
-		}else
-			return 0.0;
-		return questionGrade;
 
-	}
-	
-	
-	private Double calculateEntropy(ItemSessionResponse answer, String textLearnerAnswer, double maxGradePerQuestion){
-		double result = maxGradePerQuestion;
-		if(answer.getText().toLowerCase().trim().equalsIgnoreCase(textLearnerAnswer.toLowerCase().trim())){
-			return result*1.0;
-		}else{
-			return result*0.0;
-		}
-	}
+  @Override
+  public BigDecimal grade(GradingParameters params) {
+    BigDecimal questionGrade = BigDecimal.ZERO;
+    BigDecimal maxGradePerQuestion = params.getMaxGradePerQuestion();
+    
+    boolean correct = true;
+    
+    List<ItemResponse> answers = getItem().getAnswers();
+    if (answers.size() == 1) {
+      ItemResponse answer = answers.get(0);
+      String textLearnerAnswer = null;
+      if (getLearnerFillAnswer() != null) {
+        textLearnerAnswer = getLearnerFillAnswer().toLowerCase();
+        questionGrade = calculateEntropy(answer, textLearnerAnswer, maxGradePerQuestion);
+      }
+      if (questionGrade != maxGradePerQuestion) {
+        correct = false;
+      }
+      if (params.isConfidenceLevel() && getExamineeWasConfident()) {
+        if (questionGrade.equals(BigDecimal.ZERO)) {
+          // Pregunta contestada incorrectamente
+          questionGrade = questionGrade.subtract(maxGradePerQuestion.multiply(params.getPenConfidenceLevel()));
+        } else {
+          // Pregunta contestada correctamente
+          questionGrade = questionGrade.add(maxGradePerQuestion.multiply(params.getRewardConfidenceLevel()));
+        }
+      }
+      if (!params.isPartialCorrection() && !correct) {
+        if (!textLearnerAnswer.trim().equalsIgnoreCase("")) {
+          questionGrade = questionGrade.subtract(maxGradePerQuestion.multiply(params.getPenQuestionFailed()));
+        } else {
+          questionGrade = questionGrade.subtract(maxGradePerQuestion.multiply(params.getPenQuestionNotAnswered()));
+        }
+      }
+    }
+    
+    return questionGrade;
+  }
 
-	  @SuppressWarnings("unchecked")
-	  @Override
-	  public <T> T getAdapter(Class<T> clazz) {
-	    T result = null;
-	    if (ItemSessionFillInBlanks.class.equals(clazz)) {
-	      result = (T) this;
-	    }
-	    return result;
-	  }
+
+  private BigDecimal calculateEntropy(ItemResponse answer, String textLearnerAnswer,
+      BigDecimal maxGradePerQuestion) {
+    BigDecimal result = maxGradePerQuestion;
+    if (answer.getText().toLowerCase().trim()
+        .equalsIgnoreCase(textLearnerAnswer.toLowerCase().trim())) {
+      result = result.multiply(BigDecimal.ONE);
+    } else {
+      result = result.multiply(BigDecimal.ZERO);
+    }
+    return result;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T getAdapter(Class<T> clazz) {
+    T result = null;
+    if (ItemSessionFillInBlanks.class.equals(clazz)) {
+      result = (T) this;
+    }
+    return result;
+  }
 }

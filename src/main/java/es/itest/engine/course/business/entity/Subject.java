@@ -13,7 +13,7 @@ public class Subject {
 	// The following attribute is not stored into the database
 	private Short usedInExam;		// Flag to avoid deleting themes used in exam
 	// Group
-//	private Group group;			// Group related to this subject
+	private Group group;			// Group related to this subject
 	// Questions of this subject
 	private Long numQuestions;		
 	
